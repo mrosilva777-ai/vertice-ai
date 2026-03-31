@@ -1332,7 +1332,7 @@ function renderDashboard() {
   const banner = document.getElementById('no-client-banner');
   if(banner) banner.style.display = getActiveClient()?'none':'flex';
   const keyBanner = document.getElementById('no-apikey-banner');
-  if(keyBanner) keyBanner.style.display = settings.apikey?'none':'flex';
+  if(keyBanner) keyBanner.style.display = 'none';
 }
 
 // ══════════════════════════════════════════════
@@ -1402,7 +1402,7 @@ updateStorageInfo();
 // Apply saved settings to selects
 if(settings.model) document.getElementById('cfg-model').value = settings.model;
 if(settings.tokens) document.getElementById('cfg-tokens').value = settings.tokens;
-if(settings.apikey) document.getElementById('cfg-apikey').value = settings.apikey;
+
 </script>
 </body>
 </html>
