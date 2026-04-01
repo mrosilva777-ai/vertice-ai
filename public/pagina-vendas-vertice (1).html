@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5 Erros que Fazem seu Comércio ser Invisível no Instagram — Vértice</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black:   #000000;
+    --surface: #0a0a0a;
+    --g1:      #1A1A1A;
+    --g2:      #2A2A2A;
+    --white:   #F5F5F5;
+    --gray:    #888888;
+    --lightgray: #BBBBBB;
+    --purple:  #7A00FF;
+    --purple2: #9B33FF;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── PURPLE TOP BAR ── */
+  .top-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--purple);
+    position: fixed;
+    top: 0;
+    z-index: 100;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 3px;
+    width: 100%;
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(12px);
+    z-index: 99;
+    border-bottom: 1px solid var(--g1);
+  }
+
+  .nav-logo {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    color: var(--white);
+    letter-spacing: 3px;
+  }
+
+  .nav-logo span { color: var(--purple); }
+
+  .nav-cta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--purple);
+    text-decoration: none;
+    border: 1px solid var(--purple);
+    padding: 8px 18px;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+  }
+
+  .nav-cta:hover {
+    background: var(--purple);
+    color: var(--white);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, var(--purple), transparent);
+  }
+
+  /* Glow behind hero */
+  .hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(122,0,255,0.12) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-inner { position: relative; z-index: 1; max-width: 780px; }
+
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--purple);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.1s;
+  }
+
+  .hero-title {
+    font-size: clamp(36px, 6vw, 68px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.25s;
+  }
+
+  .hero-title em {
+    font-style: normal;
+    color: var(--purple);
+  }
+
+  .hero-subtitle {
+    font-size: clamp(15px, 2vw, 18px);
+    color: var(--lightgray);
+    font-weight: 300;
+    max-width: 560px;
+    margin: 0 auto 48px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.4s;
+  }
+
+  .hero-cta-wrap {
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.55s;
+  }
+
+  .btn-main {
+    display: inline-block;
+    background: var(--purple);
+    color: var(--white);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 18px 48px;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-main::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.08);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .btn-main:hover::after { opacity: 1; }
+  .btn-main:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(122,0,255,0.4); }
+
+  .price-tag {
+    margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gray);
+    letter-spacing: 1px;
+  }
+
+  .price-tag strong {
+    color: var(--white);
+    font-size: 15px;
+  }
+
+  /* ── SECTION BASE ── */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 96px 24px;
+  }
+
+  .container { max-width: 860px; margin: 0 auto; }
+  .container-wide { max-width: 1100px; margin: 0 auto; }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--purple);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+
+  .divider {
+    width: 40px;
+    height: 2px;
+    background: var(--purple);
+    margin-bottom: 40px;
+  }
+
+  /* ── DOR SECTION ── */
+  .dor-section { background: var(--surface); }
+
+  .dor-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .dor-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px;
+    background: var(--g1);
+    border-left: 2px solid var(--purple);
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .dor-item.visible { opacity: 1; transform: translateX(0); }
+
+  .dor-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .dor-text {
+    font-size: 15px;
+    color: var(--lightgray);
+    line-height: 1.5;
+  }
+
+  /* ── ERROS SECTION ── */
+  .erros-section { background: var(--black); }
+
+  .erros-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 48px;
+  }
+
+  .erro-item {
+    background: var(--surface);
+    border: 1px solid var(--g1);
+    padding: 32px;
+    transition: border-color 0.2s;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s;
+  }
+
+  .erro-item.visible { opacity: 1; transform: translateY(0); }
+  .erro-item:hover { border-color: var(--purple); }
+
+  .erro-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .erro-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--purple);
+    background: rgba(122,0,255,0.1);
+    border: 1px solid rgba(122,0,255,0.3);
+    padding: 4px 10px;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  .erro-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--white);
+  }
+
+  .erro-body {
+    font-size: 14px;
+    color: var(--lightgray);
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .erro-fix {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--purple);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── O QUE VOCÊ LEVA ── */
+  .leva-section { background: var(--surface); }
+
+  .leva-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 48px;
+  }
+
+  .leva-card {
+    background: var(--g1);
+    padding: 28px 24px;
+    border-top: 2px solid var(--purple);
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .leva-card.visible { opacity: 1; transform: translateY(0); }
+
+  .leva-card-icon { font-size: 28px; margin-bottom: 12px; }
+  .leva-card-title { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+  .leva-card-desc { font-size: 13px; color: var(--lightgray); line-height: 1.6; }
+
+  /* ── OFERTA / CTA ── */
+  .oferta-section { background: var(--black); }
+
+  .oferta-box {
+    background: var(--surface);
+    border: 1px solid var(--g2);
+    padding: 64px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .oferta-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--purple);
+  }
+
+  .oferta-glow {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(122,0,255,0.15) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .oferta-box > * { position: relative; z-index: 1; }
+
+  .oferta-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--purple);
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+  }
+
+  .oferta-title {
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+
+  .oferta-subtitle {
+    font-size: 14px;
+    color: var(--lightgray);
+    margin-bottom: 36px;
+    font-weight: 300;
+  }
+
+  .oferta-price {
+    margin-bottom: 32px;
+  }
+
+  .price-old {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--gray);
+    text-decoration: line-through;
+    margin-bottom: 4px;
+  }
+
+  .price-new {
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .price-new span {
+    font-size: 24px;
+    font-weight: 400;
+    vertical-align: top;
+    margin-top: 10px;
+    display: inline-block;
+    color: var(--lightgray);
+  }
+
+  .price-desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 1px;
+    margin-top: 8px;
+  }
+
+  .btn-comprar {
+    display: inline-block;
+    background: var(--purple);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 16px;
+    padding: 20px 56px;
+    text-decoration: none;
+    transition: all 0.25s;
+    width: 100%;
+    max-width: 360px;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-comprar:hover {
+    background: var(--purple2);
+    transform: translateY(-2px);
+    box-shadow: 0 16px 48px rgba(122,0,255,0.45);
+  }
+
+  .oferta-garantia {
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--gray);
+  }
+
+  /* ── SOBRE A VÉRTICE ── */
+  .sobre-section { background: var(--surface); }
+
+  .sobre-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+
+  @media (max-width: 700px) {
+    .sobre-inner { grid-template-columns: 1fr; gap: 32px; }
+    nav { padding: 14px 20px; }
+    .oferta-box { padding: 40px 24px; }
+  }
+
+  .sobre-logo {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 72px;
+    color: var(--white);
+    letter-spacing: -2px;
+    line-height: 1;
+    border: 1px solid var(--g2);
+    padding: 40px;
+    text-align: center;
+  }
+
+  .sobre-logo span { color: var(--purple); }
+
+  .sobre-text { font-size: 15px; color: var(--lightgray); line-height: 1.8; }
+  .sobre-text p { margin-bottom: 16px; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--black);
+    border-top: 1px solid var(--g1);
+    padding: 40px 24px;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    letter-spacing: 4px;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  .footer-logo span { color: var(--purple); }
+
+  .footer-slogan {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+  }
+
+  .footer-copy {
+    font-size: 12px;
+    color: var(--g2);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SCROLL INDICATOR ── */
+  .scroll-hint {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.9s;
+  }
+
+  .scroll-hint span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--gray);
+    letter-spacing: 2px;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gray), transparent);
+    animation: scrollPulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  /* ── STICKY CTA BAR (mobile) ── */
+  .sticky-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--g1);
+    padding: 12px 20px;
+    z-index: 98;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  @media (max-width: 600px) {
+    .sticky-bar { display: flex; }
+  }
+
+  .sticky-price {
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  .sticky-price small {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--gray);
+    font-weight: 400;
+  }
+
+  .sticky-btn {
+    background: var(--purple);
+    color: var(--white);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 12px 24px;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">VÉR<span>T</span>ICE</div>
+  <a href="#oferta" class="nav-cta">QUERO O EBOOK</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <p class="hero-tag">Guia prático para donos de negócio</p>
+    <h1 class="hero-title">
+      5 Erros que Fazem seu<br>Comércio ser <em>Invisível</em><br>no Instagram
+    </h1>
+    <p class="hero-subtitle">
+      Você posta todo dia e não vê resultado. Não é azar — são erros específicos que têm solução. Este guia mostra cada um deles.
+    </p>
+    <div class="hero-cta-wrap">
+      <a href="#oferta" class="btn-main">QUERO CORRIGIR AGORA</a>
+      <p class="price-tag">acesso imediato por apenas <strong>R$27</strong></p>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- DOR -->
+<section class="dor-section">
+  <div class="container">
+    <p class="section-label">// você se identifica?</p>
+    <h2 class="section-title">Isso te soa familiar?</h2>
+    <div class="divider"></div>
+    <ul class="dor-list">
+      <li class="dor-item">
+        <span class="dor-icon">📉</span>
+        <p class="dor-text">Você posta mas o alcance continua caindo — e não sabe o porquê.</p>
+      </li>
+      <li class="dor-item">
+        <span class="dor-icon">👻</span>
+        <p class="dor-text">Seu perfil parece morto mesmo quando você posta com frequência.</p>
+      </li>
+      <li class="dor-item">
+        <span class="dor-icon">😤</span>
+        <p class="dor-text">Concorrentes com produto pior do que o seu têm mais seguidores e mais clientes.</p>
+      </li>
+      <li class="dor-item">
+        <span class="dor-icon">⏰</span>
+        <p class="dor-text">Você gasta tempo criando conteúdo mas isso não se converte em venda nenhuma.</p>
+      </li>
+      <li class="dor-item">
+        <span class="dor-icon">🤷</span>
+        <p class="dor-text">Você não sabe o que está errando — ninguém nunca te explicou as regras do jogo.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ERROS -->
+<section class="erros-section">
+  <div class="container">
+    <p class="section-label">// o que está te travando</p>
+    <h2 class="section-title">Os 5 erros que destroem perfis de comércios locais</h2>
+    <div class="divider"></div>
+    <div class="erros-grid">
+
+      <div class="erro-item">
+        <div class="erro-header">
+          <span class="erro-num">ERRO 01</span>
+          <span class="erro-title">Postar sem consistência</span>
+        </div>
+        <p class="erro-body">O algoritmo funciona como um sistema de confiança. Quando você some, ele interpreta como abandono e para de te distribuir. Você volta e ninguém vê — não porque o conteúdo é ruim, mas porque você quebrou o ritmo.</p>
+        <p class="erro-fix">→ No ebook: como criar uma rotina realista de postagem que o algoritmo recompensa.</p>
+      </div>
+
+      <div class="erro-item">
+        <div class="erro-header">
+          <span class="erro-num">ERRO 02</span>
+          <span class="erro-title">Falar do produto, não da dor do cliente</span>
+        </div>
+        <p class="erro-body">Ninguém acorda pensando no seu produto. As pessoas acordam pensando nos problemas delas. "Prato do dia disponível" não vende. "Onde almoçar rápido e barato hoje?" — isso captura atenção.</p>
+        <p class="erro-fix">→ No ebook: como reformular qualquer post para falar com a dor do cliente.</p>
+      </div>
+
+      <div class="erro-item">
+        <div class="erro-header">
+          <span class="erro-num">ERRO 03</span>
+          <span class="erro-title">Ignorar os horários de maior alcance</span>
+        </div>
+        <p class="erro-body">Postar quando seu público está dormindo ou trabalhando mata o post antes de ele começar. Poucos likes nas primeiras horas = algoritmo classifica como conteúdo fraco = distribui menos.</p>
+        <p class="erro-fix">→ No ebook: como usar o Instagram Insights para nunca mais errar o horário.</p>
+      </div>
+
+      <div class="erro-item">
+        <div class="erro-header">
+          <span class="erro-num">ERRO 04</span>
+          <span class="erro-title">Não ter identidade visual definida</span>
+        </div>
+        <p class="erro-body">Quando alguém entra no seu perfil e cada post parece feito por uma pessoa diferente, a percepção inconsciente é: esse negócio não é sério. A pessoa vai embora sem seguir, sem comprar.</p>
+        <p class="erro-fix">→ No ebook: como montar uma identidade visual simples sem pagar designer.</p>
+      </div>
+
+      <div class="erro-item">
+        <div class="erro-header">
+          <span class="erro-num">ERRO 05</span>
+          <span class="erro-title">Postar por postar, sem estratégia</span>
+        </div>
+        <p class="erro-body">Você pode corrigir os 4 erros anteriores e ainda assim não ver resultado. Postar sem estratégia é dirigir sem destino. Você se movimenta, gasta energia, mas não chega em lugar nenhum.</p>
+        <p class="erro-fix">→ No ebook: como definir objetivo para cada post e transformar conteúdo em vendas.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- O QUE VOCÊ LEVA -->
+<section class="leva-section">
+  <div class="container">
+    <p class="section-label">// o que está incluso</p>
+    <h2 class="section-title">O que você recebe</h2>
+    <div class="divider"></div>
+    <div class="leva-grid">
+      <div class="leva-card">
+        <div class="leva-card-icon">📖</div>
+        <div class="leva-card-title">Guia completo em PDF</div>
+        <div class="leva-card-desc">Linguagem direta, sem enrolação. Feito pra quem gerencia negócio e não tem tempo a perder.</div>
+      </div>
+      <div class="leva-card">
+        <div class="leva-card-icon">✅</div>
+        <div class="leva-card-title">5 correções práticas</div>
+        <div class="leva-card-desc">Cada erro vem com uma solução aplicável ainda hoje, sem precisar contratar ninguém.</div>
+      </div>
+      <div class="leva-card">
+        <div class="leva-card-icon">⚡</div>
+        <div class="leva-card-title">Acesso imediato</div>
+        <div class="leva-card-desc">Comprou, recebeu. O PDF vai direto pro seu e-mail em menos de 1 minuto.</div>
+      </div>
+      <div class="leva-card">
+        <div class="leva-card-icon">🎯</div>
+        <div class="leva-card-title">Para comércios em SP</div>
+        <div class="leva-card-desc">Exemplos reais de restaurantes e lojas locais. Nada genérico, nada de gringo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OFERTA -->
+<section class="oferta-section" id="oferta">
+  <div class="container">
+    <div class="oferta-box">
+      <div class="oferta-glow"></div>
+      <p class="oferta-tag">// OFERTA DE LANÇAMENTO</p>
+      <h2 class="oferta-title">5 Erros que Fazem seu Comércio ser Invisível no Instagram</h2>
+      <p class="oferta-subtitle">Guia prático para donos de negócio em São Paulo</p>
+
+      <div class="oferta-price">
+        <p class="price-old">De R$ 97</p>
+        <p class="price-new"><span>R$</span>27</p>
+        <p class="price-desc">pagamento único · acesso imediato</p>
+      </div>
+
+      <!-- 🔴 TROQUE O HREF PELO SEU LINK DA KIWIFY -->
+      <a href="https://pay.kiwify.com.br/2L1PoSe" class="btn-comprar">QUERO MEU EBOOK AGORA</a>
+
+      <p class="oferta-garantia">🔒 Pagamento 100% seguro via Kiwify</p>
+    </div>
+  </div>
+</section>
+
+<!-- SOBRE A VÉRTICE -->
+<section class="sobre-section">
+  <div class="container">
+    <div class="sobre-inner">
+      <div class="sobre-logo">VÉR<span>T</span>ICE</div>
+      <div>
+        <p class="section-label">// quem está por trás disso</p>
+        <h2 class="section-title" style="font-size:28px;">A Vértice</h2>
+        <div class="divider"></div>
+        <div class="sobre-text">
+          <p>A Vértice usa inteligência artificial para cuidar do marketing de negócios locais no Instagram.</p>
+          <p>Conteúdo diário, identidade visual, estratégia — tudo feito pra você, sem você precisar entender de marketing.</p>
+          <p>Enquanto você foca no que sabe fazer, a gente cuida de fazer seu negócio aparecer.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">VÉR<span>T</span>ICE</div>
+  <p class="footer-slogan">ENGENHARIA DE CRESCIMENTO PREVISÍVEL.</p>
+  <p class="footer-copy">© 2025 Vértice. Todos os direitos reservados.</p>
+</footer>
+
+<!-- STICKY BAR MOBILE -->
+<div class="sticky-bar">
+  <div class="sticky-price">
+    R$ 27
+    <small>acesso imediato</small>
+  </div>
+  <!-- 🔴 TROQUE O HREF PELO SEU LINK DA KIWIFY -->
+  <a href="https://pay.kiwify.com.br/2L1PoSe" class="sticky-btn">COMPRAR AGORA</a>
+</div>
+
+<script>
+  // Intersection Observer para animar elementos ao entrar na tela
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, entry.target.dataset.delay || 0);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.dor-item, .erro-item, .leva-card').forEach((el, i) => {
+    el.dataset.delay = i * 80;
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

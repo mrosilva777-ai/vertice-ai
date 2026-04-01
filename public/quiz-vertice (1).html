@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico de Marketing — Vértice</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black:   #000000;
+    --surface: #0a0a0a;
+    --g1:      #1A1A1A;
+    --g2:      #2A2A2A;
+    --g3:      #3A3A3A;
+    --white:   #F5F5F5;
+    --gray:    #888888;
+    --light:   #BBBBBB;
+    --purple:  #7A00FF;
+    --purple2: #9B33FF;
+    --green:   #00C896;
+    --red:     #FF3B3B;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  /* noise */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--purple);
+    z-index: 100;
+  }
+
+  /* ── WRAP ── */
+  .wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 640px;
+  }
+
+  /* ── LOGO ── */
+  .logo {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .logo-text {
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: 4px;
+    color: var(--white);
+  }
+
+  .logo-text span { color: var(--purple); }
+
+  .logo-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--gray);
+    letter-spacing: 2px;
+    margin-top: 4px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--g1);
+    padding: 48px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--purple);
+  }
+
+  @media (max-width: 500px) {
+    .card { padding: 32px 24px; }
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; animation: fadeIn 0.4s ease; }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── INTRO ── */
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--purple);
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: clamp(24px, 5vw, 34px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  h1 em { font-style: normal; color: var(--purple); }
+
+  .intro-desc {
+    font-size: 14px;
+    color: var(--light);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  /* ── FORM ── */
+  .field { margin-bottom: 20px; }
+
+  label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--purple);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  input[type="text"],
+  input[type="email"] {
+    width: 100%;
+    background: var(--g1);
+    border: 1px solid var(--g2);
+    color: var(--white);
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus { border-color: var(--purple); }
+  input::placeholder { color: var(--gray); }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    margin-bottom: 32px;
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .progress-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--gray);
+    letter-spacing: 1px;
+  }
+
+  .progress-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--purple);
+  }
+
+  .progress-bar {
+    height: 2px;
+    background: var(--g2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--purple);
+    transition: width 0.4s ease;
+  }
+
+  /* ── QUESTÃO ── */
+  .question-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--purple);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .question-text {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  .question-sub {
+    font-size: 13px;
+    color: var(--light);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  /* ── OPTIONS ── */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .opt {
+    background: var(--g1);
+    border: 1px solid var(--g2);
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14px;
+    color: var(--light);
+    user-select: none;
+  }
+
+  .opt:hover { border-color: var(--purple); color: var(--white); }
+
+  .opt.selected {
+    border-color: var(--purple);
+    background: rgba(122,0,255,0.1);
+    color: var(--white);
+  }
+
+  .opt-letter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--purple);
+    background: rgba(122,0,255,0.15);
+    border: 1px solid rgba(122,0,255,0.3);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-block;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 16px 36px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s;
+    letter-spacing: 0.5px;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--purple);
+    color: var(--white);
+  }
+
+  .btn-primary:hover {
+    background: var(--purple2);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(122,0,255,0.4);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--white);
+    border: 1px solid var(--g3);
+  }
+
+  .btn-outline:hover { border-color: var(--white); }
+
+  .btn-green {
+    background: var(--green);
+    color: var(--black);
+  }
+
+  .btn-green:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,200,150,0.3);
+  }
+
+  /* ── LOADING ── */
+  .loading-wrap {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--g2);
+    border-top-color: var(--purple);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gray);
+    letter-spacing: 1px;
+  }
+
+  .loading-steps {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .loading-step {
+    font-size: 12px;
+    color: var(--g3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s;
+  }
+
+  .loading-step.done { color: var(--green); }
+  .loading-step.active { color: var(--light); }
+
+  .step-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* ── RESULTADO ── */
+  .nivel-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 6px 16px;
+    margin-bottom: 20px;
+  }
+
+  .nivel-iniciante { background: rgba(255,59,59,0.15); color: #FF6B6B; border: 1px solid rgba(255,59,59,0.3); }
+  .nivel-intermediario { background: rgba(255,165,0,0.15); color: #FFB347; border: 1px solid rgba(255,165,0,0.3); }
+  .nivel-avancado { background: rgba(0,200,150,0.15); color: var(--green); border: 1px solid rgba(0,200,150,0.3); }
+
+  .resultado-title {
+    font-size: 26px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .resultado-title em { font-style: normal; color: var(--purple); }
+
+  .diagnostico-box {
+    background: var(--g1);
+    border-left: 2px solid var(--purple);
+    padding: 20px 24px;
+    margin: 24px 0;
+    font-size: 14px;
+    color: var(--light);
+    line-height: 1.8;
+    font-style: italic;
+  }
+
+  .divider-line {
+    width: 40px;
+    height: 2px;
+    background: var(--purple);
+    margin: 24px 0;
+  }
+
+  .cta-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--gray);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .cta-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+
+  .btn-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* ── ERROR ── */
+  .error-msg {
+    background: rgba(255,59,59,0.1);
+    border: 1px solid rgba(255,59,59,0.3);
+    color: #FF6B6B;
+    font-size: 13px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  /* ── FOOTER ── */
+  .page-footer {
+    text-align: center;
+    margin-top: 32px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--g3);
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<div class="wrap">
+
+  <!-- LOGO -->
+  <div class="logo">
+    <div class="logo-text">VÉR<span>T</span>ICE</div>
+    <div class="logo-sub">ENGENHARIA DE CRESCIMENTO PREVISÍVEL.</div>
+  </div>
+
+  <div class="card">
+
+    <!-- ══ SCREEN 0: INTRO ══════════════════════════════════════════ -->
+    <div class="screen active" id="screen-intro">
+      <p class="tag">// DIAGNÓSTICO GRATUITO</p>
+      <h1>Descubra por que seu negócio está <em>invisível</em> no Instagram</h1>
+      <p class="intro-desc">
+        Responda 4 perguntas rápidas. Nossa IA analisa seu perfil e entrega um diagnóstico personalizado — com o principal erro que está te impedindo de crescer.
+      </p>
+
+      <div class="field">
+        <label>SEU NOME</label>
+        <input type="text" id="input-nome" placeholder="Como você se chama?" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label>SEU E-MAIL</label>
+        <input type="email" id="input-email" placeholder="seu@email.com" autocomplete="off">
+      </div>
+
+      <div class="error-msg" id="error-intro">Preencha nome e e-mail para continuar.</div>
+
+      <button class="btn btn-primary" onclick="startQuiz()">COMEÇAR DIAGNÓSTICO →</button>
+    </div>
+
+    <!-- ══ SCREEN 1–4: PERGUNTAS ════════════════════════════════════ -->
+    <div class="screen" id="screen-quiz">
+      <div class="progress-wrap">
+        <div class="progress-info">
+          <span class="progress-label">PROGRESSO</span>
+          <span class="progress-count" id="progress-count">1 / 4</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width:25%"></div>
+        </div>
+      </div>
+
+      <p class="question-num" id="question-num">PERGUNTA 01</p>
+      <p class="question-text" id="question-text"></p>
+      <p class="question-sub" id="question-sub"></p>
+
+      <div class="options" id="options-wrap"></div>
+
+      <div class="error-msg" id="error-quiz">Selecione uma opção para continuar.</div>
+
+      <button class="btn btn-primary" id="btn-next" onclick="nextQuestion()">PRÓXIMA →</button>
+    </div>
+
+    <!-- ══ SCREEN LOADING ════════════════════════════════════════════ -->
+    <div class="screen" id="screen-loading">
+      <div class="loading-wrap">
+        <div class="spinner"></div>
+        <p class="loading-text">ANALISANDO SEU PERFIL...</p>
+        <div class="loading-steps">
+          <div class="loading-step" id="step-1">
+            <div class="step-dot"></div>
+            Salvando suas respostas
+          </div>
+          <div class="loading-step" id="step-2">
+            <div class="step-dot"></div>
+            Classificando seu nível
+          </div>
+          <div class="loading-step" id="step-3">
+            <div class="step-dot"></div>
+            Gerando diagnóstico com IA
+          </div>
+          <div class="loading-step" id="step-4">
+            <div class="step-dot"></div>
+            Preparando seu resultado
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN RESULTADO ══════════════════════════════════════════ -->
+    <div class="screen" id="screen-resultado">
+      <p class="tag">// SEU DIAGNÓSTICO</p>
+
+      <div id="nivel-badge" class="nivel-badge"></div>
+      <div id="score-display" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:2px;margin-bottom:16px;"></div>
+
+      <h2 class="resultado-title" id="resultado-title"></h2>
+
+      <div class="diagnostico-box" id="diagnostico-text"></div>
+
+      <div class="divider-line"></div>
+
+      <p class="cta-label">// PRÓXIMO PASSO</p>
+      <p class="cta-title" id="cta-title"></p>
+
+      <div class="btn-row" id="cta-buttons"></div>
+    </div>
+
+  </div><!-- /card -->
+
+  <div class="page-footer">VÉRTICE © 2025 · DIAGNÓSTICO GRATUITO</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// ⚙️  CONFIGURAÇÃO — substitua pelos seus valores reais
+// ═══════════════════════════════════════════════════════════════════
+const CONFIG = {
+  // 🔴 Supabase: cole sua URL e chave anon após criar o projeto
+  SUPABASE_URL:  'SUA_SUPABASE_URL_AQUI',
+  SUPABASE_KEY:  'SUA_SUPABASE_ANON_KEY_AQUI',
+
+  // 🔴 WhatsApp: cole seu número com DDI (ex: 5511999999999)
+  WHATSAPP_NUM:  'SEU_NUMERO_AQUI',
+
+  // 🔴 Ebook: cole o link do checkout da Kiwify
+  KIWIFY_LINK:   'https://pay.kiwify.com.br/2L1PoSe',
+
+  // Anthropic API
+  AI_MODEL: 'claude-sonnet-4-20250514',
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// 📋  PERGUNTAS DO QUIZ
+// Cada opção tem um score (0–2): 0=ruim, 1=médio, 2=bom
+// Score total máximo: 4 perguntas × 2 pontos = 8 pontos
+// ═══════════════════════════════════════════════════════════════════
+const PERGUNTAS = [
+  {
+    texto: 'Com que frequência você posta no Instagram do seu negócio?',
+    sub: 'Seja honesto — a consistência é um dos fatores mais críticos para o algoritmo.',
+    opcoes: [
+      { letra: 'A', texto: 'Raramente ou quando lembro',   score: 0 },
+      { letra: 'B', texto: '1 a 2 vezes por semana',       score: 1 },
+      { letra: 'C', texto: 'Quase todos os dias',          score: 2 },
+      { letra: 'D', texto: 'Todos os dias sem falta',      score: 2 },
+    ]
+  },
+  {
+    texto: 'O que você costuma publicar nos seus posts?',
+    sub: 'Pense no último mês de conteúdo que você criou.',
+    opcoes: [
+      { letra: 'A', texto: 'Fotos do produto ou serviço',       score: 0 },
+      { letra: 'B', texto: 'Promoções e preços',                score: 0 },
+      { letra: 'C', texto: 'Dicas úteis para meus clientes',    score: 2 },
+      { letra: 'D', texto: 'Mistura de tudo isso',              score: 1 },
+    ]
+  },
+  {
+    texto: 'Você tem identidade visual definida no seu perfil?',
+    sub: 'Cores fixas, fonte padrão, estilo visual que se repete nos posts.',
+    opcoes: [
+      { letra: 'A', texto: 'Não, cada post parece diferente',               score: 0 },
+      { letra: 'B', texto: 'Tento manter um padrão, mas não é consistente', score: 1 },
+      { letra: 'C', texto: 'Sim, tenho cores e estilo definidos',           score: 2 },
+      { letra: 'D', texto: 'Tenho identidade profissional com manual',      score: 2 },
+    ]
+  },
+  {
+    texto: 'Você sabe qual o objetivo de cada post que publica?',
+    sub: 'Por exemplo: atrair seguidores, gerar mensagens no direct, vender.',
+    opcoes: [
+      { letra: 'A', texto: 'Não, posto para não ficar parado',          score: 0 },
+      { letra: 'B', texto: 'Às vezes tenho uma ideia do objetivo',      score: 1 },
+      { letra: 'C', texto: 'Sim, sempre defino o objetivo antes',       score: 2 },
+      { letra: 'D', texto: 'Sim, tenho estratégia completa de conteúdo', score: 2 },
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════
+// 🗂️  ESTADO GLOBAL
+// ═══════════════════════════════════════════════════════════════════
+const state = {
+  nome:        '',
+  email:       '',
+  respostas:   [],  // { pergunta, resposta, score }
+  currentQ:    0,
+  selectedOpt: null,
+  nivel:       '',
+  score:       0,
+  diagnostico: '',
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// 🖥️  NAVEGAÇÃO ENTRE TELAS
+// ═══════════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ✉️  VALIDAÇÃO DE EMAIL (RFC-simples)
+// ═══════════════════════════════════════════════════════════════════
+function emailValido(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 🚀  INICIAR QUIZ
+// ═══════════════════════════════════════════════════════════════════
+function startQuiz() {
+  const nome  = document.getElementById('input-nome').value.trim();
+  const email = document.getElementById('input-email').value.trim();
+  const err   = document.getElementById('error-intro');
+
+  if (!nome) {
+    err.textContent = 'Por favor, informe seu nome.';
+    err.style.display = 'block'; return;
+  }
+  if (!emailValido(email)) {
+    err.textContent = 'Informe um e-mail válido (ex: seunome@email.com).';
+    err.style.display = 'block'; return;
+  }
+
+  err.style.display = 'none';
+  state.nome      = nome;
+  state.email     = email;
+  state.currentQ  = 0;
+  state.respostas = [];
+  state.score     = 0;
+
+  renderQuestion();
+  showScreen('screen-quiz');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ❓  RENDERIZAR PERGUNTA ATUAL
+// ═══════════════════════════════════════════════════════════════════
+function renderQuestion() {
+  const q   = PERGUNTAS[state.currentQ];
+  const num = state.currentQ + 1;
+  const tot = PERGUNTAS.length;
+
+  document.getElementById('question-num').textContent   = `PERGUNTA ${String(num).padStart(2,'0')}`;
+  document.getElementById('question-text').textContent  = q.texto;
+  document.getElementById('question-sub').textContent   = q.sub;
+  document.getElementById('progress-count').textContent = `${num} / ${tot}`;
+  document.getElementById('progress-fill').style.width  = `${(num / tot) * 100}%`;
+  document.getElementById('error-quiz').style.display   = 'none';
+
+  // Resetar botão
+  const btn = document.getElementById('btn-next');
+  btn.disabled    = false;
+  btn.textContent = num < tot ? 'PRÓXIMA →' : 'VER MEU DIAGNÓSTICO →';
+
+  state.selectedOpt = null;
+
+  const wrap = document.getElementById('options-wrap');
+  wrap.innerHTML = '';
+  q.opcoes.forEach((op, i) => {
+    const div = document.createElement('div');
+    div.className = 'opt';
+    div.innerHTML = `<span class="opt-letter">${op.letra}</span>${op.texto}`;
+    div.onclick = () => selectOption(i);
+    wrap.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ✅  SELECIONAR OPÇÃO
+// ═══════════════════════════════════════════════════════════════════
+function selectOption(idx) {
+  state.selectedOpt = idx;
+  document.querySelectorAll('.opt').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
+  });
+  document.getElementById('error-quiz').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ➡️  AVANÇAR PERGUNTA
+// ═══════════════════════════════════════════════════════════════════
+function nextQuestion() {
+  if (state.selectedOpt === null) {
+    document.getElementById('error-quiz').style.display = 'block';
+    return;
+  }
+
+  const q   = PERGUNTAS[state.currentQ];
+  const opt = q.opcoes[state.selectedOpt];
+
+  state.respostas.push({
+    pergunta: q.texto,
+    resposta: opt.texto,
+    score:    opt.score,
+  });
+
+  if (state.currentQ < PERGUNTAS.length - 1) {
+    state.currentQ++;
+    renderQuestion();
+  } else {
+    // Desabilitar botão para evitar duplo clique
+    const btn = document.getElementById('btn-next');
+    btn.disabled    = true;
+    btn.textContent = 'ANALISANDO...';
+    processarResultado();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 🧠  CALCULAR SCORE E CLASSIFICAR NÍVEL
+// Score: soma dos pontos de cada resposta (máx 8)
+// 0–3  → iniciante
+// 4–6  → intermediario
+// 7–8  → avancado
+// ═══════════════════════════════════════════════════════════════════
+function calcularNivel(respostas) {
+  const total = respostas.reduce((acc, r) => acc + (r.score ?? 0), 0);
+  state.score = total;
+
+  if (total <= 3) return 'iniciante';
+  if (total <= 6) return 'intermediario';
+  return 'avancado';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 🤖  GERAR DIAGNÓSTICO COM IA + FALLBACKS POR NÍVEL
+// ═══════════════════════════════════════════════════════════════════
+const FALLBACKS = {
+  iniciante:     'Você ainda está no começo da jornada no Instagram e isso é normal. O problema principal é a falta de consistência e estratégia: você posta quando lembra, sem saber por quê. Antes de crescer, você precisa de uma base — e esse guia vai te dar exatamente isso.',
+  intermediario: 'Você já entende algumas regras do jogo, mas está travado em um patamar médio. O que está faltando é clareza de estratégia: você cria conteúdo, mas sem um objetivo definido para cada post, o esforço se dilui. O próximo passo é transformar presença em resultado.',
+  avancado:      'Você tem uma base sólida e já entende como o Instagram funciona. O seu gargalo agora não é conhecimento — é escala. Para ir além, você precisa de sistemas que automatizem e otimizem o que já funciona, e é aí que entra uma análise estratégica mais profunda.',
+};
+
+async function gerarDiagnostico(respostas, nivel) {
+  const resumo = respostas.map((r, i) =>
+    `Pergunta ${i+1}: ${r.pergunta}\nResposta: ${r.resposta}`
+  ).join('\n\n');
+
+  const prompt = `Você é um especialista em marketing digital para pequenos negócios locais em São Paulo.
+
+Analise esse usuário com base nas respostas de um quiz de marketing no Instagram.
+Nível classificado: ${nivel} (score: ${state.score}/8).
+
+Respostas:
+${resumo}
+
+Seja direto e identifique o principal erro que impede o crescimento dele no Instagram.
+Gere um diagnóstico curto (máximo 3 frases), impactante e prático.
+Fale diretamente com ele, na segunda pessoa.
+Não use bullet points. Não use emojis. Apenas texto corrido, direto ao ponto.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model:      CONFIG.AI_MODEL,
+        max_tokens: 300,
+        messages:   [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const data = await response.json();
+    const texto = data?.content?.[0]?.text?.trim();
+
+    // Garante que nunca retorna vazio
+    return texto || FALLBACKS[nivel] || FALLBACKS['intermediario'];
+
+  } catch (e) {
+    console.warn('IA indisponível, usando fallback:', e.message);
+    return FALLBACKS[nivel] || FALLBACKS['intermediario'];
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 💾  SALVAR NO SUPABASE (com verificação de resposta HTTP)
+// ═══════════════════════════════════════════════════════════════════
+async function salvarNoSupabase(nivel, diagnostico) {
+  if (CONFIG.SUPABASE_URL === 'SUA_SUPABASE_URL_AQUI') {
+    console.warn('⚠️ Supabase não configurado — lead não salvo.');
+    return false;
+  }
+
+  const payload = {
+    nome:        state.nome,
+    email:       state.email,
+    resposta1:   state.respostas[0]?.resposta || '',
+    resposta2:   state.respostas[1]?.resposta || '',
+    resposta3:   state.respostas[2]?.resposta || '',
+    resposta4:   state.respostas[3]?.resposta || '',
+    nivel,
+    score:       state.score,
+    diagnostico,
+  };
+
+  try {
+    const res = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/leads`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        CONFIG.SUPABASE_KEY,
+        'Authorization': `Bearer ${CONFIG.SUPABASE_KEY}`,
+        'Prefer':        'return=minimal',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const erroTexto = await res.text();
+      console.error('Supabase erro HTTP:', res.status, erroTexto);
+      return false;
+    }
+
+    console.log('✅ Lead salvo no Supabase com sucesso.');
+    return true;
+
+  } catch (e) {
+    console.error('❌ Falha de conexão com Supabase:', e.message);
+    return false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ⏳  ORQUESTRADOR PRINCIPAL — com try/catch global
+// ═══════════════════════════════════════════════════════════════════
+async function processarResultado() {
+  showScreen('screen-loading');
+
+  const steps = ['step-1','step-2','step-3','step-4'];
+
+  try {
+    // Step 1 — salvar respostas
+    await delay(500);
+    setStep(steps, 0, 'done');
+    setStep(steps, 1, 'active');
+
+    // Step 2 — calcular nível
+    const nivel = calcularNivel(state.respostas);
+    state.nivel = nivel;
+    await delay(500);
+    setStep(steps, 1, 'done');
+    setStep(steps, 2, 'active');
+
+    // Step 3 — diagnóstico com IA
+    const diagnostico = await gerarDiagnostico(state.respostas, nivel);
+    state.diagnostico = diagnostico;
+    setStep(steps, 2, 'done');
+    setStep(steps, 3, 'active');
+
+    // Step 4 — salvar no Supabase (não bloqueia o fluxo se falhar)
+    await salvarNoSupabase(nivel, diagnostico);
+    await delay(400);
+    setStep(steps, 3, 'done');
+    await delay(300);
+
+    // Exibir resultado
+    renderResultado(nivel, diagnostico);
+    showScreen('screen-resultado');
+
+  } catch (err) {
+    // Fallback de emergência — nunca deixa o usuário travado
+    console.error('Erro crítico no processamento:', err);
+    const nivel       = state.nivel || 'intermediario';
+    const diagnostico = state.diagnostico || FALLBACKS[nivel];
+    renderResultado(nivel, diagnostico);
+    showScreen('screen-resultado');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 🖥️  RENDERIZAR RESULTADO FINAL
+// ═══════════════════════════════════════════════════════════════════
+function renderResultado(nivel, diagnostico) {
+  // Garantia: nível sempre válido
+  const nivelSeguro = ['iniciante','intermediario','avancado'].includes(nivel)
+    ? nivel : 'intermediario';
+
+  // Mensagens WhatsApp incluem o nível automaticamente
+  const msgIntermediario = encodeURIComponent(
+    `Oi! Acabei de fazer o diagnóstico da Vértice. Fui classificado como INTERMEDIÁRIO e quero destravar meu crescimento no Instagram.`
+  );
+  const msgAvancado = encodeURIComponent(
+    `Oi! Acabei de fazer o diagnóstico da Vértice. Fui classificado como AVANÇADO e quero uma análise estratégica.`
+  );
+
+  const waBase = `https://wa.me/${CONFIG.WHATSAPP_NUM}`;
+
+  const nivelConfig = {
+    iniciante: {
+      badge:     'INICIANTE',
+      badgeClass:'nivel-iniciante',
+      titulo:    'Você está deixando dinheiro na mesa todo dia.',
+      ctaTitle:  'O guia que vai te tirar do zero no Instagram:',
+      btnText:   'COMEÇAR DO ZERO →',
+      btnClass:  'btn-primary',
+      btnLink:   CONFIG.KIWIFY_LINK,
+      btnTarget: '_blank',
+    },
+    intermediario: {
+      badge:     'INTERMEDIÁRIO',
+      badgeClass:'nivel-intermediario',
+      titulo:    'Você já sabe o básico — mas algo está travando seu crescimento.',
+      ctaTitle:  'Vamos descobrir exatamente o que está te prendendo:',
+      btnText:   'QUERO DESTRAVAR MEU CRESCIMENTO →',
+      btnClass:  'btn-primary',
+      btnLink:   `${waBase}?text=${msgIntermediario}`,
+      btnTarget: '_blank',
+    },
+    avancado: {
+      badge:     'AVANÇADO',
+      badgeClass:'nivel-avancado',
+      titulo:    'Você tem base sólida. Agora é hora de escalar com estratégia.',
+      ctaTitle:  'Uma análise estratégica pode multiplicar seus resultados:',
+      btnText:   'QUERO ANÁLISE ESTRATÉGICA →',
+      btnClass:  'btn-green',
+      btnLink:   `${waBase}?text=${msgAvancado}`,
+      btnTarget: '_blank',
+    },
+  };
+
+  const cfg = nivelConfig[nivelSeguro];
+
+  // Badge
+  const badge = document.getElementById('nivel-badge');
+  badge.textContent = cfg.badge;
+  badge.className   = `nivel-badge ${cfg.badgeClass}`;
+
+  // Score visual
+  const scoreEl = document.getElementById('score-display');
+  if (scoreEl) {
+    scoreEl.textContent = `Score: ${state.score}/8`;
+  }
+
+  // Título
+  document.getElementById('resultado-title').innerHTML =
+    cfg.titulo.replace(/Instagram|Vértice/g, m => `<em>${m}</em>`);
+
+  // Diagnóstico — garante que nunca exibe vazio
+  const diag = (diagnostico || FALLBACKS[nivelSeguro] || '').trim();
+  document.getElementById('diagnostico-text').textContent = `"${diag}"`;
+
+  // CTA
+  document.getElementById('cta-title').textContent = cfg.ctaTitle;
+
+  // Botões
+  const btns = document.getElementById('cta-buttons');
+  btns.innerHTML = `
+    <a href="${cfg.btnLink}" target="${cfg.btnTarget}" rel="noopener noreferrer" class="btn ${cfg.btnClass}">
+      ${cfg.btnText}
+    </a>
+    <a href="pagina-vendas-vertice.html" class="btn btn-outline">VER O EBOOK →</a>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// 🔧  UTILITÁRIOS
+// ═══════════════════════════════════════════════════════════════════
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function setStep(steps, idx, status) {
+  steps.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('done', 'active');
+    if (i < idx)   el.classList.add('done');
+    if (i === idx) el.classList.add(status);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ♿  ACESSIBILIDADE — Enter aciona botões
+// ═══════════════════════════════════════════════════════════════════
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const intro = document.getElementById('screen-intro');
+    const quiz  = document.getElementById('screen-quiz');
+    if (intro?.classList.contains('active')) startQuiz();
+    if (quiz?.classList.contains('active'))  nextQuestion();
+  }
+});
+</script>
+</body>
+</html>
+<!--
+═══════════════════════════════════════════════════════════════
+📋  SQL — CRIAR TABELA NO SUPABASE
+Cole isso no SQL Editor do seu projeto Supabase:
+
+create table leads (
+  id          uuid primary key default gen_random_uuid(),
+  nome        text not null,
+  email       text not null,
+  resposta1   text,
+  resposta2   text,
+  resposta3   text,
+  resposta4   text,
+  nivel       text,
+  score       integer,
+  diagnostico text,
+  created_at  timestamp with time zone default now()
+);
+
+alter table leads disable row level security;
+═══════════════════════════════════════════════════════════════
+-->
