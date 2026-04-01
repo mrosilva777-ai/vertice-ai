@@ -2,816 +2,164 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vértice — Diagnóstico Gratuito</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Vértice</title>
+
 <style>
-  :root {
-    --black: #000000;
-    --surface: #0a0a0a;
-    --surface2: #111111;
-    --border: #1e1e1e;
-    --text: #f0f0f0;
-    --muted: #666;
-    --purple: #7A00FF;
-    --purple-dim: rgba(122,0,255,0.12);
-    --purple-glow: rgba(122,0,255,0.35);
-  }
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0a0a0a;
+  color: #fff;
+  display: flex;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+.sidebar {
+  width: 200px;
+  background: #111;
+  padding: 20px;
+}
 
-  body {
-    background: var(--black);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+.nav-item {
+  padding: 10px;
+  cursor: pointer;
+  margin-bottom: 5px;
+  background: #1a1a1a;
+}
 
-  /* NOISE OVERLAY */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.4;
-  }
+.nav-item:hover {
+  background: #333;
+}
 
-  /* GRID BG */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: 
-      linear-gradient(rgba(122,0,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(122,0,255,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    pointer-events: none;
-    z-index: 0;
-  }
+.main {
+  flex: 1;
+  padding: 20px;
+}
 
-  /* HEADER */
-  header {
-    position: relative;
-    z-index: 10;
-    padding: 28px 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-  }
+.page {
+  display: none;
+}
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+.page.active {
+  display: block;
+}
 
-  .logo-mark {
-    width: 32px;
-    height: 32px;
-  }
+.card {
+  background: #1a1a1a;
+  padding: 20px;
+  margin-bottom: 20px;
+}
 
-  .logo-text {
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: 0.2em;
-    color: var(--text);
-  }
+button {
+  padding: 10px;
+  background: purple;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
 
-  .logo-text span { color: var(--purple); }
-
-  .badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--purple);
-    border: 1px solid var(--purple-glow);
-    padding: 5px 12px;
-    letter-spacing: 0.1em;
-    background: var(--purple-dim);
-  }
-
-  /* MAIN */
-  main {
-    position: relative;
-    z-index: 10;
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 60px 24px 80px;
-  }
-
-  /* HERO */
-  #screen-hero {
-    text-align: center;
-    animation: fadeUp 0.6s ease both;
-  }
-
-  .eyebrow {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--purple);
-    letter-spacing: 0.2em;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .eyebrow::before, .eyebrow::after {
-    content: '';
-    width: 30px;
-    height: 1px;
-    background: var(--purple-glow);
-  }
-
-  h1 {
-    font-size: clamp(2.2rem, 6vw, 3.6rem);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    margin-bottom: 20px;
-  }
-
-  h1 em {
-    font-style: normal;
-    color: var(--purple);
-  }
-
-  .subtitle {
-    font-size: 1.05rem;
-    color: var(--muted);
-    line-height: 1.7;
-    max-width: 500px;
-    margin: 0 auto 40px;
-    font-weight: 400;
-  }
-
-  /* FORM CAPTURE */
-  .capture-form {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    max-width: 420px;
-    margin: 0 auto;
-  }
-
-  .field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    text-align: left;
-  }
-
-  .field-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    color: var(--muted);
-  }
-
-  input[type="text"], input[type="email"] {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 14px 16px;
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.2s;
-    width: 100%;
-  }
-
-  input:focus {
-    border-color: var(--purple);
-  }
-
-  input::placeholder { color: #333; }
-
-  .btn-primary {
-    background: var(--purple);
-    color: #fff;
-    border: none;
-    padding: 16px 28px;
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 0.15em;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 100%;
-    margin-top: 6px;
-  }
-
-  .btn-primary:hover { background: #6500d9; }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  /* QUIZ */
-  #screen-quiz {
-    display: none;
-    animation: fadeUp 0.5s ease both;
-  }
-
-  .progress-bar {
-    width: 100%;
-    height: 2px;
-    background: var(--border);
-    margin-bottom: 48px;
-    position: relative;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--purple);
-    transition: width 0.4s ease;
-  }
-
-  .progress-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    margin-bottom: 8px;
-  }
-
-  .question-number {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--purple);
-    letter-spacing: 0.2em;
-    margin-bottom: 16px;
-  }
-
-  .question-text {
-    font-size: clamp(1.4rem, 4vw, 2rem);
-    font-weight: 800;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
-    margin-bottom: 36px;
-  }
-
-  .options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .option {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 18px 22px;
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    font-weight: 400;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .option:hover {
-    border-color: var(--purple);
-    background: var(--purple-dim);
-  }
-
-  .option.selected {
-    border-color: var(--purple);
-    background: var(--purple-dim);
-    color: #fff;
-  }
-
-  .option-key {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--purple);
-    min-width: 20px;
-    letter-spacing: 0.1em;
-  }
-
-  /* LOADING */
-  #screen-loading {
-    display: none;
-    text-align: center;
-    padding: 80px 0;
-    animation: fadeUp 0.5s ease both;
-  }
-
-  .loading-spinner {
-    width: 48px;
-    height: 48px;
-    border: 2px solid var(--border);
-    border-top-color: var(--purple);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 28px;
-  }
-
-  .loading-text {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
-    letter-spacing: 0.15em;
-  }
-
-  /* RESULT */
-  #screen-result {
-    display: none;
-    animation: fadeUp 0.6s ease both;
-  }
-
-  .result-header {
-    margin-bottom: 32px;
-  }
-
-  .nivel-tag {
-    display: inline-block;
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    padding: 6px 14px;
-    border: 1px solid var(--purple);
-    color: var(--purple);
-    margin-bottom: 20px;
-    background: var(--purple-dim);
-  }
-
-  .score-line {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 16px;
-    letter-spacing: 0.1em;
-  }
-
-  .result-title {
-    font-size: clamp(1.8rem, 5vw, 2.8rem);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    margin-bottom: 24px;
-  }
-
-  .diagnostico-box {
-    background: var(--surface);
-    border-left: 3px solid var(--purple);
-    padding: 24px 28px;
-    margin-bottom: 36px;
-    font-size: 15px;
-    line-height: 1.75;
-    color: #ccc;
-    font-style: italic;
-    position: relative;
-  }
-
-  .diagnostico-box::before {
-    content: '"';
-    font-size: 60px;
-    color: var(--purple-glow);
-    position: absolute;
-    top: -10px;
-    left: 20px;
-    font-family: Georgia, serif;
-    line-height: 1;
-  }
-
-  .result-cta {
-    border-top: 1px solid var(--border);
-    padding-top: 32px;
-  }
-
-  .cta-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.15em;
-    margin-bottom: 16px;
-  }
-
-  .cta-headline {
-    font-size: 1.4rem;
-    font-weight: 800;
-    margin-bottom: 24px;
-    line-height: 1.3;
-  }
-
-  .btn-cta {
-    display: block;
-    background: var(--purple);
-    color: #fff;
-    border: none;
-    padding: 18px 28px;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    transition: all 0.2s;
-    width: 100%;
-    margin-bottom: 12px;
-  }
-
-  .btn-cta:hover { background: #6500d9; }
-
-  .btn-secondary {
-    display: block;
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    padding: 16px 28px;
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    transition: all 0.2s;
-    width: 100%;
-  }
-
-  .btn-secondary:hover { border-color: var(--muted); color: var(--text); }
-
-  .price-tag {
-    text-align: center;
-    margin-top: 16px;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-  }
-
-  .price-tag strong {
-    color: var(--text);
-    font-size: 22px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-  }
-
-  /* FOOTER */
-  footer {
-    position: relative;
-    z-index: 10;
-    text-align: center;
-    padding: 24px;
-    border-top: 1px solid var(--border);
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: #333;
-    letter-spacing: 0.1em;
-  }
-
-  /* ANIMATIONS */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  /* ERROR */
-  .error-msg {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: #ff4444;
-    letter-spacing: 0.05em;
-    margin-top: 8px;
-    display: none;
-  }
-
-  /* MOBILE */
-  @media (max-width: 600px) {
-    header { padding: 20px; }
-    main { padding: 40px 20px 60px; }
-  }
+input, select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  background: #222;
+  color: #fff;
+  border: 1px solid #444;
+}
 </style>
+
 </head>
+
 <body>
 
-<header>
-  <div class="logo">
-    <svg class="logo-mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 6L16 26L28 6" stroke="#F0F0F0" stroke-width="2.5" stroke-linecap="square"/>
-      <circle cx="16" cy="6" r="2.5" fill="#7A00FF"/>
-    </svg>
-    <span class="logo-text">VÉR<span>T</span>ICE</span>
-  </div>
-  <div class="badge">// DIAGNÓSTICO GRATUITO</div>
-</header>
+<div class="sidebar">
+  <div class="nav-item" onclick="nav('master')">🧠 Plano Completo</div>
+</div>
 
-<main>
+<div class="main">
 
-  <!-- SCREEN 1: HERO + CAPTURA -->
-  <div id="screen-hero">
-    <div class="eyebrow">IA aplicada ao seu negócio</div>
-    <h1>Por que seu negócio está <em>invisível</em> no Instagram?</h1>
-    <p class="subtitle">Responda 4 perguntas. Nossa IA analisa seu perfil e entrega o diagnóstico exato do que está te impedindo de crescer.</p>
+  <div id="page-master" class="page active">
 
-    <div class="capture-form">
-      <div class="field-group">
-        <label class="field-label">SEU NOME</label>
-        <input type="text" id="input-nome" placeholder="Como você se chama?" autocomplete="off">
-        <span class="error-msg" id="err-nome">Digite seu nome.</span>
-      </div>
-      <div class="field-group">
-        <label class="field-label">SEU E-MAIL</label>
-        <input type="email" id="input-email" placeholder="seu@email.com" autocomplete="off">
-        <span class="error-msg" id="err-email">Digite um e-mail válido.</span>
-      </div>
-      <button class="btn-primary" id="btn-comecar" onclick="comecar()">COMEÇAR DIAGNÓSTICO →</button>
-    </div>
-  </div>
+    <div class="card">
+      <h2>Plano Completo</h2>
 
-  <!-- SCREEN 2: QUIZ -->
-  <div id="screen-quiz">
-    <div class="progress-label" id="progress-label">PERGUNTA 1 DE 4</div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progress-fill" style="width:25%"></div>
-    </div>
-    <div class="question-number" id="q-number">// 01</div>
-    <div class="question-text" id="q-text"></div>
-    <div class="options" id="q-options"></div>
-  </div>
+      <label>Objetivo</label>
+      <select id="objetivo">
+        <option>Vender mais</option>
+        <option>Crescer seguidores</option>
+        <option>Engajar</option>
+      </select>
 
-  <!-- SCREEN 3: LOADING -->
-  <div id="screen-loading">
-    <div class="loading-spinner"></div>
-    <div class="loading-text" id="loading-text">ANALISANDO SEU PERFIL...</div>
-  </div>
+      <label>Produto</label>
+      <input id="produto" placeholder="Ex: Pizza artesanal">
 
-  <!-- SCREEN 4: RESULTADO -->
-  <div id="screen-result">
-    <div class="result-header">
-      <div class="nivel-tag" id="nivel-tag">INICIANTE</div>
-      <div class="score-line" id="score-line">Score: 0/8</div>
-      <div class="result-title">Você está deixando<br>dinheiro na mesa todo dia.</div>
+      <button onclick="runMaster()">Gerar plano</button>
     </div>
 
-    <div class="diagnostico-box" id="diagnostico-text">
-      Analisando seu perfil...
+    <div class="card">
+      <h3>Resultado</h3>
+      <div id="output">Clique no botão...</div>
     </div>
 
-    <div class="result-cta">
-      <div class="cta-label">// PRÓXIMO PASSO</div>
-      <div class="cta-headline" id="cta-headline">O guia que vai te tirar do zero no Instagram:</div>
-      <a href="https://pay.kiwify.com.br/2L1PoSe" target="_blank" rel="noopener" class="btn-cta" id="btn-cta">QUERO O EBOOK AGORA →</a>
-      <a href="https://wa.me/5511962502449?text=Acabei%20de%20fazer%20o%20diagn%C3%B3stico%20e%20quero%20ajuda%20com%20meu%20Instagram" target="_blank" rel="noopener" class="btn-secondary" id="btn-wa">Falar com a Vértice no WhatsApp →</a>
-      <div class="price-tag"><strong>R$27</strong> &nbsp;·&nbsp; acesso imediato &nbsp;·&nbsp; pagamento seguro</div>
-    </div>
   </div>
 
-</main>
-
-<footer>VÉRTICE © 2025 &nbsp;·&nbsp; ENGENHARIA DE CRESCIMENTO PREVISÍVEL.</footer>
+</div>
 
 <script>
-  // ─── CONFIG ───────────────────────────────────────────────────
-  const KIWIFY_LINK = 'https://pay.kiwify.com.br/2L1PoSe';
-  const WHATSAPP_NUM = '5511999999999'; // ← troque pelo seu número
 
-  // ─── PERGUNTAS ────────────────────────────────────────────────
-  const perguntas = [
-    {
-      texto: 'Com que frequência você posta no Instagram do seu negócio?',
-      opcoes: [
-        { texto: 'Raramente ou nunca', pts: 0 },
-        { texto: 'Quando lembro, sem padrão', pts: 1 },
-        { texto: '3–4x por semana', pts: 2 },
-        { texto: 'Todo dia, de forma planejada', pts: 3 }
-      ]
-    },
-    {
-      texto: 'Seus posts falam mais sobre o produto ou sobre o problema do cliente?',
-      opcoes: [
-        { texto: 'Só mostro o produto/serviço', pts: 0 },
-        { texto: 'Às vezes falo do cliente', pts: 1 },
-        { texto: 'Equilibro os dois', pts: 2 },
-        { texto: 'Sempre parto da dor do cliente', pts: 3 }
-      ]
-    },
-    {
-      texto: 'Você tem uma identidade visual definida no perfil?',
-      opcoes: [
-        { texto: 'Não, cada post é diferente', pts: 0 },
-        { texto: 'Tenho algumas cores, mas não é consistente', pts: 1 },
-        { texto: 'Tenho um padrão básico', pts: 2 },
-        { texto: 'Sim, identidade forte e coerente', pts: 3 }
-      ]
-    },
-    {
-      texto: 'Você tem uma estratégia clara de conteúdo com objetivos definidos?',
-      opcoes: [
-        { texto: 'Não, posto sem planejamento', pts: 0 },
-        { texto: 'Tenho algumas ideias soltas', pts: 1 },
-        { texto: 'Tenho um calendário básico', pts: 2 },
-        { texto: 'Sim, estratégia completa com metas', pts: 3 }
-      ]
-    }
-  ];
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+}
 
-  // ─── ESTADO ───────────────────────────────────────────────────
-  let nome = '', email = '', respostas = [], score = 0, qAtual = 0;
+async function runMaster() {
+  const objetivo = document.getElementById('objetivo').value;
+  const produto = document.getElementById('produto').value;
 
-  // ─── VALIDAÇÃO ────────────────────────────────────────────────
-  function validarEmail(e) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
-  }
+  document.getElementById('output').innerText = "Gerando...";
 
-  function comecar() {
-    nome = document.getElementById('input-nome').value.trim();
-    email = document.getElementById('input-email').value.trim();
+  const prompt = `
+Crie um plano de marketing completo.
 
-    let ok = true;
-    document.getElementById('err-nome').style.display = 'none';
-    document.getElementById('err-email').style.display = 'none';
+Objetivo: ${objetivo}
+Produto: ${produto}
 
-    if (!nome) {
-      document.getElementById('err-nome').style.display = 'block';
-      ok = false;
-    }
-    if (!validarEmail(email)) {
-      document.getElementById('err-email').style.display = 'block';
-      ok = false;
-    }
-    if (!ok) return;
+Inclua:
+- Persona
+- Plano semanal
+- 3 posts
+- Ideias de imagens
+- Respostas de comentários
+- Script de vendas
+`;
 
-    mostrar('screen-quiz');
-    renderPergunta(0);
-  }
+  // SIMULAÇÃO (por enquanto)
+  const resposta = `
+📌 PERSONA:
+Pessoas que gostam de ${produto}
 
-  // ─── QUIZ ─────────────────────────────────────────────────────
-  function renderPergunta(idx) {
-    const p = perguntas[idx];
-    const num = idx + 1;
-    const pct = (num / perguntas.length) * 100;
+📅 PLANO:
+Postar 3 vezes na semana focando em ${objetivo}
 
-    document.getElementById('progress-label').textContent = `PERGUNTA ${num} DE ${perguntas.length}`;
-    document.getElementById('progress-fill').style.width = pct + '%';
-    document.getElementById('q-number').textContent = `// 0${num}`;
-    document.getElementById('q-text').textContent = p.texto;
+📝 POSTS:
+1. Você já experimentou ${produto}?
+2. O segredo por trás de ${produto}
+3. Promoção especial hoje
 
-    const container = document.getElementById('q-options');
-    container.innerHTML = '';
-    const letras = ['A', 'B', 'C', 'D'];
+🎨 VISUAL:
+Fotos chamativas do produto
 
-    p.opcoes.forEach((op, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'option';
-      btn.innerHTML = `<span class="option-key">${letras[i]}</span>${op.texto}`;
-      btn.onclick = () => selecionarOpcao(i, op.pts, btn);
-      container.appendChild(btn);
-    });
-  }
+💬 COMENTÁRIOS:
+"Chama no direct!"
 
-  function selecionarOpcao(idx, pts, btnEl) {
-    // Visual feedback
-    document.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
-    btnEl.classList.add('selected');
+💰 VENDAS:
+"Oi! Vi que você se interessou, posso te ajudar?"
+`;
 
-    setTimeout(() => {
-      respostas[qAtual] = { idx, pts };
-      score += pts;
-      qAtual++;
+  setTimeout(() => {
+    document.getElementById('output').innerText = resposta;
+  }, 1000);
+}
 
-      if (qAtual < perguntas.length) {
-        renderPergunta(qAtual);
-      } else {
-        processarResultado();
-      }
-    }, 350);
-  }
-
-  // ─── CLASSIFICAÇÃO ────────────────────────────────────────────
-  function classificar(s) {
-    if (s <= 3) return 'iniciante';
-    if (s <= 7) return 'intermediario';
-    return 'avancado';
-  }
-
-  // ─── FALLBACKS ────────────────────────────────────────────────
-  const fallbacks = {
-    iniciante: 'Você ainda está no começo da jornada no Instagram e isso é normal. O problema principal é a falta de consistência e estratégia: você posta quando lembra, sem saber por quê. Antes de crescer, você precisa de uma base — e esse guia vai te dar exatamente isso.',
-    intermediario: 'Você já tem algum entendimento sobre marketing digital, mas está preso no meio do caminho. Falta consistência e clareza na comunicação com seu cliente. O próximo passo é estruturar uma estratégia que converta seguidores em clientes reais.',
-    avancado: 'Você já tem uma base sólida, mas há espaço para escalar. O principal gargalo agora é transformar sua presença em resultado financeiro previsível — e isso exige sistema, não só esforço.'
-  };
-
-  // ─── PROCESSAR RESULTADO ──────────────────────────────────────
-  async function processarResultado() {
-    mostrar('screen-loading');
-    const nivel = classificar(score);
-
-    // Textos dinâmicos por nível
-    const textos = {
-      iniciante: {
-        cta: 'O guia que vai te tirar do zero no Instagram:',
-        btn: 'QUERO O EBOOK AGORA →'
-      },
-      intermediario: {
-        cta: 'O guia que vai destravar seu crescimento:',
-        btn: 'QUERO O EBOOK AGORA →'
-      },
-      avancado: {
-        cta: 'Quer um sistema completo gerenciado por IA?',
-        btn: 'FALAR COM A VÉRTICE →'
-      }
-    };
-
-    // Gerar diagnóstico com IA
-    let diagnostico = fallbacks[nivel];
-    try {
-      const loadingMsgs = [
-        'ANALISANDO SEU PERFIL...',
-        'PROCESSANDO RESPOSTAS...',
-        'GERANDO DIAGNÓSTICO...'
-      ];
-      let msgIdx = 0;
-      const msgInterval = setInterval(() => {
-        msgIdx = (msgIdx + 1) % loadingMsgs.length;
-        document.getElementById('loading-text').textContent = loadingMsgs[msgIdx];
-      }, 1200);
-
-      const prompt = `Você é um especialista em marketing digital para pequenos negócios brasileiros.
-Analise esse dono de negócio com base nas respostas do quiz:
-- Frequência de posts: ${perguntas[0].opcoes[respostas[0].idx].texto}
-- Abordagem de conteúdo: ${perguntas[1].opcoes[respostas[1].idx].texto}
-- Identidade visual: ${perguntas[2].opcoes[respostas[2].idx].texto}
-- Estratégia: ${perguntas[3].opcoes[respostas[3].idx].texto}
-Nível classificado: ${nivel}
-Gere um diagnóstico curto (3–4 frases), direto, impactante e em português do Brasil. Identifique o principal erro que está impedindo o crescimento. Seja específico, não genérico. Não use listas, só texto corrido.`;
-
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 300,
-          messages: [{ role: 'user', content: prompt }]
-        })
-      });
-
-      clearInterval(msgInterval);
-
-      if (res.ok) {
-        const data = await res.json();
-        const texto = data.content?.map(b => b.text || '').join('').trim();
-        if (texto && texto.length > 20) diagnostico = texto;
-      }
-    } catch (e) {
-      console.error('IA indisponível, usando fallback:', e);
-    }
-
-    // Exibir resultado
-    const t = textos[nivel];
-    document.getElementById('nivel-tag').textContent = nivel.toUpperCase();
-    document.getElementById('score-line').textContent = `Score: ${score}/12`;
-    document.getElementById('diagnostico-text').textContent = diagnostico;
-    document.getElementById('cta-headline').textContent = t.cta;
-
-    const btnCta = document.getElementById('btn-cta');
-    const btnWa = document.getElementById('btn-wa');
-
-    if (nivel === 'avancado') {
-      btnCta.textContent = t.btn;
-      btnCta.href = `https://wa.me/${WHATSAPP_NUM}?text=Acabei%20de%20fazer%20o%20diagn%C3%B3stico%20e%20fui%20classificado%20como%20AVAN%C3%87ADO.%20Quero%20saber%20mais%20sobre%20a%20V%C3%A9rtice.`;
-      btnWa.style.display = 'none';
-    } else {
-      btnCta.textContent = t.btn;
-      btnCta.href = KIWIFY_LINK;
-      btnWa.href = `https://wa.me/${WHATSAPP_NUM}?text=Acabei%20de%20fazer%20o%20diagn%C3%B3stico%20e%20fui%20classificado%20como%20${encodeURIComponent(nivel.toUpperCase())}.%20Quero%20ajuda%20com%20meu%20Instagram.`;
-    }
-
-    mostrar('screen-result');
-  }
-
-  // ─── UTILIDADE ────────────────────────────────────────────────
-  function mostrar(id) {
-    ['screen-hero', 'screen-quiz', 'screen-loading', 'screen-result'].forEach(s => {
-      document.getElementById(s).style.display = 'none';
-    });
-    const el = document.getElementById(id);
-    el.style.display = 'block';
-    el.style.animation = 'none';
-    void el.offsetWidth;
-    el.style.animation = '';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  // Enter nos inputs
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      const hero = document.getElementById('screen-hero');
-      if (hero.style.display !== 'none' || !hero.style.display) comecar();
-    }
-  });
 </script>
 
 </body>
