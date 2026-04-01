@@ -3,1484 +3,816 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vértice</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000000'/%3E%3Cpolygon points='4,6 16,26 28,6 23,6 16,18 9,6' fill='%23F5F5F5'/%3E%3Cpolygon points='14,6 16,10 18,6' fill='%237A00FF'/%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<title>Vértice — Diagnóstico Gratuito</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#000000; --surface:#0a0a0a; --surface2:#1A1A1A; --surface3:#2A2A2A;
-  --border:rgba(255,255,255,0.055); --border2:rgba(255,255,255,0.11);
-  --accent:#7A00FF; --accent2:#9333ea; --accent3:#c4b5fd;
-  --green:#2dd4a0; --orange:#fb923c; --pink:#f472b6; --blue:#60a5fa;
-  --yellow:#fbbf24; --red:#f87171;
-  --text:#F5F5F5; --text2:#8e8ea8; --text3:#4a4a62;
-  --radius:14px; --radius-sm:8px;
-  --font-display:'Inter',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.6;min-height:100vh;display:flex;overflow-x:hidden;}
+  :root {
+    --black: #000000;
+    --surface: #0a0a0a;
+    --surface2: #111111;
+    --border: #1e1e1e;
+    --text: #f0f0f0;
+    --muted: #666;
+    --purple: #7A00FF;
+    --purple-dim: rgba(122,0,255,0.12);
+    --purple-glow: rgba(122,0,255,0.35);
+  }
 
-/* SIDEBAR */
-.sidebar{width:232px;min-width:232px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
-.logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
-.logo-mark{font-family:var(--font-display);font-weight:900;font-size:15px;color:var(--text);letter-spacing:.5px;display:flex;align-items:center;gap:9px;}
-.logo-sub{font-size:8.5px;color:var(--text3);font-family:var(--font-mono);margin-top:4px;letter-spacing:.5px;}
-.nav{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:1px;overflow-y:auto;}
-.nav-section{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;padding:12px 10px 5px;}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:12.5px;transition:all .15s;border:1px solid transparent;user-select:none;}
-.nav-item:hover{background:var(--surface2);color:var(--text);}
-.nav-item.active{background:rgba(124,92,252,.14);color:var(--accent3);border-color:rgba(124,92,252,.22);}
-.nav-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0;}
-.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:9px;font-family:var(--font-mono);padding:1px 6px;border-radius:20px;}
-.nav-badge-new{margin-left:auto;background:var(--green);color:#000;font-size:9px;font-family:var(--font-mono);padding:1px 6px;border-radius:20px;font-weight:600;}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* CLIENT SWITCHER */
-.client-switcher{padding:12px;border-top:1px solid var(--border);}
-.switcher-label{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;padding:0 2px;}
-.switcher-select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:12px;padding:8px 10px;outline:none;cursor:pointer;transition:border-color .15s;}
-.switcher-select:focus{border-color:var(--accent);}
-.active-client-pill{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-sm);margin-top:6px;}
-.client-avatar-mini{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:var(--font-display);flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--pink));}
-.client-active-name{font-size:11.5px;font-weight:500;color:var(--accent3);}
-.client-active-nicho{font-size:9px;font-family:var(--font-mono);color:var(--text3);}
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-/* SYNC STATUS */
-.sync-status{display:flex;align-items:center;gap:5px;padding:6px 12px;font-size:9px;font-family:var(--font-mono);color:var(--text3);border-top:1px solid var(--border);}
-.sync-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);flex-shrink:0;}
-.sync-dot.synced{background:var(--green);}
-.sync-dot.syncing{background:var(--orange);animation:pulse 1s infinite;}
-.sync-dot.error{background:var(--red);}
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
 
-/* MAIN */
-.main{margin-left:232px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
-.header{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;background:rgba(8,8,13,.9);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
-.header-title{font-family:var(--font-display);font-size:18px;font-weight:700;flex:1;}
-.status-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.22);border-radius:20px;font-size:10px;font-family:var(--font-mono);color:var(--green);}
-.status-dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-.content{padding:24px 28px;flex:1;}
-.page{display:none;}
-.page.active{display:block;animation:fadeIn .25s ease;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  /* GRID BG */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(122,0,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(122,0,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-/* ATOMS */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.card-title{font-family:var(--font-display);font-size:13.5px;font-weight:700;letter-spacing:-.2px;}
-.card-sub{font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:2px;}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
-.stat-label{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
-.stat-value{font-family:var(--font-display);font-size:26px;font-weight:800;letter-spacing:-1px;}
-.stat-change{font-size:10px;font-family:var(--font-mono);margin-top:3px;}
-.up{color:var(--green);} .down{color:var(--red);}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s;font-family:var(--font-body);white-space:nowrap;}
-.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
-.btn-primary:hover{filter:brightness(1.12);}
-.btn-ghost{background:transparent;color:var(--text2);border-color:var(--border2);}
-.btn-ghost:hover{background:var(--surface2);color:var(--text);}
-.btn-sm{padding:4px 10px;font-size:10px;}
-.btn-green{background:rgba(45,212,160,.12);color:var(--green);border:1px solid rgba(45,212,160,.25);}
-.btn-green:hover{background:rgba(45,212,160,.22);}
-.tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:9.5px;font-family:var(--font-mono);font-weight:500;}
-.tag-purple{background:rgba(124,92,252,.13);color:var(--accent3);border:1px solid rgba(124,92,252,.18);}
-.tag-green{background:rgba(45,212,160,.1);color:var(--green);border:1px solid rgba(45,212,160,.18);}
-.tag-orange{background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.18);}
-.tag-pink{background:rgba(244,114,182,.1);color:var(--pink);border:1px solid rgba(244,114,182,.18);}
-.tag-blue{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.18);}
-.tag-red{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.18);}
-.input-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
-.input-label{font-size:10px;color:var(--text2);font-family:var(--font-mono);}
-input,textarea,select{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:12.5px;padding:8px 11px;width:100%;outline:none;transition:border-color .15s;}
-input:focus,textarea:focus,select:focus{border-color:var(--accent);}
-textarea{resize:vertical;min-height:72px;}
-select option{background:var(--surface2);}
-.divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
-.loading-bar{height:2px;background:var(--surface3);border-radius:2px;overflow:hidden;margin:10px 0;}
-.loading-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));border-radius:2px;width:0%;transition:width .4s ease;}
-.output-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-size:12px;line-height:1.9;color:var(--text);white-space:pre-wrap;word-break:break-word;}
-.section{margin-bottom:22px;}
-.section-title{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
-.progress{background:var(--surface2);border-radius:20px;height:5px;overflow:hidden;}
-.progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--accent),var(--pink));}
-table{width:100%;border-collapse:collapse;}
-th{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:7px 12px;text-align:left;border-bottom:1px solid var(--border);}
-td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:var(--surface2);}
-::-webkit-scrollbar{width:3px;height:3px;}
-::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px;}
-.tabs{display:flex;gap:3px;background:var(--surface2);padding:3px;border-radius:var(--radius-sm);margin-bottom:18px;}
-.tab{padding:5px 13px;border-radius:6px;font-size:11px;cursor:pointer;color:var(--text3);transition:all .15s;font-family:var(--font-mono);}
-.tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.5);}
-.tab:hover:not(.active){color:var(--text2);}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.cursor{display:inline-block;width:2px;height:13px;background:var(--accent);animation:blink 1s infinite;vertical-align:middle;margin-left:2px;}
+  /* HEADER */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
 
-/* MEMORY CARD */
-.memory-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;}
-.memory-key{font-size:9.5px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
-.memory-val{font-size:12px;color:var(--text);}
-.memory-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-/* ONBOARDING */
-.onboard-step{display:none;}
-.onboard-step.active{display:block;animation:fadeIn .25s ease;}
-.step-indicator{display:flex;gap:6px;margin-bottom:20px;}
-.step-dot{width:28px;height:4px;border-radius:2px;background:var(--surface3);transition:background .3s;}
-.step-dot.done{background:var(--green);}
-.step-dot.active{background:var(--accent);}
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+  }
 
-/* COPY VARIANTS */
-.copy-variant{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;position:relative;}
-.copy-variant-label{font-size:9px;font-family:var(--font-mono);color:var(--accent3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
-.copy-variant-text{font-size:12px;line-height:1.85;color:var(--text);white-space:pre-wrap;}
-.copy-btn-copy{position:absolute;top:10px;right:10px;background:var(--surface3);border:1px solid var(--border2);color:var(--text3);border-radius:5px;padding:3px 8px;font-size:9px;font-family:var(--font-mono);cursor:pointer;transition:all .15s;}
-.copy-btn-copy:hover{color:var(--text);border-color:var(--border2);}
+  .logo-text {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    color: var(--text);
+  }
 
-/* CLIENTS */
-.client-row{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;transition:border-color .15s;}
-.client-row:hover{border-color:var(--border2);}
-.client-row-avatar{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--font-display);flex-shrink:0;}
-.client-row-info{flex:1;}
-.client-row-name{font-size:12.5px;font-weight:600;color:var(--text);}
-.client-row-meta{font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:1px;}
+  .logo-text span { color: var(--purple); }
 
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;}
-.modal-overlay.open{display:flex;}
-.modal-box{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:26px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;position:relative;}
-.modal-title{font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:4px;}
-.modal-sub{font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-bottom:20px;}
-.modal-close{position:absolute;top:16px;right:16px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-.modal-close:hover{color:var(--text);}
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--purple);
+    border: 1px solid var(--purple-glow);
+    padding: 5px 12px;
+    letter-spacing: 0.1em;
+    background: var(--purple-dim);
+  }
 
-/* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;padding:11px 18px;border-radius:9px;font-size:12px;font-family:var(--font-mono);z-index:9999;transition:all .4s;pointer-events:none;}
-.toast-success{background:rgba(45,212,160,.15);border:1px solid rgba(45,212,160,.35);color:var(--green);}
-.toast-error{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--red);}
+  /* MAIN */
+  main {
+    position: relative;
+    z-index: 10;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
 
-/* DASHBOARD */
-.agent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:border-color .15s;}
-.agent-card:hover{border-color:var(--border2);}
-.agent-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-.agent-status{display:flex;align-items:center;gap:5px;font-size:9.5px;font-family:var(--font-mono);color:var(--green);margin-top:2px;}
+  /* HERO */
+  #screen-hero {
+    text-align: center;
+    animation: fadeUp 0.6s ease both;
+  }
 
-/* ALERT */
-.alert-card{border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:9px;border-left:3px solid;display:flex;gap:12px;align-items:flex-start;}
-.alert-high{background:rgba(248,113,113,.07);border-color:var(--red);}
-.alert-med{background:rgba(251,146,60,.07);border-color:var(--orange);}
-.alert-low{background:rgba(45,212,160,.07);border-color:var(--green);}
-.alert-title{font-size:12.5px;font-weight:500;color:var(--text);}
-.alert-desc{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.5;}
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--purple);
+    letter-spacing: 0.2em;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
 
-/* CHART */
-.chart-bars{display:flex;align-items:flex-end;gap:7px;height:90px;padding-top:4px;}
-.chart-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
-.chart-bar{width:100%;border-radius:3px 3px 0 0;transition:opacity .15s;cursor:pointer;}
-.chart-bar:hover{opacity:.75;}
-.chart-label{font-size:8.5px;font-family:var(--font-mono);color:var(--text3);}
+  .eyebrow::before, .eyebrow::after {
+    content: '';
+    width: 30px;
+    height: 1px;
+    background: var(--purple-glow);
+  }
 
-/* HISTORY */
-.history-item{display:flex;gap:13px;padding:12px 0;border-bottom:1px solid var(--border);}
-.history-item:last-child{border-bottom:none;}
-.history-thumb{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--surface3);}
-.history-meta{flex:1;}
-.history-title{font-size:12.5px;font-weight:500;color:var(--text);margin-bottom:2px;}
-.history-excerpt{font-size:11px;color:var(--text3);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-.history-footer{display:flex;align-items:center;gap:8px;margin-top:5px;}
-.notif{display:flex;align-items:flex-start;gap:10px;padding:11px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:7px;}
-.notif-icon{font-size:14px;flex-shrink:0;}
-.notif-text{font-size:12px;color:var(--text2);}
+  h1 {
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--purple);
+  }
+
+  .subtitle {
+    font-size: 1.05rem;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 500px;
+    margin: 0 auto 40px;
+    font-weight: 400;
+  }
+
+  /* FORM CAPTURE */
+  .capture-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+  }
+
+  .field-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+  }
+
+  input[type="text"], input[type="email"] {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 14px 16px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input:focus {
+    border-color: var(--purple);
+  }
+
+  input::placeholder { color: #333; }
+
+  .btn-primary {
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    padding: 16px 28px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  .btn-primary:hover { background: #6500d9; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* QUIZ */
+  #screen-quiz {
+    display: none;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--purple);
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+
+  .question-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--purple);
+    letter-spacing: 0.2em;
+    margin-bottom: 16px;
+  }
+
+  .question-text {
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: 36px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 18px 22px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .option:hover {
+    border-color: var(--purple);
+    background: var(--purple-dim);
+  }
+
+  .option.selected {
+    border-color: var(--purple);
+    background: var(--purple-dim);
+    color: #fff;
+  }
+
+  .option-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--purple);
+    min-width: 20px;
+    letter-spacing: 0.1em;
+  }
+
+  /* LOADING */
+  #screen-loading {
+    display: none;
+    text-align: center;
+    padding: 80px 0;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--border);
+    border-top-color: var(--purple);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 28px;
+  }
+
+  .loading-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+  }
+
+  /* RESULT */
+  #screen-result {
+    display: none;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .result-header {
+    margin-bottom: 32px;
+  }
+
+  .nivel-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    padding: 6px 14px;
+    border: 1px solid var(--purple);
+    color: var(--purple);
+    margin-bottom: 20px;
+    background: var(--purple-dim);
+  }
+
+  .score-line {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    letter-spacing: 0.1em;
+  }
+
+  .result-title {
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+
+  .diagnostico-box {
+    background: var(--surface);
+    border-left: 3px solid var(--purple);
+    padding: 24px 28px;
+    margin-bottom: 36px;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #ccc;
+    font-style: italic;
+    position: relative;
+  }
+
+  .diagnostico-box::before {
+    content: '"';
+    font-size: 60px;
+    color: var(--purple-glow);
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+
+  .result-cta {
+    border-top: 1px solid var(--border);
+    padding-top: 32px;
+  }
+
+  .cta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+  }
+
+  .cta-headline {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 24px;
+    line-height: 1.3;
+  }
+
+  .btn-cta {
+    display: block;
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    padding: 18px 28px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .btn-cta:hover { background: #6500d9; }
+
+  .btn-secondary {
+    display: block;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 16px 28px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s;
+    width: 100%;
+  }
+
+  .btn-secondary:hover { border-color: var(--muted); color: var(--text); }
+
+  .price-tag {
+    text-align: center;
+    margin-top: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .price-tag strong {
+    color: var(--text);
+    font-size: 22px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 24px;
+    border-top: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #333;
+    letter-spacing: 0.1em;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ERROR */
+  .error-msg {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #ff4444;
+    letter-spacing: 0.05em;
+    margin-top: 8px;
+    display: none;
+  }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    header { padding: 20px; }
+    main { padding: 40px 20px 60px; }
+  }
 </style>
 </head>
 <body>
 
-<!-- ══ SIDEBAR ══ -->
-<aside class="sidebar">
+<header>
   <div class="logo">
-    <div class="logo-mark">
-      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
-        <polygon points="2,4 16,28 30,4 25,4 16,20 7,4" fill="#F5F5F5"/>
-        <polygon points="13,4 16,9.5 19,4" fill="#7A00FF"/>
-      </svg>
-      VÉRTICE
-    </div>
-    <div class="logo-sub">Engenharia de crescimento previsível.</div>
+    <svg class="logo-mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 6L16 26L28 6" stroke="#F0F0F0" stroke-width="2.5" stroke-linecap="square"/>
+      <circle cx="16" cy="6" r="2.5" fill="#7A00FF"/>
+    </svg>
+    <span class="logo-text">VÉR<span>T</span>ICE</span>
   </div>
-  <nav class="nav">
-    <div class="nav-section">Principal</div>
-    <div class="nav-item active" onclick="nav('dashboard',this)"><span class="nav-icon">◈</span>Dashboard</div>
-    <div class="nav-section">Agentes IA</div>
-    <div class="nav-item" onclick="nav('copy',this)"><span class="nav-icon">✦</span>Agente Copy<span class="nav-badge">IA</span></div>
-    <div class="nav-item" onclick="nav('orchestrator',this)"><span class="nav-icon">⬡</span>Orquestrador<span class="nav-badge">IA</span></div>
-    <div class="nav-item" onclick="nav('visual',this)"><span class="nav-icon">◉</span>Agente Visual<span class="nav-badge">IA</span></div>
-    <div class="nav-section">Gestão</div>
-    <div class="nav-item" onclick="nav('clients',this)"><span class="nav-icon">◈</span>Clientes</div>
-    <div class="nav-item" onclick="nav('onboarding',this)"><span class="nav-icon">★</span>Onboarding<span class="nav-badge-new">novo</span></div>
-    <div class="nav-item" onclick="nav('history',this)"><span class="nav-icon">≡</span>Histórico</div>
-    <div class="nav-item" onclick="nav('settings',this)"><span class="nav-icon">⊙</span>Config</div>
-  </nav>
+  <div class="badge">// DIAGNÓSTICO GRATUITO</div>
+</header>
 
-  <!-- CLIENT SWITCHER -->
-  <div class="client-switcher">
-    <div class="switcher-label">Cliente ativo</div>
-    <select class="switcher-select" id="global-client-select" onchange="switchClient(this.value)">
-      <option value="">— Selecione um cliente —</option>
-    </select>
-    <div class="active-client-pill" id="active-client-pill" style="display:none">
-      <div class="client-avatar-mini" id="active-client-avatar">?</div>
-      <div>
-        <div class="client-active-name" id="active-client-name">—</div>
-        <div class="client-active-nicho" id="active-client-nicho">—</div>
+<main>
+
+  <!-- SCREEN 1: HERO + CAPTURA -->
+  <div id="screen-hero">
+    <div class="eyebrow">IA aplicada ao seu negócio</div>
+    <h1>Por que seu negócio está <em>invisível</em> no Instagram?</h1>
+    <p class="subtitle">Responda 4 perguntas. Nossa IA analisa seu perfil e entrega o diagnóstico exato do que está te impedindo de crescer.</p>
+
+    <div class="capture-form">
+      <div class="field-group">
+        <label class="field-label">SEU NOME</label>
+        <input type="text" id="input-nome" placeholder="Como você se chama?" autocomplete="off">
+        <span class="error-msg" id="err-nome">Digite seu nome.</span>
       </div>
+      <div class="field-group">
+        <label class="field-label">SEU E-MAIL</label>
+        <input type="email" id="input-email" placeholder="seu@email.com" autocomplete="off">
+        <span class="error-msg" id="err-email">Digite um e-mail válido.</span>
+      </div>
+      <button class="btn-primary" id="btn-comecar" onclick="comecar()">COMEÇAR DIAGNÓSTICO →</button>
     </div>
   </div>
 
-  <!-- SYNC STATUS -->
-  <div class="sync-status" id="sync-status">
-    <div class="sync-dot" id="sync-dot"></div>
-    <span id="sync-label">conectando...</span>
-  </div>
-</aside>
-
-<!-- ══ MAIN ══ -->
-<main class="main">
-  <div class="header">
-    <div class="header-title" id="hdr">Dashboard</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div class="status-pill"><span class="status-dot"></span>3 agentes online</div>
-      <button class="btn btn-primary btn-sm" onclick="nav('onboarding',null)">+ Novo cliente</button>
+  <!-- SCREEN 2: QUIZ -->
+  <div id="screen-quiz">
+    <div class="progress-label" id="progress-label">PERGUNTA 1 DE 4</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:25%"></div>
     </div>
+    <div class="question-number" id="q-number">// 01</div>
+    <div class="question-text" id="q-text"></div>
+    <div class="options" id="q-options"></div>
   </div>
 
-  <div class="content">
-
-<!-- ══ DASHBOARD ══ -->
-<div class="page active" id="page-dashboard">
-  <div id="no-client-banner" style="background:rgba(124,92,252,.08);border:1px solid rgba(124,92,252,.2);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
-    <span style="font-size:18px">★</span>
-    <div>
-      <div style="font-size:12.5px;font-weight:500;color:var(--accent3)">Nenhum cliente ativo selecionado</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px">Selecione um cliente na barra lateral ou <span style="color:var(--accent3);cursor:pointer;text-decoration:underline" onclick="nav('onboarding',null)">cadastre um novo</span> para os agentes usarem o contexto de marca.</div>
-    </div>
+  <!-- SCREEN 3: LOADING -->
+  <div id="screen-loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loading-text">ANALISANDO SEU PERFIL...</div>
   </div>
 
-  <div class="grid-4 section">
-    <div class="stat-card"><div class="stat-label">Clientes ativos</div><div class="stat-value" id="dash-stat-clients">0</div><div class="stat-change" style="color:var(--text3)">cadastrados</div></div>
-    <div class="stat-card"><div class="stat-label">Copies geradas</div><div class="stat-value" id="dash-stat-copies">0</div><div class="stat-change up" id="dash-stat-copies-sub">esta sessão</div></div>
-    <div class="stat-card"><div class="stat-label">Pautas criadas</div><div class="stat-value" id="dash-stat-pautas">0</div><div class="stat-change up" id="dash-stat-pautas-sub">esta sessão</div></div>
-    <div class="stat-card"><div class="stat-label">Briefs visuais</div><div class="stat-value" id="dash-stat-briefs">0</div><div class="stat-change up" id="dash-stat-briefs-sub">esta sessão</div></div>
-  </div>
-
-  <div class="grid-2 section">
-    <div class="card">
-      <div class="card-header"><div class="card-title">Acesso rápido — Agentes</div></div>
-      <div class="grid-2" style="gap:10px">
-        <div class="agent-card" onclick="nav('copy',null)">
-          <div class="agent-icon" style="background:rgba(244,114,182,.12)">✦</div>
-          <div><div style="font-weight:600;font-size:12px">Copy</div><div class="agent-status">● pronto</div></div>
-        </div>
-        <div class="agent-card" onclick="nav('orchestrator',null)">
-          <div class="agent-icon" style="background:rgba(124,92,252,.14)">⬡</div>
-          <div><div style="font-weight:600;font-size:12px">Orquestrador</div><div class="agent-status">● pronto</div></div>
-        </div>
-        <div class="agent-card" onclick="nav('visual',null)">
-          <div class="agent-icon" style="background:rgba(96,165,250,.12)">◉</div>
-          <div><div style="font-weight:600;font-size:12px">Visual</div><div class="agent-status">● pronto</div></div>
-        </div>
-        <div class="agent-card" onclick="nav('onboarding',null)">
-          <div class="agent-icon" style="background:rgba(45,212,160,.12)">★</div>
-          <div><div style="font-weight:600;font-size:12px">Onboarding</div><div class="agent-status">● pronto</div></div>
-        </div>
-      </div>
+  <!-- SCREEN 4: RESULTADO -->
+  <div id="screen-result">
+    <div class="result-header">
+      <div class="nivel-tag" id="nivel-tag">INICIANTE</div>
+      <div class="score-line" id="score-line">Score: 0/8</div>
+      <div class="result-title">Você está deixando<br>dinheiro na mesa todo dia.</div>
     </div>
 
-    <div class="card">
-      <div class="card-header"><div class="card-title">Seus clientes</div><button class="btn btn-ghost btn-sm" onclick="nav('clients',null)">Ver todos →</button></div>
-      <div id="dash-clients-list">
-        <div style="color:var(--text3);font-size:12px;padding:20px 0;text-align:center">Nenhum cliente cadastrado ainda.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar primeiro cliente →</span></div>
-      </div>
+    <div class="diagnostico-box" id="diagnostico-text">
+      Analisando seu perfil...
+    </div>
+
+    <div class="result-cta">
+      <div class="cta-label">// PRÓXIMO PASSO</div>
+      <div class="cta-headline" id="cta-headline">O guia que vai te tirar do zero no Instagram:</div>
+      <a href="https://pay.kiwify.com.br/2L1PoSe" target="_blank" rel="noopener" class="btn-cta" id="btn-cta">QUERO O EBOOK AGORA →</a>
+      <a href="https://wa.me/5511962502449?text=Acabei%20de%20fazer%20o%20diagn%C3%B3stico%20e%20quero%20ajuda%20com%20meu%20Instagram" target="_blank" rel="noopener" class="btn-secondary" id="btn-wa">Falar com a Vértice no WhatsApp →</a>
+      <div class="price-tag"><strong>R$27</strong> &nbsp;·&nbsp; acesso imediato &nbsp;·&nbsp; pagamento seguro</div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-header"><div class="card-title">Últimas gerações</div><button class="btn btn-ghost btn-sm" onclick="nav('history',null)">Histórico completo →</button></div>
-    <div id="dash-recent-list">
-      <div style="color:var(--text3);font-size:12px;padding:16px 0;text-align:center">Suas gerações de conteúdo aparecerão aqui.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ COPY ══ -->
-<div class="page" id="page-copy">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header">
-        <div><div class="card-title">✦ Agente Copy</div><div class="card-sub" id="copy-client-indicator">contexto: nenhum cliente ativo</div></div>
-      </div>
-      <div class="input-group"><label class="input-label">Tipo de post</label>
-        <select id="copy-tipo">
-          <option>Produto em destaque</option><option>Oferta / Promoção</option><option>Educativo / Dica</option>
-          <option>Bastidores</option><option>Depoimento de cliente</option><option>Lançamento</option>
-          <option>Engajamento (pergunta)</option><option>Storytelling de marca</option>
-        </select>
-      </div>
-      <div class="input-group"><label class="input-label">Rede social</label>
-        <select id="copy-rede">
-          <option>Instagram (feed)</option><option>Instagram (stories)</option><option>Instagram (reels)</option>
-          <option>TikTok</option><option>Facebook</option><option>LinkedIn</option>
-        </select>
-      </div>
-      <div class="input-group"><label class="input-label">Produto / serviço em foco</label>
-        <input id="copy-produto" placeholder="ex: Pão de queijo artesanal">
-      </div>
-      <div class="input-group"><label class="input-label">Gancho emocional / ângulo</label>
-        <select id="copy-gancho">
-          <option>Curiosidade ("Você sabia que...")</option>
-          <option>Urgência / Escassez</option>
-          <option>Prova social / Depoimento</option>
-          <option>Transformação antes/depois</option>
-          <option>Nos bastidores</option>
-          <option>Pergunta provocativa</option>
-          <option>Nostalgia / Emoção</option>
-          <option>Benefício direto</option>
-        </select>
-      </div>
-      <div class="input-group"><label class="input-label">CTA (chamada para ação)</label>
-        <input id="copy-cta" placeholder="ex: Peça pelo WhatsApp, Venha nos visitar">
-      </div>
-      <div class="input-group"><label class="input-label">Contexto extra (opcional)</label>
-        <textarea id="copy-contexto" placeholder="ex: Semana do aniversário da loja, produto esgotando, promoção relâmpago..." style="min-height:52px"></textarea>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:4px">
-        <button class="btn btn-primary" style="flex:1" onclick="runCopy(1)">✦ Gerar 1 versão</button>
-        <button class="btn btn-ghost" style="flex:1" onclick="runCopy(3)">✦✦✦ 3 variações</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Copy gerada</div>
-        <span class="tag tag-purple" id="copy-tag">aguardando</span>
-      </div>
-      <div class="loading-bar"><div class="loading-fill" id="copy-loading"></div></div>
-      <div id="copy-output-area">
-        <div class="output-box" id="copy-output" style="min-height:320px;font-size:12px">Preencha o brief ao lado e clique em gerar...</div>
-      </div>
-      <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap" id="copy-actions" style="display:none">
-        <button class="btn btn-ghost btn-sm" onclick="copyAll()">⎘ Copiar tudo</button>
-        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('copy')">≡ Salvar no histórico</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ ORCHESTRATOR ══ -->
-<div class="page" id="page-orchestrator">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header">
-        <div><div class="card-title">⬡ Orquestrador</div><div class="card-sub" id="orc-client-indicator">contexto: nenhum cliente ativo</div></div>
-      </div>
-      <div class="input-group"><label class="input-label">Semana de referência</label>
-        <input id="orc-semana" type="text" placeholder="ex: 31 mar – 6 abr, ou deixe em branco para esta semana">
-      </div>
-      <div class="input-group"><label class="input-label">Redes para a pauta</label>
-        <select id="orc-redes">
-          <option>Instagram + Facebook</option><option>Instagram + TikTok</option>
-          <option>Só Instagram</option><option>Todas as redes</option>
-        </select>
-      </div>
-      <div class="input-group"><label class="input-label">Objetivo da semana</label>
-        <select id="orc-objetivo">
-          <option>Aumentar vendas</option><option>Crescer seguidores</option>
-          <option>Engajar comunidade</option><option>Lançar produto/serviço</option>
-          <option>Construir autoridade</option>
-        </select>
-      </div>
-      <div class="input-group"><label class="input-label">Posts por semana</label>
-        <select id="orc-freq">
-          <option>3 posts</option><option>5 posts</option><option>7 posts (diário)</option><option>10+ posts</option>
-        </select>
-      </div>
-      <div class="input-group"><label class="input-label">Contexto especial (datas, promoções)</label>
-        <textarea id="orc-contexto" placeholder="ex: Dia das Mães no domingo, lançamento do cardápio de inverno, volta às aulas..."></textarea>
-      </div>
-      <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="runOrchestrator()">⬡ Gerar pauta completa</button>
-    </div>
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Pauta da semana</div>
-        <span class="tag tag-purple" id="orc-tag">aguardando</span>
-      </div>
-      <div class="loading-bar"><div class="loading-fill" id="orc-loading"></div></div>
-      <div class="output-box" id="orc-output" style="min-height:400px;font-size:12px">Preencha o brief e clique em gerar...</div>
-      <div style="display:flex;gap:6px;margin-top:12px">
-        <button class="btn btn-ghost btn-sm" onclick="copyOutput('orc-output')">⎘ Copiar</button>
-        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('orc')">≡ Salvar no histórico</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ VISUAL ══ -->
-<div class="page" id="page-visual">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header">
-        <div><div class="card-title">◉ Agente Visual</div><div class="card-sub" id="vis-client-indicator">contexto: nenhum cliente ativo</div></div>
-      </div>
-      <div class="input-group"><label class="input-label">Objetivo do visual</label>
-        <select id="vis-objetivo">
-          <option>Apresentar produto</option><option>Promoção / Oferta</option>
-          <option>Conteúdo educativo</option><option>Bastidores / Behind the scenes</option>
-          <option>Depoimento / Prova social</option><option>Identidade de marca</option>
-        </select>
-      </div>
-      <div class="input-group"><label class="input-label">Formato</label>
-        <select id="vis-formato">
-          <option>Feed quadrado 1:1</option><option>Story / Reels 9:16</option>
-          <option>Carrossel (até 10 slides)</option><option>Banner 16:9</option>
-        </select>
-      </div>
-      <div class="input-group"><label class="input-label">Estilo visual</label>
-        <select id="vis-estilo">
-          <option>Fotografia real, luz natural</option><option>Flat design minimalista</option>
-          <option>Ilustração colorida</option><option>Dark & premium</option>
-          <option>Vintage / Retrô</option><option>Clean & corporativo</option>
-        </select>
-      </div>
-      <div class="input-group"><label class="input-label">Elemento principal</label>
-        <input id="vis-elemento" placeholder="ex: pão de queijo saindo do forno, modelo usando o produto">
-      </div>
-      <div class="input-group"><label class="input-label">Paleta de cores da marca</label>
-        <input id="vis-cores" placeholder="ex: marrom, bege, dourado · ou deixe em branco para usar o DNA da marca">
-      </div>
-      <div class="input-group"><label class="input-label">Mood / sensação</label>
-        <select id="vis-mood">
-          <option>Aconchegante e familiar</option><option>Fresco e energético</option>
-          <option>Luxuoso e sofisticado</option><option>Divertido e jovem</option>
-          <option>Nostálgico e emocional</option><option>Limpo e confiável</option>
-        </select>
-      </div>
-      <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="runVisual()">◉ Gerar direção criativa</button>
-    </div>
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Direção criativa + Prompt IA</div>
-        <span class="tag tag-blue" id="vis-tag">aguardando</span>
-      </div>
-      <div class="loading-bar"><div class="loading-fill" id="vis-loading"></div></div>
-      <div class="output-box" id="vis-output" style="min-height:400px;font-size:12px">Preencha o brief e clique em gerar...</div>
-      <div style="display:flex;gap:6px;margin-top:12px">
-        <button class="btn btn-ghost btn-sm" onclick="copyOutput('vis-output')">⎘ Copiar</button>
-        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('vis')">≡ Salvar no histórico</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ CLIENTS ══ -->
-<div class="page" id="page-clients">
-  <div class="grid-2">
-    <div>
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">Seus clientes</div><div class="card-sub" id="clients-sub">0 cadastrados</div></div>
-          <button class="btn btn-primary btn-sm" onclick="nav('onboarding',null)">+ Novo cliente</button>
-        </div>
-        <div id="clients-list">
-          <div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center">
-            Nenhum cliente ainda.<br>
-            <span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar agora →</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card" id="client-detail-card" style="display:none">
-      <div class="card-header">
-        <div><div class="card-title" id="cd-nome">—</div><div class="card-sub" id="cd-nicho">—</div></div>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-primary btn-sm" onclick="activateClientFromDetail()">Ativar</button>
-          <button class="btn btn-ghost btn-sm" style="color:var(--red)" id="cd-delete-btn">Remover</button>
-        </div>
-      </div>
-      <div class="memory-grid" id="cd-memory-grid"></div>
-    </div>
-    <div class="card" id="client-empty-card">
-      <div style="color:var(--text3);font-size:12px;padding:32px;text-align:center;line-height:2">
-        ← Selecione um cliente para ver o DNA de marca salvo
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ ONBOARDING ══ -->
-<div class="page" id="page-onboarding">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title">★ Onboarding de Cliente</div><div class="card-sub">Cria o DNA de marca — usado por todos os agentes</div></div></div>
-      <div class="step-indicator" id="step-ind">
-        <div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div>
-      </div>
-      <div class="onboard-step active" id="step-1">
-        <div class="section-title">1 / 5 — Identidade</div>
-        <div class="input-group"><label class="input-label">Nome da empresa *</label><input id="ob-nome" placeholder="ex: Padaria Boa"></div>
-        <div class="input-group"><label class="input-label">Nicho</label>
-          <select id="ob-nicho"><option>Alimentação e Gastronomia</option><option>Moda e Beleza</option><option>Saúde e Bem-estar</option><option>Serviços Locais</option><option>Educação</option><option>Pet Shop</option><option>Varejo</option><option>Auto e Mecânica</option><option>Tecnologia</option><option>Outro</option></select>
-        </div>
-        <div class="input-group"><label class="input-label">Cidade / Região</label><input id="ob-cidade" placeholder="ex: São Paulo, SP"></div>
-        <div class="input-group"><label class="input-label">Tempo no mercado</label>
-          <select id="ob-anos"><option>Menos de 1 ano</option><option>1–3 anos</option><option>3–10 anos</option><option>Mais de 10 anos</option></select>
-        </div>
-        <div class="input-group"><label class="input-label">Slogan ou frase da marca</label><input id="ob-slogan" placeholder="ex: Feito com amor desde 1998"></div>
-        <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="stepNext(1)">Próximo →</button>
-      </div>
-      <div class="onboard-step" id="step-2">
-        <div class="section-title">2 / 5 — Público-Alvo</div>
-        <div class="input-group"><label class="input-label">Faixa etária</label>
-          <select id="ob-idade"><option>18–25 anos</option><option>25–35 anos</option><option>35–50 anos</option><option>50+ anos</option><option>Todas as idades</option></select>
-        </div>
-        <div class="input-group"><label class="input-label">Gênero predominante</label>
-          <select id="ob-genero"><option>Feminino</option><option>Masculino</option><option>Equilibrado</option></select>
-        </div>
-        <div class="input-group"><label class="input-label">Classe social</label>
-          <select id="ob-classe"><option>C / Popular</option><option>C/B — Médio</option><option>B/A — Médio-alto</option><option>A — Premium</option></select>
-        </div>
-        <div class="input-group"><label class="input-label">Principais dores do cliente ideal</label>
-          <textarea id="ob-dores" placeholder="ex: Quer produtos frescos perto de casa, sem tempo para cozinhar..."></textarea>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" style="flex:1" onclick="stepPrev(2)">← Voltar</button>
-          <button class="btn btn-primary" style="flex:2" onclick="stepNext(2)">Próximo →</button>
-        </div>
-      </div>
-      <div class="onboard-step" id="step-3">
-        <div class="section-title">3 / 5 — Tom de Voz</div>
-        <div class="input-group"><label class="input-label">Tom principal</label>
-          <select id="ob-tom"><option>Amigável e acolhedor</option><option>Profissional e confiável</option><option>Jovem e descolado</option><option>Premium e sofisticado</option><option>Divertido e irreverente</option><option>Educativo e especialista</option></select>
-        </div>
-        <div class="input-group"><label class="input-label">Uso de emojis</label>
-          <select id="ob-emoji"><option>Sim, com moderação</option><option>Sim, bastante</option><option>Raramente</option><option>Nunca</option></select>
-        </div>
-        <div class="input-group"><label class="input-label">Trata o cliente como</label>
-          <select id="ob-trato"><option>Você (informal)</option><option>Você (formal)</option><option>Amigo / Parceiro</option></select>
-        </div>
-        <div class="input-group"><label class="input-label">Palavras PROIBIDAS</label><input id="ob-evitar" placeholder="ex: barato, promoção relâmpago, genérico..."></div>
-        <div class="input-group"><label class="input-label">Palavras-chave obrigatórias</label><input id="ob-keywords" placeholder="ex: artesanal, amor, tradição, fresquinho..."></div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" style="flex:1" onclick="stepPrev(3)">← Voltar</button>
-          <button class="btn btn-primary" style="flex:2" onclick="stepNext(3)">Próximo →</button>
-        </div>
-      </div>
-      <div class="onboard-step" id="step-4">
-        <div class="section-title">4 / 5 — Produto & Diferencial</div>
-        <div class="input-group"><label class="input-label">Principais produtos / serviços</label>
-          <textarea id="ob-produtos" placeholder="Liste separados por vírgula: pão francês, croissant, bolo de aniversário..."></textarea>
-        </div>
-        <div class="input-group"><label class="input-label">Maior diferencial competitivo</label>
-          <textarea id="ob-diferencial" placeholder="O que faz esta empresa única? Por que o cliente escolhe ela e não o concorrente?"></textarea>
-        </div>
-        <div class="input-group"><label class="input-label">Ticket médio</label>
-          <select id="ob-ticket"><option>Até R$ 30</option><option>R$ 30–100</option><option>R$ 100–500</option><option>Acima de R$ 500</option></select>
-        </div>
-        <div class="input-group"><label class="input-label">Sazonalidade importante</label>
-          <input id="ob-sazonal" placeholder="ex: Natal, Páscoa, Dia das Mães, volta às aulas...">
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" style="flex:1" onclick="stepPrev(4)">← Voltar</button>
-          <button class="btn btn-primary" style="flex:2" onclick="stepNext(4)">Próximo →</button>
-        </div>
-      </div>
-      <div class="onboard-step" id="step-5">
-        <div class="section-title">5 / 5 — Redes & Objetivo</div>
-        <div class="input-group"><label class="input-label">Redes ativas</label>
-          <select id="ob-redes"><option>Instagram + Facebook</option><option>Instagram + TikTok</option><option>Todas</option><option>Só Instagram</option></select>
-        </div>
-        <div class="input-group"><label class="input-label">Frequência desejada</label>
-          <select id="ob-freq"><option>3–4 posts/semana</option><option>5–7 posts/semana</option><option>1–2 posts/semana</option><option>Diário</option></select>
-        </div>
-        <div class="input-group"><label class="input-label">Meta principal</label>
-          <select id="ob-meta"><option>Aumentar vendas</option><option>Crescer seguidores</option><option>Construir autoridade</option><option>Engajar comunidade</option></select>
-        </div>
-        <div class="input-group"><label class="input-label">Observações extras</label>
-          <textarea id="ob-obs" placeholder="Qualquer detalhe adicional: concorrentes, localização, restrições..."></textarea>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" style="flex:1" onclick="stepPrev(5)">← Voltar</button>
-          <button class="btn btn-primary" style="flex:2" onclick="runOnboarding()">★ Gerar DNA de Marca</button>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">DNA de Marca</div><span class="tag tag-green" id="ob-tag">aguardando</span></div>
-      <div class="loading-bar"><div class="loading-fill" id="ob-loading"></div></div>
-      <div class="output-box" id="ob-output" style="min-height:400px;font-size:11.5px">Complete o onboarding e a IA vai gerar o DNA completo da marca — tom de voz, perfil de cliente, diretrizes e regras que todos os agentes usam automaticamente...</div>
-      <div id="ob-memory-section" style="display:none;margin-top:16px">
-        <hr class="divider">
-        <div style="font-size:12px;font-weight:600;margin-bottom:10px;color:var(--text2)">Salvo na memória dos agentes</div>
-        <div class="memory-grid" id="ob-memory-grid"></div>
-        <button class="btn btn-green" style="width:100%;margin-top:12px" onclick="nav('copy',null)">Ir para Agente Copy com este contexto →</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ HISTORY ══ -->
-<div class="page" id="page-history">
-  <div class="card">
-    <div class="card-header">
-      <div><div class="card-title">Histórico de Gerações</div><div class="card-sub" id="hist-sub">0 itens salvos</div></div>
-      <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearHistory()">Limpar tudo</button>
-    </div>
-    <div id="history-list">
-      <div style="color:var(--text3);font-size:12px;padding:32px;text-align:center">
-        Suas gerações salvas aparecerão aqui.<br>
-        <span style="font-size:11px">Use o botão "Salvar no histórico" em qualquer agente.</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ SETTINGS ══ -->
-<div class="page" id="page-settings">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header"><div class="card-title">Configuração dos Agentes</div></div>
-      <div class="input-group">
-        <label class="input-label">🔑 Chave de API</label>
-        <input id="cfg-apikey" type="password" value="gerenciada pelo servidor" readonly style="opacity:.4;cursor:not-allowed">
-        <div style="font-size:10px;color:var(--green);font-family:var(--font-mono);margin-top:4px">✓ Chave segura — configurada no Netlify, nunca exposta no browser</div>
-      </div>
-      <div class="input-group"><label class="input-label">🤖 Modelo Claude</label>
-        <select id="cfg-model">
-          <option value="claude-sonnet-4-20250514">claude-sonnet-4 (recomendado)</option>
-          <option value="claude-opus-4-20250514">claude-opus-4 (mais poderoso)</option>
-          <option value="claude-haiku-4-5-20251001">claude-haiku-4-5 (mais rápido)</option>
-        </select>
-      </div>
-      <div class="input-group"><label class="input-label">Idioma padrão dos agentes</label>
-        <select id="cfg-lang"><option>Português Brasileiro</option><option>Inglês</option><option>Espanhol</option></select>
-      </div>
-      <div class="input-group"><label class="input-label">Tamanho máximo da resposta</label>
-        <select id="cfg-tokens"><option value="800">Curto (800 tokens)</option><option value="1500" selected>Médio (1500 tokens)</option><option value="2500">Longo (2500 tokens)</option></select>
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="saveSettings()">Salvar configurações</button>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">Dados salvos</div></div>
-      <div class="notif">
-        <span class="notif-icon">☁</span>
-        <div>
-          <div class="notif-text" style="color:var(--text)">Armazenamento em nuvem (Supabase)</div>
-          <div class="notif-text" style="font-size:11px;margin-top:2px">Clientes, DNA de marca e histórico ficam salvos no servidor — acessíveis de qualquer dispositivo.</div>
-        </div>
-      </div>
-      <div class="notif" style="margin-top:6px">
-        <span class="notif-icon">💾</span>
-        <div>
-          <div class="notif-text" style="color:var(--text)">Backup local (localStorage)</div>
-          <div class="notif-text" style="font-size:11px;margin-top:2px">Cópia local de segurança no navegador. Plataforma funciona mesmo offline.</div>
-        </div>
-      </div>
-      <div style="margin-top:12px;display:flex;gap:8px">
-        <button class="btn btn-ghost btn-sm" onclick="exportData()">⬇ Exportar dados</button>
-        <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearAllData()">✕ Apagar tudo</button>
-      </div>
-      <div class="divider"></div>
-      <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono)" id="storage-info">Calculando...</div>
-    </div>
-  </div>
-</div>
-
-  </div><!-- /content -->
 </main>
 
+<footer>VÉRTICE © 2025 &nbsp;·&nbsp; ENGENHARIA DE CRESCIMENTO PREVISÍVEL.</footer>
+
 <script>
-// ══════════════════════════════════════════════
-// SUPABASE CONFIG
-// ══════════════════════════════════════════════
-const SUPABASE_URL = 'https://opigoplvnbcbtbgwgadb.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_nlaH3jiD9uwNiRNdG4OR_g_AhZSkBII';
+  // ─── CONFIG ───────────────────────────────────────────────────
+  const KIWIFY_LINK = 'https://pay.kiwify.com.br/2L1PoSe';
+  const WHATSAPP_NUM = '5511999999999'; // ← troque pelo seu número
 
-let sbReady = false;
-
-// Carrega o SDK do Supabase dinamicamente
-async function loadSupabase() {
-  return new Promise((resolve) => {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-    script.onload = () => {
-      window._sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      sbReady = true;
-      setSyncStatus('synced', 'nuvem ativa');
-      resolve(true);
-    };
-    script.onerror = () => {
-      setSyncStatus('error', 'offline — usando local');
-      resolve(false);
-    };
-    document.head.appendChild(script);
-  });
-}
-
-function setSyncStatus(state, label) {
-  const dot = document.getElementById('sync-dot');
-  const lbl = document.getElementById('sync-label');
-  dot.className = 'sync-dot ' + state;
-  lbl.textContent = label;
-}
-
-// ══════════════════════════════════════════════
-// STORAGE — ESPELHO DUPLO (localStorage + Supabase)
-// ══════════════════════════════════════════════
-const LS = {
-  get: (k, def=null) => { try { const v=localStorage.getItem(k); return v?JSON.parse(v):def; } catch(e){return def;} },
-  set: (k,v) => { try { localStorage.setItem(k,JSON.stringify(v)); } catch(e){} },
-  del: (k) => { try { localStorage.removeItem(k); } catch(e){} }
-};
-
-// Salva cliente no Supabase (upsert por nome)
-async function sbSaveClient(clientObj) {
-  if(!sbReady) return;
-  try {
-    setSyncStatus('syncing', 'sincronizando...');
-    const { error } = await window._sb
-      .from('clients')
-      .upsert({ nome: clientObj.nome, nicho: clientObj.nicho, dna: clientObj.dna }, { onConflict: 'nome' });
-    if(error) throw error;
-    setSyncStatus('synced', 'salvo na nuvem');
-  } catch(e) {
-    setSyncStatus('error', 'erro ao salvar');
-    console.warn('Supabase save error:', e.message);
-  }
-}
-
-// Carrega clientes do Supabase e mescla com localStorage
-async function sbLoadClients() {
-  if(!sbReady) return;
-  try {
-    setSyncStatus('syncing', 'carregando...');
-    const { data, error } = await window._sb
-      .from('clients')
-      .select('*')
-      .order('created_at', { ascending: true });
-    if(error) throw error;
-    if(data && data.length > 0) {
-      // Mescla: Supabase é a fonte da verdade
-      const remoteNames = data.map(c => c.nome.toLowerCase());
-      // Adiciona clientes remotos que não existem localmente
-      data.forEach(remote => {
-        const localIdx = clients.findIndex(c => c.nome.toLowerCase() === remote.nome.toLowerCase());
-        if(localIdx >= 0) {
-          clients[localIdx] = { nome: remote.nome, nicho: remote.nicho, dna: remote.dna };
-        } else {
-          clients.push({ nome: remote.nome, nicho: remote.nicho, dna: remote.dna });
-        }
-      });
-      LS.set('aios_clients', clients);
-      refreshClientSelect();
-      renderDashboard();
+  // ─── PERGUNTAS ────────────────────────────────────────────────
+  const perguntas = [
+    {
+      texto: 'Com que frequência você posta no Instagram do seu negócio?',
+      opcoes: [
+        { texto: 'Raramente ou nunca', pts: 0 },
+        { texto: 'Quando lembro, sem padrão', pts: 1 },
+        { texto: '3–4x por semana', pts: 2 },
+        { texto: 'Todo dia, de forma planejada', pts: 3 }
+      ]
+    },
+    {
+      texto: 'Seus posts falam mais sobre o produto ou sobre o problema do cliente?',
+      opcoes: [
+        { texto: 'Só mostro o produto/serviço', pts: 0 },
+        { texto: 'Às vezes falo do cliente', pts: 1 },
+        { texto: 'Equilibro os dois', pts: 2 },
+        { texto: 'Sempre parto da dor do cliente', pts: 3 }
+      ]
+    },
+    {
+      texto: 'Você tem uma identidade visual definida no perfil?',
+      opcoes: [
+        { texto: 'Não, cada post é diferente', pts: 0 },
+        { texto: 'Tenho algumas cores, mas não é consistente', pts: 1 },
+        { texto: 'Tenho um padrão básico', pts: 2 },
+        { texto: 'Sim, identidade forte e coerente', pts: 3 }
+      ]
+    },
+    {
+      texto: 'Você tem uma estratégia clara de conteúdo com objetivos definidos?',
+      opcoes: [
+        { texto: 'Não, posto sem planejamento', pts: 0 },
+        { texto: 'Tenho algumas ideias soltas', pts: 1 },
+        { texto: 'Tenho um calendário básico', pts: 2 },
+        { texto: 'Sim, estratégia completa com metas', pts: 3 }
+      ]
     }
-    setSyncStatus('synced', 'nuvem ativa');
-  } catch(e) {
-    setSyncStatus('error', 'offline — usando local');
-    console.warn('Supabase load error:', e.message);
-  }
-}
+  ];
 
-// Salva item no histórico do Supabase
-async function sbSaveHistory(item) {
-  if(!sbReady) return;
-  try {
-    await window._sb.from('history').insert({
-      type: item.type,
-      label: item.label,
-      client_name: item.client,
-      content: item.content
+  // ─── ESTADO ───────────────────────────────────────────────────
+  let nome = '', email = '', respostas = [], score = 0, qAtual = 0;
+
+  // ─── VALIDAÇÃO ────────────────────────────────────────────────
+  function validarEmail(e) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
+  }
+
+  function comecar() {
+    nome = document.getElementById('input-nome').value.trim();
+    email = document.getElementById('input-email').value.trim();
+
+    let ok = true;
+    document.getElementById('err-nome').style.display = 'none';
+    document.getElementById('err-email').style.display = 'none';
+
+    if (!nome) {
+      document.getElementById('err-nome').style.display = 'block';
+      ok = false;
+    }
+    if (!validarEmail(email)) {
+      document.getElementById('err-email').style.display = 'block';
+      ok = false;
+    }
+    if (!ok) return;
+
+    mostrar('screen-quiz');
+    renderPergunta(0);
+  }
+
+  // ─── QUIZ ─────────────────────────────────────────────────────
+  function renderPergunta(idx) {
+    const p = perguntas[idx];
+    const num = idx + 1;
+    const pct = (num / perguntas.length) * 100;
+
+    document.getElementById('progress-label').textContent = `PERGUNTA ${num} DE ${perguntas.length}`;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('q-number').textContent = `// 0${num}`;
+    document.getElementById('q-text').textContent = p.texto;
+
+    const container = document.getElementById('q-options');
+    container.innerHTML = '';
+    const letras = ['A', 'B', 'C', 'D'];
+
+    p.opcoes.forEach((op, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'option';
+      btn.innerHTML = `<span class="option-key">${letras[i]}</span>${op.texto}`;
+      btn.onclick = () => selecionarOpcao(i, op.pts, btn);
+      container.appendChild(btn);
     });
-  } catch(e) {
-    console.warn('Supabase history error:', e.message);
   }
-}
 
-// Remove cliente do Supabase
-async function sbDeleteClient(nome) {
-  if(!sbReady) return;
-  try {
-    await window._sb.from('clients').delete().eq('nome', nome);
-  } catch(e) {
-    console.warn('Supabase delete error:', e.message);
+  function selecionarOpcao(idx, pts, btnEl) {
+    // Visual feedback
+    document.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
+    btnEl.classList.add('selected');
+
+    setTimeout(() => {
+      respostas[qAtual] = { idx, pts };
+      score += pts;
+      qAtual++;
+
+      if (qAtual < perguntas.length) {
+        renderPergunta(qAtual);
+      } else {
+        processarResultado();
+      }
+    }, 350);
   }
-}
 
-// ══════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════
-let clients     = LS.get('aios_clients', []);
-let chatHistory = LS.get('aios_history', []);
-let activeIdx   = LS.get('aios_active_idx', null);
-let sessionStats = {copies:0, pautas:0, briefs:0};
-let settings    = LS.get('aios_settings', {});
-if(!settings.model || settings.model.includes('gemini')) settings.model = 'claude-sonnet-4-20250514';
-if(!settings.tokens) settings.tokens = 1500;
-LS.set('aios_settings', settings);
-
-// ══════════════════════════════════════════════
-// NAVIGATION
-// ══════════════════════════════════════════════
-const pageTitles = {
-  dashboard:'Dashboard', copy:'Agente Copy', orchestrator:'Orquestrador',
-  visual:'Agente Visual', clients:'Clientes', onboarding:'Onboarding de Cliente',
-  history:'Histórico', settings:'Configurações'
-};
-function nav(page, el) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  document.getElementById('hdr').textContent = pageTitles[page]||page;
-  if(el) el.classList.add('active');
-  else document.querySelectorAll('.nav-item').forEach(n=>{
-    if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'")) n.classList.add('active');
-  });
-  if(page==='clients') renderClients();
-  if(page==='history') renderHistory();
-  if(page==='dashboard') renderDashboard();
-  updateClientIndicators();
-}
-
-// ══════════════════════════════════════════════
-// ACTIVE CLIENT
-// ══════════════════════════════════════════════
-function getActiveClient() {
-  if(activeIdx===null || !clients[activeIdx]) return null;
-  return clients[activeIdx];
-}
-
-function switchClient(idx) {
-  activeIdx = idx===''?null:parseInt(idx);
-  LS.set('aios_active_idx', activeIdx);
-  updateClientSwitcherUI();
-  updateClientIndicators();
-  renderDashboard();
-  showToast('✓ Cliente alterado: '+(getActiveClient()?getActiveClient().nome:'nenhum'), 'success');
-}
-
-function updateClientSwitcherUI() {
-  const sel = document.getElementById('global-client-select');
-  const pill = document.getElementById('active-client-pill');
-  const c = getActiveClient();
-  sel.value = activeIdx===null?'':activeIdx;
-  if(c) {
-    pill.style.display='flex';
-    document.getElementById('active-client-avatar').textContent = c.nome.slice(0,2).toUpperCase();
-    document.getElementById('active-client-name').textContent = c.nome;
-    document.getElementById('active-client-nicho').textContent = c.nicho||'';
-    document.getElementById('no-client-banner') && (document.getElementById('no-client-banner').style.display='none');
-  } else {
-    pill.style.display='none';
-    document.getElementById('no-client-banner') && (document.getElementById('no-client-banner').style.display='flex');
+  // ─── CLASSIFICAÇÃO ────────────────────────────────────────────
+  function classificar(s) {
+    if (s <= 3) return 'iniciante';
+    if (s <= 7) return 'intermediario';
+    return 'avancado';
   }
-}
 
-function updateClientIndicators() {
-  const c = getActiveClient();
-  const label = c ? `contexto: ${c.nome}` : 'contexto: nenhum cliente ativo — selecione na barra lateral';
-  ['copy','orc','vis'].forEach(p => {
-    const el = document.getElementById(p+'-client-indicator');
-    if(el) { el.textContent = label; el.style.color = c?'var(--green)':'var(--text3)'; }
-  });
-}
-
-function refreshClientSelect() {
-  const sel = document.getElementById('global-client-select');
-  sel.innerHTML = '<option value="">— Selecione um cliente —</option>';
-  clients.forEach((c,i) => {
-    const opt = document.createElement('option');
-    opt.value = i; opt.textContent = c.nome + ' · ' + (c.nicho||'');
-    sel.appendChild(opt);
-  });
-  if(activeIdx!==null && clients[activeIdx]) sel.value = activeIdx;
-  else { activeIdx=null; LS.set('aios_active_idx',null); }
-  updateClientSwitcherUI();
-}
-
-// ══════════════════════════════════════════════
-// CLAUDE API — via Netlify Function
-// ══════════════════════════════════════════════
-async function callClaude(system, user, outEl, loadEl, tagEl, tagDone) {
-  const model  = settings.model  || 'claude-sonnet-4-20250514';
-  const tokens = settings.tokens || 1500;
-
-  outEl.textContent = '';
-  loadEl.style.width = '15%';
-  if(tagEl){tagEl.textContent='gerando...';tagEl.className='tag tag-orange';}
-
-  const cur = document.createElement('span');
-  cur.className = 'cursor';
-  outEl.appendChild(cur);
-
-  try {
-    loadEl.style.width = '50%';
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ system, user, model, max_tokens: tokens })
-    });
-    const data = await res.json();
-    if(!res.ok || data.error) throw new Error(data.error || `Erro HTTP ${res.status}`);
-    const text = data.text || '';
-    cur.remove();
-    outEl.textContent = '';
-    loadEl.style.width = '90%';
-    let i = 0;
-    const speed = text.length > 800 ? 4 : 8;
-    const iv = setInterval(() => {
-      outEl.textContent += text[i] || '';
-      i++;
-      if(i >= text.length) clearInterval(iv);
-    }, speed);
-    setTimeout(() => { loadEl.style.width = '0%'; }, 800);
-    if(tagEl){tagEl.textContent=tagDone||'pronto';tagEl.className='tag tag-green';}
-    return text;
-  } catch(e) {
-    cur.remove();
-    outEl.textContent = '⚠ Erro: ' + e.message;
-    loadEl.style.width = '0%';
-    if(tagEl){tagEl.textContent='erro';tagEl.className='tag tag-red';}
-    return null;
-  }
-}
-
-// ══════════════════════════════════════════════
-// BRAND CONTEXT
-// ══════════════════════════════════════════════
-function getBrandContext() {
-  const c = getActiveClient();
-  if(!c || !c.dna) return '';
-  const d = c.dna;
-  return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DNA DE MARCA — USE ESTAS INFORMAÇÕES EM TODO O CONTEÚDO
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Empresa: ${d.nome||''}
-Nicho: ${d.nicho||''}
-Cidade: ${d.cidade||''}
-Slogan: ${d.slogan||''}
-Tom de voz: ${d.tom||''}
-Trata o cliente como: ${d.trato||''}
-Emojis: ${d.emoji||''}
-Público-alvo: ${d.idade||''} · ${d.genero||''} · Classe ${d.classe||''}
-Dores do cliente: ${d.dores||''}
-Produtos/serviços: ${d.produtos||''}
-Diferencial: ${d.diferencial||''}
-Palavras OBRIGATÓRIAS: ${d.keywords||''}
-Palavras PROIBIDAS: ${d.evitar||''}
-Ticket médio: ${d.ticket||''}
-Sazonalidade: ${d.sazonal||''}
-Meta principal: ${d.meta||''}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`;
-}
-
-// ══════════════════════════════════════════════
-// AGENTE COPY
-// ══════════════════════════════════════════════
-async function runCopy(n) {
-  const ctx = getBrandContext();
-  const tipo  = document.getElementById('copy-tipo').value;
-  const rede  = document.getElementById('copy-rede').value;
-  const prod  = document.getElementById('copy-produto').value;
-  const ganho = document.getElementById('copy-gancho').value;
-  const cta   = document.getElementById('copy-cta').value;
-  const extra = document.getElementById('copy-contexto').value;
-
-  const sys = `Você é um copywriter sênior especializado em pequenas e médias empresas brasileiras. Você cria textos que convertem, com personalidade real — nunca genéricos.
-
-REGRAS ABSOLUTAS:
-- Use SEMPRE as palavras-chave obrigatórias e NUNCA as proibidas
-- Adapte o tom de voz exatamente como descrito no DNA
-- Emojis: use conforme a instrução do DNA (não mais, não menos)
-- Inclua o CTA de forma natural, nunca forçada
-- O texto deve soar humano, como se o próprio dono da empresa escreveu
-- Para Instagram/TikTok: use quebras de linha estratégicas para gerar rolagem
-- Hashtags: no máximo 5, relevantes e sem ser genéricas demais
-- NUNCA use frases clichê como "qualidade incomparável", "preço justo", "venha nos visitar"`;
-
-  const usr = `${ctx}
-BRIEFING DO POST:
-Tipo: ${tipo}
-Rede: ${rede}
-Produto/serviço: ${prod||'principal produto da empresa'}
-Gancho / ângulo: ${ganho}
-CTA desejado: ${cta||'entre em contato'}
-Contexto especial: ${extra||'nenhum'}
-
-${n===1
-  ? 'Crie 1 copy EXCELENTE pronta para publicar. Seja específico, original e use o DNA da marca.'
-  : `Crie 3 variações de copy para o mesmo post, cada uma com gancho diferente:
-VARIAÇÃO 1 — Gancho emocional / storytelling
-VARIAÇÃO 2 — Direto ao ponto, foco no benefício
-VARIAÇÃO 3 — Prova social / curiosidade
-Separe com uma linha "---" entre cada variação. Numere e nomeie cada uma.`}`;
-
-  const result = await callClaude(sys, usr,
-    document.getElementById('copy-output'),
-    document.getElementById('copy-loading'),
-    document.getElementById('copy-tag'),
-    n===1?'1 copy pronta':'3 variações prontas'
-  );
-  if(result) {
-    sessionStats.copies++;
-    document.getElementById('dash-stat-copies').textContent = sessionStats.copies;
-    document.getElementById('copy-actions').style.display='flex';
-    addToHistory('copy', tipo+' · '+rede, result, getActiveClient()?.nome);
-  }
-}
-
-// ══════════════════════════════════════════════
-// AGENTE ORQUESTRADOR
-// ══════════════════════════════════════════════
-async function runOrchestrator() {
-  const ctx    = getBrandContext();
-  const semana = document.getElementById('orc-semana').value;
-  const redes  = document.getElementById('orc-redes').value;
-  const obj    = document.getElementById('orc-objetivo').value;
-  const freq   = document.getElementById('orc-freq').value;
-  const extra  = document.getElementById('orc-contexto').value;
-
-  const sys = `Você é um estrategista de conteúdo digital sênior, especializado em criar pautas editoriais para pequenas e médias empresas brasileiras.
-
-REGRAS:
-- A pauta deve ser REALISTA e ESPECÍFICA para este negócio — nada genérico
-- Varie os formatos (carrossel, reels, foto, story) estrategicamente
-- Os horários devem ser os mais eficazes para o nicho indicado
-- O tema de cada post deve ser único e conectado ao contexto da marca
-- Inclua pelo menos 1 post de alto engajamento (pergunta, enquete, tendência)
-- Use os produtos reais listados no DNA, não invenções genéricas`;
-
-  const usr = `${ctx}
-BRIEFING DA PAUTA:
-Semana: ${semana||'próxima semana'}
-Redes: ${redes}
-Objetivo principal: ${obj}
-Frequência: ${freq}
-Contexto especial: ${extra||'nenhum'}
-
-Crie a pauta editorial completa no formato:
-
-━━━ PAUTA EDITORIAL ━━━
-
-Para cada post inclua:
-📅 DIA E HORÁRIO
-📱 REDE E FORMATO
-🎯 OBJETIVO DO POST
-📝 TEMA / TÍTULO
-💡 GANCHO
-📋 ESTRUTURA SUGERIDA (em 3 pontos)
-#️⃣ HASHTAGS SUGERIDAS (máx. 5)
----
-
-Ao final: 🔑 ESTRATÉGIA DA SEMANA em 3 linhas.`;
-
-  const result = await callClaude(sys, usr,
-    document.getElementById('orc-output'),
-    document.getElementById('orc-loading'),
-    document.getElementById('orc-tag'),
-    'pauta pronta'
-  );
-  if(result) {
-    sessionStats.pautas++;
-    document.getElementById('dash-stat-pautas').textContent = sessionStats.pautas;
-    addToHistory('orc', 'Pauta · '+redes, result, getActiveClient()?.nome);
-  }
-}
-
-// ══════════════════════════════════════════════
-// AGENTE VISUAL
-// ══════════════════════════════════════════════
-async function runVisual() {
-  const ctx      = getBrandContext();
-  const objetivo = document.getElementById('vis-objetivo').value;
-  const formato  = document.getElementById('vis-formato').value;
-  const estilo   = document.getElementById('vis-estilo').value;
-  const elem     = document.getElementById('vis-elemento').value;
-  const cores    = document.getElementById('vis-cores').value;
-  const mood     = document.getElementById('vis-mood').value;
-
-  const sys = `Você é Diretor de Arte de uma agência digital criativa. Você cria briefings visuais detalhados e prompts profissionais para IA como Midjourney, DALL-E e Firefly.
-
-REGRAS:
-- O briefing deve ser específico ao negócio — não genérico
-- O prompt em inglês deve ser técnico, com parâmetros de câmera, iluminação e composição
-- As dicas de produção devem ser práticas e aplicáveis sem equipe grande
-- Considere o DNA da marca em todas as decisões visuais`;
-
-  const usr = `${ctx}
-BRIEFING VISUAL:
-Objetivo: ${objetivo}
-Formato: ${formato}
-Estilo: ${estilo}
-Elemento principal: ${elem||'principal produto ou serviço da marca'}
-Cores: ${cores||'paleta da marca (ver DNA acima)'}
-Mood: ${mood}
-
-Gere uma direção criativa completa:
-
-🎨 CONCEITO CRIATIVO
-📐 COMPOSIÇÃO E LAYOUT
-💡 REFERÊNCIAS DE ESTILO (3 referências)
-🤖 PROMPT PARA IA (inglês, técnico, mínimo 60 palavras)
-🎬 DICAS DE PRODUÇÃO (3 dicas práticas)
-⚠️ EVITE (3 elementos que não combinam)`;
-
-  const result = await callClaude(sys, usr,
-    document.getElementById('vis-output'),
-    document.getElementById('vis-loading'),
-    document.getElementById('vis-tag'),
-    'brief pronto'
-  );
-  if(result) {
-    sessionStats.briefs++;
-    document.getElementById('dash-stat-briefs').textContent = sessionStats.briefs;
-    addToHistory('vis', objetivo+' · '+formato, result, getActiveClient()?.nome);
-  }
-}
-
-// ══════════════════════════════════════════════
-// ONBOARDING
-// ══════════════════════════════════════════════
-let currentStep = 1;
-function stepNext(n) { goStep(n+1); }
-function stepPrev(n) { goStep(n-1); }
-function goStep(n) {
-  document.getElementById('step-'+currentStep).classList.remove('active');
-  currentStep = n;
-  document.getElementById('step-'+n).classList.add('active');
-  const dots = document.querySelectorAll('#step-ind .step-dot');
-  dots.forEach((d,i)=>{
-    d.classList.remove('active','done');
-    if(i<n-1) d.classList.add('done');
-    else if(i===n-1) d.classList.add('active');
-  });
-}
-
-async function runOnboarding() {
-  const nome = document.getElementById('ob-nome').value.trim();
-  if(!nome) { showToast('⚠ Digite o nome da empresa.','error'); return; }
-
-  const dna = {
-    nome, nicho:document.getElementById('ob-nicho').value, cidade:document.getElementById('ob-cidade').value,
-    anos:document.getElementById('ob-anos').value, slogan:document.getElementById('ob-slogan').value,
-    idade:document.getElementById('ob-idade').value, genero:document.getElementById('ob-genero').value,
-    classe:document.getElementById('ob-classe').value, dores:document.getElementById('ob-dores').value,
-    tom:document.getElementById('ob-tom').value, emoji:document.getElementById('ob-emoji').value,
-    trato:document.getElementById('ob-trato').value, evitar:document.getElementById('ob-evitar').value,
-    keywords:document.getElementById('ob-keywords').value, produtos:document.getElementById('ob-produtos').value,
-    diferencial:document.getElementById('ob-diferencial').value, ticket:document.getElementById('ob-ticket').value,
-    sazonal:document.getElementById('ob-sazonal').value, redes:document.getElementById('ob-redes').value,
-    freq:document.getElementById('ob-freq').value, meta:document.getElementById('ob-meta').value,
-    obs:document.getElementById('ob-obs').value,
+  // ─── FALLBACKS ────────────────────────────────────────────────
+  const fallbacks = {
+    iniciante: 'Você ainda está no começo da jornada no Instagram e isso é normal. O problema principal é a falta de consistência e estratégia: você posta quando lembra, sem saber por quê. Antes de crescer, você precisa de uma base — e esse guia vai te dar exatamente isso.',
+    intermediario: 'Você já tem algum entendimento sobre marketing digital, mas está preso no meio do caminho. Falta consistência e clareza na comunicação com seu cliente. O próximo passo é estruturar uma estratégia que converta seguidores em clientes reais.',
+    avancado: 'Você já tem uma base sólida, mas há espaço para escalar. O principal gargalo agora é transformar sua presença em resultado financeiro previsível — e isso exige sistema, não só esforço.'
   };
 
-  const sys = `Você é o estrategista de marca de uma agência digital. Crie um documento de DNA de marca completo, estruturado e acionável. Responda em português brasileiro.`;
-  const usr = `Com base neste briefing completo, crie o DNA de marca que todos os agentes de IA devem seguir ao criar conteúdo para este cliente:
+  // ─── PROCESSAR RESULTADO ──────────────────────────────────────
+  async function processarResultado() {
+    mostrar('screen-loading');
+    const nivel = classificar(score);
 
-${JSON.stringify(dna, null, 2)}
+    // Textos dinâmicos por nível
+    const textos = {
+      iniciante: {
+        cta: 'O guia que vai te tirar do zero no Instagram:',
+        btn: 'QUERO O EBOOK AGORA →'
+      },
+      intermediario: {
+        cta: 'O guia que vai destravar seu crescimento:',
+        btn: 'QUERO O EBOOK AGORA →'
+      },
+      avancado: {
+        cta: 'Quer um sistema completo gerenciado por IA?',
+        btn: 'FALAR COM A VÉRTICE →'
+      }
+    };
 
-Estruture assim:
+    // Gerar diagnóstico com IA
+    let diagnostico = fallbacks[nivel];
+    try {
+      const loadingMsgs = [
+        'ANALISANDO SEU PERFIL...',
+        'PROCESSANDO RESPOSTAS...',
+        'GERANDO DIAGNÓSTICO...'
+      ];
+      let msgIdx = 0;
+      const msgInterval = setInterval(() => {
+        msgIdx = (msgIdx + 1) % loadingMsgs.length;
+        document.getElementById('loading-text').textContent = loadingMsgs[msgIdx];
+      }, 1200);
 
-🏢 PERFIL DA MARCA
-🗣️ VOZ E TOM
-👤 PERSONA DO CLIENTE IDEAL
-📋 DIRETRIZES EDITORIAIS
-🔑 GANCHO EMOCIONAL
-📅 CALENDÁRIO BASE`;
+      const prompt = `Você é um especialista em marketing digital para pequenos negócios brasileiros.
+Analise esse dono de negócio com base nas respostas do quiz:
+- Frequência de posts: ${perguntas[0].opcoes[respostas[0].idx].texto}
+- Abordagem de conteúdo: ${perguntas[1].opcoes[respostas[1].idx].texto}
+- Identidade visual: ${perguntas[2].opcoes[respostas[2].idx].texto}
+- Estratégia: ${perguntas[3].opcoes[respostas[3].idx].texto}
+Nível classificado: ${nivel}
+Gere um diagnóstico curto (3–4 frases), direto, impactante e em português do Brasil. Identifique o principal erro que está impedindo o crescimento. Seja específico, não genérico. Não use listas, só texto corrido.`;
 
-  const result = await callClaude(sys, usr,
-    document.getElementById('ob-output'),
-    document.getElementById('ob-loading'),
-    document.getElementById('ob-tag'),
-    'DNA salvo'
-  );
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 300,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
 
-  if(result) {
-    dna.dnaText = result;
-    const existing = clients.findIndex(c=>c.nome.toLowerCase()===nome.toLowerCase());
-    if(existing >= 0) {
-      clients[existing].dna = dna;
-      activeIdx = existing;
-    } else {
-      clients.push({nome, nicho:dna.nicho, dna});
-      activeIdx = clients.length-1;
+      clearInterval(msgInterval);
+
+      if (res.ok) {
+        const data = await res.json();
+        const texto = data.content?.map(b => b.text || '').join('').trim();
+        if (texto && texto.length > 20) diagnostico = texto;
+      }
+    } catch (e) {
+      console.error('IA indisponível, usando fallback:', e);
     }
-    // Salva local
-    LS.set('aios_clients', clients);
-    LS.set('aios_active_idx', activeIdx);
-    // Salva na nuvem
-    await sbSaveClient({nome, nicho:dna.nicho, dna});
 
-    refreshClientSelect();
-    updateClientSwitcherUI();
-    updateClientIndicators();
+    // Exibir resultado
+    const t = textos[nivel];
+    document.getElementById('nivel-tag').textContent = nivel.toUpperCase();
+    document.getElementById('score-line').textContent = `Score: ${score}/12`;
+    document.getElementById('diagnostico-text').textContent = diagnostico;
+    document.getElementById('cta-headline').textContent = t.cta;
 
-    const mg = document.getElementById('ob-memory-grid');
-    const ms = document.getElementById('ob-memory-section');
-    mg.innerHTML = [
-      {k:'Empresa', v:dna.nome}, {k:'Nicho', v:dna.nicho}, {k:'Tom de voz', v:dna.tom},
-      {k:'Público', v:`${dna.idade} · ${dna.genero}`}, {k:'Keywords', v:dna.keywords||'—'},
-      {k:'Proibido', v:dna.evitar||'—'}, {k:'Redes', v:dna.redes}, {k:'Meta', v:dna.meta}
-    ].map(it=>`<div class="memory-card"><div class="memory-key">${it.k}</div><div class="memory-val">${it.v}</div></div>`).join('');
-    ms.style.display='block';
-    showToast(`✓ ${nome} salvo na nuvem!`, 'success');
-    document.getElementById('dash-stat-clients').textContent = clients.length;
+    const btnCta = document.getElementById('btn-cta');
+    const btnWa = document.getElementById('btn-wa');
+
+    if (nivel === 'avancado') {
+      btnCta.textContent = t.btn;
+      btnCta.href = `https://wa.me/${WHATSAPP_NUM}?text=Acabei%20de%20fazer%20o%20diagn%C3%B3stico%20e%20fui%20classificado%20como%20AVAN%C3%87ADO.%20Quero%20saber%20mais%20sobre%20a%20V%C3%A9rtice.`;
+      btnWa.style.display = 'none';
+    } else {
+      btnCta.textContent = t.btn;
+      btnCta.href = KIWIFY_LINK;
+      btnWa.href = `https://wa.me/${WHATSAPP_NUM}?text=Acabei%20de%20fazer%20o%20diagn%C3%B3stico%20e%20fui%20classificado%20como%20${encodeURIComponent(nivel.toUpperCase())}.%20Quero%20ajuda%20com%20meu%20Instagram.`;
+    }
+
+    mostrar('screen-result');
   }
-}
 
-// ══════════════════════════════════════════════
-// CLIENTS PAGE
-// ══════════════════════════════════════════════
-let selectedClientIdx = null;
-
-function renderClients() {
-  const list = document.getElementById('clients-list');
-  const sub  = document.getElementById('clients-sub');
-  sub.textContent = clients.length + ' cliente'+(clients.length!==1?'s':'')+' cadastrado'+(clients.length!==1?'s':'');
-  if(!clients.length) {
-    list.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center">Nenhum cliente ainda.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar agora →</span></div>`;
-    return;
+  // ─── UTILIDADE ────────────────────────────────────────────────
+  function mostrar(id) {
+    ['screen-hero', 'screen-quiz', 'screen-loading', 'screen-result'].forEach(s => {
+      document.getElementById(s).style.display = 'none';
+    });
+    const el = document.getElementById(id);
+    el.style.display = 'block';
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  list.innerHTML = clients.map((c,i)=>{
-    const isActive = activeIdx===i;
-    return `<div class="client-row" onclick="selectClient(${i})" style="${isActive?'border-color:rgba(124,92,252,.4);':''}">
-      <div class="client-row-avatar" style="background:linear-gradient(135deg,var(--accent),var(--pink))">${c.nome.slice(0,2).toUpperCase()}</div>
-      <div class="client-row-info">
-        <div class="client-row-name">${c.nome}${isActive?' <span class="tag tag-green" style="padding:1px 6px;font-size:8px;margin-left:4px">ativo</span>':''}</div>
-        <div class="client-row-meta">${c.nicho||'—'} · ${c.dna?'DNA salvo':'sem DNA'}</div>
-      </div>
-      <div style="font-size:18px;color:var(--text3)">›</div>
-    </div>`;
-  }).join('');
-}
 
-function selectClient(i) {
-  selectedClientIdx = i;
-  const c = clients[i];
-  document.getElementById('client-empty-card').style.display='none';
-  document.getElementById('client-detail-card').style.display='block';
-  document.getElementById('cd-nome').textContent = c.nome;
-  document.getElementById('cd-nicho').textContent = c.nicho||'—';
-  document.getElementById('cd-delete-btn').onclick = ()=>deleteClient(i);
-  const d = c.dna;
-  const mg = document.getElementById('cd-memory-grid');
-  if(d) {
-    mg.innerHTML = [
-      {k:'Tom de voz', v:d.tom}, {k:'Público', v:`${d.idade||''} · ${d.genero||''}`},
-      {k:'Redes', v:d.redes||'—'}, {k:'Meta', v:d.meta||'—'},
-      {k:'Keywords', v:d.keywords||'—'}, {k:'Proibido', v:d.evitar||'—'},
-      {k:'Ticket médio', v:d.ticket||'—'}, {k:'Diferencial', v:d.diferencial||'—'},
-    ].map(it=>`<div class="memory-card"><div class="memory-key">${it.k}</div><div class="memory-val">${it.v||'—'}</div></div>`).join('');
-  } else {
-    mg.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:12px">DNA ainda não gerado. <span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Fazer onboarding →</span></div>`;
-  }
-}
-
-function activateClientFromDetail() {
-  if(selectedClientIdx===null) return;
-  switchClient(selectedClientIdx);
-  renderClients();
-}
-
-async function deleteClient(i) {
-  if(!confirm(`Remover "${clients[i].nome}"? Esta ação não pode ser desfeita.`)) return;
-  const nome = clients[i].nome;
-  clients.splice(i,1);
-  if(activeIdx===i) { activeIdx=null; LS.set('aios_active_idx',null); }
-  else if(activeIdx>i) { activeIdx--; LS.set('aios_active_idx',activeIdx); }
-  LS.set('aios_clients', clients);
-  // Remove da nuvem também
-  await sbDeleteClient(nome);
-  refreshClientSelect();
-  updateClientSwitcherUI();
-  selectedClientIdx=null;
-  document.getElementById('client-detail-card').style.display='none';
-  document.getElementById('client-empty-card').style.display='block';
-  renderClients();
-  showToast('Cliente removido.','success');
-}
-
-// ══════════════════════════════════════════════
-// HISTORY
-// ══════════════════════════════════════════════
-const typeLabels = {copy:'✦ Copy', orc:'⬡ Pauta', vis:'◉ Visual'};
-const typeTags   = {copy:'tag-pink', orc:'tag-purple', vis:'tag-blue'};
-
-function addToHistory(type, label, content, clientName) {
-  chatHistory.unshift({
-    id: Date.now(), type, label,
-    client: clientName||'—',
-    content,
-    date: new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})
+  // Enter nos inputs
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const hero = document.getElementById('screen-hero');
+      if (hero.style.display !== 'none' || !hero.style.display) comecar();
+    }
   });
-  if(chatHistory.length>50) chatHistory.pop();
-  LS.set('aios_history', chatHistory);
-  document.getElementById('hist-sub') && (document.getElementById('hist-sub').textContent = chatHistory.length+' itens salvos');
-  // Salva na nuvem (assíncrono, não bloqueia)
-  sbSaveHistory({type, label, client: clientName||'—', content});
-}
-
-function saveToHistory(type) {
-  const outId = {copy:'copy-output', orc:'orc-output', vis:'vis-output'}[type];
-  const content = document.getElementById(outId)?.textContent;
-  if(!content || content.includes('Preencha')) return showToast('⚠ Nenhum conteúdo para salvar.','error');
-  addToHistory(type, 'Salvo manualmente', content, getActiveClient()?.nome);
-  showToast('✓ Salvo no histórico!','success');
-}
-
-function renderHistory() {
-  const list = document.getElementById('history-list');
-  const sub  = document.getElementById('hist-sub');
-  if(sub) sub.textContent = chatHistory.length+' itens salvos';
-  if(!chatHistory.length) {
-    list.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:32px;text-align:center">Nenhum item no histórico ainda.</div>`;
-    return;
-  }
-  list.innerHTML = chatHistory.map(h=>`
-    <div class="history-item">
-      <div class="history-thumb">${{copy:'✦',orc:'⬡',vis:'◉'}[h.type]||'★'}</div>
-      <div class="history-meta">
-        <div class="history-title">${typeLabels[h.type]||h.type} — ${h.label}</div>
-        <div class="history-excerpt">${h.content}</div>
-        <div class="history-footer">
-          <span class="tag ${typeTags[h.type]||'tag-purple'}">${h.client}</span>
-          <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3);margin-left:auto">${h.date}</span>
-          <button class="btn btn-ghost btn-sm" onclick="copyText(${h.id})">⎘</button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function clearHistory() {
-  if(!confirm('Limpar todo o histórico?')) return;
-  chatHistory = []; LS.set('aios_history',[]);
-  renderHistory();
-}
-
-function copyText(id) {
-  const item = chatHistory.find(h=>h.id===id);
-  if(item) { navigator.clipboard.writeText(item.content); showToast('✓ Copiado!','success'); }
-}
-
-// ══════════════════════════════════════════════
-// DASHBOARD
-// ══════════════════════════════════════════════
-function renderDashboard() {
-  document.getElementById('dash-stat-clients').textContent = clients.length;
-  document.getElementById('dash-stat-copies').textContent = sessionStats.copies;
-  document.getElementById('dash-stat-pautas').textContent = sessionStats.pautas;
-  document.getElementById('dash-stat-briefs').textContent = sessionStats.briefs;
-
-  const dcl = document.getElementById('dash-clients-list');
-  if(!clients.length) {
-    dcl.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:16px 0;text-align:center">Nenhum cliente cadastrado.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar primeiro cliente →</span></div>`;
-  } else {
-    dcl.innerHTML = clients.slice(0,4).map((c,i)=>`
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="switchClient(${i});nav('copy',null)">
-        <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${c.nome.slice(0,2).toUpperCase()}</div>
-        <div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--text)">${c.nome}</div><div style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">${c.nicho||'—'}</div></div>
-        ${activeIdx===i?'<span class="tag tag-green" style="font-size:8px">ativo</span>':'<span style="font-size:10px;color:var(--text3)">›</span>'}
-      </div>`).join('');
-  }
-
-  const drl = document.getElementById('dash-recent-list');
-  const recent = chatHistory.slice(0,3);
-  if(!recent.length) {
-    drl.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:16px 0;text-align:center">Suas gerações aparecerão aqui.</div>`;
-  } else {
-    drl.innerHTML = recent.map(h=>`
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-        <div style="width:32px;height:32px;border-radius:7px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${{copy:'✦',orc:'⬡',vis:'◉'}[h.type]}</div>
-        <div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--text)">${typeLabels[h.type]} — ${h.label}</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">${h.client} · ${h.date}</div></div>
-      </div>`).join('');
-  }
-
-  const banner = document.getElementById('no-client-banner');
-  if(banner) banner.style.display = getActiveClient()?'none':'flex';
-}
-
-// ══════════════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════════════
-function copyOutput(id) {
-  const text = document.getElementById(id)?.textContent;
-  if(text) { navigator.clipboard.writeText(text); showToast('✓ Copiado!','success'); }
-}
-function copyAll() { copyOutput('copy-output'); }
-
-function showToast(msg, type='success') {
-  const t = document.createElement('div');
-  t.className = `toast toast-${type}`;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateY(10px)'; setTimeout(()=>t.remove(),400); }, 2400);
-}
-
-function saveSettings() {
-  settings.model  = document.getElementById('cfg-model').value;
-  settings.tokens = parseInt(document.getElementById('cfg-tokens').value);
-  LS.set('aios_settings', settings);
-  showToast('✓ Configurações salvas!','success');
-}
-
-function exportData() {
-  const data = {clients, history:chatHistory, settings, exportedAt: new Date().toISOString()};
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'vertice-backup.json';
-  a.click();
-}
-
-function clearAllData() {
-  if(!confirm('⚠ Apagar TODOS os dados locais? Os dados na nuvem permanecem.')) return;
-  ['aios_clients','aios_history','aios_active_idx','aios_settings'].forEach(k=>LS.del(k));
-  clients=[]; chatHistory=[]; activeIdx=null; sessionStats={copies:0,pautas:0,briefs:0};
-  refreshClientSelect(); renderDashboard(); renderClients(); renderHistory();
-  showToast('Dados locais apagados.','success');
-}
-
-function updateStorageInfo() {
-  try {
-    const used = JSON.stringify(localStorage).length;
-    document.getElementById('storage-info').textContent =
-      `${clients.length} clientes · ${chatHistory.length} histórico · ~${(used/1024).toFixed(1)}KB local · ☁ Supabase ativo`;
-  } catch(e){}
-}
-
-// ══════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════
-async function init() {
-  refreshClientSelect();
-  updateClientSwitcherUI();
-  updateClientIndicators();
-  renderDashboard();
-  updateStorageInfo();
-  if(settings.model) document.getElementById('cfg-model').value = settings.model;
-  if(settings.tokens) document.getElementById('cfg-tokens').value = settings.tokens;
-
-  // Conecta ao Supabase e carrega dados da nuvem
-  setSyncStatus('', 'conectando...');
-  await loadSupabase();
-  if(sbReady) {
-    await sbLoadClients();
-    updateStorageInfo();
-  }
-}
-
-init();
 </script>
+
 </body>
 </html>
