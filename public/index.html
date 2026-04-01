@@ -2,165 +2,1027 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vértice</title>
-
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000000'/%3E%3Cpolygon points='4,6 16,26 28,6 23,6 16,18 9,6' fill='%23F5F5F5'/%3E%3Cpolygon points='14,6 16,10 18,6' fill='%237A00FF'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #0a0a0a;
-  color: #fff;
-  display: flex;
+:root {
+  --bg:#000000; --surface:#0a0a0a; --surface2:#1A1A1A; --surface3:#2A2A2A;
+  --border:rgba(255,255,255,0.055); --border2:rgba(255,255,255,0.11);
+  --accent:#7A00FF; --accent2:#9333ea; --accent3:#c4b5fd;
+  --green:#2dd4a0; --orange:#fb923c; --pink:#f472b6; --blue:#60a5fa;
+  --yellow:#fbbf24; --red:#f87171;
+  --text:#F5F5F5; --text2:#8e8ea8; --text3:#4a4a62;
+  --radius:14px; --radius-sm:8px;
+  --font-display:'Inter',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace;
 }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.6;min-height:100vh;display:flex;overflow-x:hidden;}
+.sidebar{width:232px;min-width:232px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+.logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
+.logo-mark{font-family:var(--font-display);font-weight:900;font-size:15px;color:var(--text);letter-spacing:.5px;display:flex;align-items:center;gap:9px;}
+.logo-sub{font-size:8.5px;color:var(--text3);font-family:var(--font-mono);margin-top:4px;letter-spacing:.5px;}
+.nav{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:1px;overflow-y:auto;}
+.nav-section{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;padding:12px 10px 5px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:12.5px;transition:all .15s;border:1px solid transparent;user-select:none;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:rgba(122,0,255,.14);color:var(--accent3);border-color:rgba(122,0,255,.22);}
+.nav-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:9px;font-family:var(--font-mono);padding:1px 6px;border-radius:20px;}
+.nav-badge-new{margin-left:auto;background:var(--green);color:#000;font-size:9px;font-family:var(--font-mono);padding:1px 6px;border-radius:20px;font-weight:600;}
+.client-switcher{padding:12px;border-top:1px solid var(--border);}
+.switcher-label{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;padding:0 2px;}
+.switcher-select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:12px;padding:8px 10px;outline:none;cursor:pointer;}
+.active-client-pill{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(122,0,255,.1);border:1px solid rgba(122,0,255,.2);border-radius:var(--radius-sm);margin-top:6px;}
+.client-avatar-mini{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--pink));}
+.client-active-name{font-size:11.5px;font-weight:500;color:var(--accent3);}
+.client-active-nicho{font-size:9px;font-family:var(--font-mono);color:var(--text3);}
+.sync-status{display:flex;align-items:center;gap:5px;padding:6px 12px;font-size:9px;font-family:var(--font-mono);color:var(--text3);border-top:1px solid var(--border);}
+.sync-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);flex-shrink:0;}
+.sync-dot.synced{background:var(--green);}
+.sync-dot.syncing{background:var(--orange);animation:pulse 1s infinite;}
+.sync-dot.error{background:var(--red);}
+.main{margin-left:232px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.header{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;background:rgba(0,0,0,.9);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
+.header-title{font-family:var(--font-display);font-size:18px;font-weight:700;flex:1;}
+.status-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.22);border-radius:20px;font-size:10px;font-family:var(--font-mono);color:var(--green);}
+.status-dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.content{padding:24px 28px;flex:1;}
+.page{display:none;}
+.page.active{display:block;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.card-title{font-family:var(--font-display);font-size:13.5px;font-weight:700;letter-spacing:-.2px;}
+.card-sub{font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:2px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
+.stat-label{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+.stat-value{font-family:var(--font-display);font-size:26px;font-weight:800;letter-spacing:-1px;}
+.stat-change{font-size:10px;font-family:var(--font-mono);margin-top:3px;}
+.up{color:var(--green);} .down{color:var(--red);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s;font-family:var(--font-body);white-space:nowrap;}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-primary:hover{filter:brightness(1.12);}
+.btn-ghost{background:transparent;color:var(--text2);border-color:var(--border2);}
+.btn-ghost:hover{background:var(--surface2);color:var(--text);}
+.btn-sm{padding:4px 10px;font-size:10px;}
+.btn-green{background:rgba(45,212,160,.12);color:var(--green);border:1px solid rgba(45,212,160,.25);}
+.btn-green:hover{background:rgba(45,212,160,.22);}
+.tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:9.5px;font-family:var(--font-mono);font-weight:500;}
+.tag-purple{background:rgba(122,0,255,.13);color:var(--accent3);border:1px solid rgba(122,0,255,.18);}
+.tag-green{background:rgba(45,212,160,.1);color:var(--green);border:1px solid rgba(45,212,160,.18);}
+.tag-orange{background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.18);}
+.tag-pink{background:rgba(244,114,182,.1);color:var(--pink);border:1px solid rgba(244,114,182,.18);}
+.tag-blue{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.18);}
+.tag-red{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.18);}
+.input-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.input-label{font-size:10px;color:var(--text2);font-family:var(--font-mono);}
+input,textarea,select{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:12.5px;padding:8px 11px;width:100%;outline:none;transition:border-color .15s;}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+textarea{resize:vertical;min-height:72px;}
+select option{background:var(--surface2);}
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
+.loading-bar{height:2px;background:var(--surface3);border-radius:2px;overflow:hidden;margin:10px 0;}
+.loading-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));border-radius:2px;width:0%;transition:width .4s ease;}
+.output-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-size:12px;line-height:1.9;color:var(--text);white-space:pre-wrap;word-break:break-word;}
+.section{margin-bottom:22px;}
+.section-title{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+.progress{background:var(--surface2);border-radius:20px;height:5px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--accent),var(--pink));}
+table{width:100%;border-collapse:collapse;}
+th{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:7px 12px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--surface2);}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.cursor{display:inline-block;width:2px;height:13px;background:var(--accent);animation:blink 1s infinite;vertical-align:middle;margin-left:2px;}
+.memory-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;}
+.memory-key{font-size:9.5px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.memory-val{font-size:12px;color:var(--text);}
+.memory-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.onboard-step{display:none;}
+.onboard-step.active{display:block;animation:fadeIn .25s ease;}
+.step-indicator{display:flex;gap:6px;margin-bottom:20px;}
+.step-dot{width:28px;height:4px;border-radius:2px;background:var(--surface3);transition:background .3s;}
+.step-dot.done{background:var(--green);}
+.step-dot.active{background:var(--accent);}
+.client-row{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;transition:border-color .15s;}
+.client-row:hover{border-color:var(--border2);}
+.client-row-avatar{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.client-row-info{flex:1;}
+.client-row-name{font-size:12.5px;font-weight:600;color:var(--text);}
+.client-row-meta{font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:1px;}
+.toast{position:fixed;bottom:24px;right:24px;padding:11px 18px;border-radius:9px;font-size:12px;font-family:var(--font-mono);z-index:9999;transition:all .4s;pointer-events:none;}
+.toast-success{background:rgba(45,212,160,.15);border:1px solid rgba(45,212,160,.35);color:var(--green);}
+.toast-error{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--red);}
+.agent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:border-color .15s;}
+.agent-card:hover{border-color:var(--border2);}
+.agent-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.agent-status{display:flex;align-items:center;gap:5px;font-size:9.5px;font-family:var(--font-mono);color:var(--green);margin-top:2px;}
+.history-item{display:flex;gap:13px;padding:12px 0;border-bottom:1px solid var(--border);}
+.history-item:last-child{border-bottom:none;}
+.history-thumb{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--surface3);}
+.history-meta{flex:1;}
+.history-title{font-size:12.5px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.history-excerpt{font-size:11px;color:var(--text3);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.history-footer{display:flex;align-items:center;gap:8px;margin-top:5px;}
+.notif{display:flex;align-items:flex-start;gap:10px;padding:11px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:7px;}
+.notif-icon{font-size:14px;flex-shrink:0;}
+.notif-text{font-size:12px;color:var(--text2);}
 
-.sidebar {
-  width: 200px;
-  background: #111;
-  padding: 20px;
-}
+/* ── PREVIEW INSTAGRAM ── */
+.ig-preview{background:#1a1a1a;border:1px solid var(--border2);border-radius:12px;overflow:hidden;max-width:360px;margin:0 auto;}
+.ig-header{display:flex;align-items:center;gap:10px;padding:12px 14px;}
+.ig-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.ig-username{font-size:12px;font-weight:600;color:#fff;}
+.ig-image{width:100%;height:200px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:40px;}
+.ig-actions{display:flex;gap:14px;padding:10px 14px 6px;font-size:18px;}
+.ig-caption{padding:0 14px 14px;font-size:12px;color:#fff;line-height:1.6;white-space:pre-wrap;}
+.ig-hashtags{color:#60a5fa;font-size:11px;margin-top:4px;}
+.ig-caption strong{font-weight:600;}
 
-.nav-item {
-  padding: 10px;
-  cursor: pointer;
-  margin-bottom: 5px;
-  background: #1a1a1a;
-}
-
-.nav-item:hover {
-  background: #333;
-}
-
-.main {
-  flex: 1;
-  padding: 20px;
-}
-
-.page {
-  display: none;
-}
-
-.page.active {
-  display: block;
-}
-
-.card {
-  background: #1a1a1a;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-button {
-  padding: 10px;
-  background: purple;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-input, select {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  background: #222;
-  color: #fff;
-  border: 1px solid #444;
-}
+/* ── COMENTÁRIOS ── */
+.comment-row{display:flex;gap:10px;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;}
+.comment-author{font-size:11px;font-weight:600;color:var(--accent3);margin-bottom:3px;}
+.comment-text{font-size:12px;color:var(--text2);line-height:1.5;}
+.reply-box{background:rgba(45,212,160,.05);border:1px solid rgba(45,212,160,.2);border-radius:var(--radius-sm);padding:10px;margin-top:8px;font-size:12px;color:var(--green);line-height:1.6;white-space:pre-wrap;}
 </style>
-
 </head>
-
 <body>
 
-<div class="sidebar">
-  <div class="nav-item" onclick="nav('master')">🧠 Plano Completo</div>
-</div>
-
-<div class="main">
-
-  <div id="page-master" class="page active">
-
-    <div class="card">
-      <h2>Plano Completo</h2>
-
-      <label>Objetivo</label>
-      <select id="objetivo">
-        <option>Vender mais</option>
-        <option>Crescer seguidores</option>
-        <option>Engajar</option>
-      </select>
-
-      <label>Produto</label>
-      <input id="produto" placeholder="Ex: Pizza artesanal">
-
-      <button onclick="runMaster()">Gerar plano</button>
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+        <polygon points="2,4 16,28 30,4 25,4 16,20 7,4" fill="#F5F5F5"/>
+        <polygon points="13,4 16,9.5 19,4" fill="#7A00FF"/>
+      </svg>
+      VÉRTICE
     </div>
-
-    <div class="card">
-      <h3>Resultado</h3>
-      <div id="output">Clique no botão...</div>
+    <div class="logo-sub">Engenharia de crescimento previsível.</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="nav('dashboard',this)"><span class="nav-icon">◈</span>Dashboard</div>
+    <div class="nav-section">Agentes IA</div>
+    <div class="nav-item" onclick="nav('copy',this)"><span class="nav-icon">✦</span>Agente Copy<span class="nav-badge">IA</span></div>
+    <div class="nav-item" onclick="nav('orchestrator',this)"><span class="nav-icon">⬡</span>Orquestrador<span class="nav-badge">IA</span></div>
+    <div class="nav-item" onclick="nav('visual',this)"><span class="nav-icon">◉</span>Agente Visual<span class="nav-badge">IA</span></div>
+    <div class="nav-item" onclick="nav('comments',this)"><span class="nav-icon">💬</span>Comentários<span class="nav-badge-new">novo</span></div>
+    <div class="nav-section">Gestão</div>
+    <div class="nav-item" onclick="nav('clients',this)"><span class="nav-icon">◈</span>Clientes</div>
+    <div class="nav-item" onclick="nav('onboarding',this)"><span class="nav-icon">★</span>Onboarding<span class="nav-badge-new">novo</span></div>
+    <div class="nav-item" onclick="nav('history',this)"><span class="nav-icon">≡</span>Histórico</div>
+    <div class="nav-item" onclick="nav('settings',this)"><span class="nav-icon">⊙</span>Config</div>
+  </nav>
+  <div class="client-switcher">
+    <div class="switcher-label">Cliente ativo</div>
+    <select class="switcher-select" id="global-client-select" onchange="switchClient(this.value)">
+      <option value="">— Selecione um cliente —</option>
+    </select>
+    <div class="active-client-pill" id="active-client-pill" style="display:none">
+      <div class="client-avatar-mini" id="active-client-avatar">?</div>
+      <div>
+        <div class="client-active-name" id="active-client-name">—</div>
+        <div class="client-active-nicho" id="active-client-nicho">—</div>
+      </div>
     </div>
+  </div>
+  <div class="sync-status" id="sync-status">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span id="sync-label">conectando...</span>
+  </div>
+</aside>
 
+<main class="main">
+  <div class="header">
+    <div class="header-title" id="hdr">Dashboard</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="status-pill"><span class="status-dot"></span>4 agentes online</div>
+      <button class="btn btn-primary btn-sm" onclick="nav('onboarding',null)">+ Novo cliente</button>
+    </div>
   </div>
 
+  <div class="content">
+
+<!-- ══ DASHBOARD ══ -->
+<div class="page active" id="page-dashboard">
+  <div id="no-client-banner" style="background:rgba(122,0,255,.08);border:1px solid rgba(122,0,255,.2);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
+    <span style="font-size:18px">★</span>
+    <div>
+      <div style="font-size:12.5px;font-weight:500;color:var(--accent3)">Nenhum cliente ativo selecionado</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px">Selecione um cliente na barra lateral ou <span style="color:var(--accent3);cursor:pointer;text-decoration:underline" onclick="nav('onboarding',null)">cadastre um novo</span> para os agentes usarem o contexto de marca.</div>
+    </div>
+  </div>
+  <div class="grid-4 section">
+    <div class="stat-card"><div class="stat-label">Clientes ativos</div><div class="stat-value" id="dash-stat-clients">0</div><div class="stat-change" style="color:var(--text3)">cadastrados</div></div>
+    <div class="stat-card"><div class="stat-label">Copies geradas</div><div class="stat-value" id="dash-stat-copies">0</div><div class="stat-change up">esta sessão</div></div>
+    <div class="stat-card"><div class="stat-label">Pautas criadas</div><div class="stat-value" id="dash-stat-pautas">0</div><div class="stat-change up">esta sessão</div></div>
+    <div class="stat-card"><div class="stat-label">Briefs visuais</div><div class="stat-value" id="dash-stat-briefs">0</div><div class="stat-change up">esta sessão</div></div>
+  </div>
+  <div class="grid-2 section">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Acesso rápido — Agentes</div></div>
+      <div class="grid-2" style="gap:10px">
+        <div class="agent-card" onclick="nav('copy',null)"><div class="agent-icon" style="background:rgba(244,114,182,.12)">✦</div><div><div style="font-weight:600;font-size:12px">Copy</div><div class="agent-status">● pronto</div></div></div>
+        <div class="agent-card" onclick="nav('orchestrator',null)"><div class="agent-icon" style="background:rgba(122,0,255,.14)">⬡</div><div><div style="font-weight:600;font-size:12px">Orquestrador</div><div class="agent-status">● pronto</div></div></div>
+        <div class="agent-card" onclick="nav('visual',null)"><div class="agent-icon" style="background:rgba(96,165,250,.12)">◉</div><div><div style="font-weight:600;font-size:12px">Visual</div><div class="agent-status">● pronto</div></div></div>
+        <div class="agent-card" onclick="nav('comments',null)"><div class="agent-icon" style="background:rgba(45,212,160,.12)">💬</div><div><div style="font-weight:600;font-size:12px">Comentários</div><div class="agent-status">● pronto</div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Seus clientes</div><button class="btn btn-ghost btn-sm" onclick="nav('clients',null)">Ver todos →</button></div>
+      <div id="dash-clients-list"><div style="color:var(--text3);font-size:12px;padding:20px 0;text-align:center">Nenhum cliente cadastrado ainda.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar primeiro cliente →</span></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Últimas gerações</div><button class="btn btn-ghost btn-sm" onclick="nav('history',null)">Histórico completo →</button></div>
+    <div id="dash-recent-list"><div style="color:var(--text3);font-size:12px;padding:16px 0;text-align:center">Suas gerações de conteúdo aparecerão aqui.</div></div>
+  </div>
 </div>
 
+<!-- ══ COPY ══ -->
+<div class="page" id="page-copy">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">✦ Agente Copy</div><div class="card-sub" id="copy-client-indicator">contexto: nenhum cliente ativo</div></div></div>
+      <div class="input-group"><label class="input-label">Tipo de post</label>
+        <select id="copy-tipo"><option>Produto em destaque</option><option>Oferta / Promoção</option><option>Educativo / Dica</option><option>Bastidores</option><option>Depoimento de cliente</option><option>Lançamento</option><option>Engajamento (pergunta)</option><option>Storytelling de marca</option></select>
+      </div>
+      <div class="input-group"><label class="input-label">Rede social</label>
+        <select id="copy-rede"><option>Instagram (feed)</option><option>Instagram (stories)</option><option>Instagram (reels)</option><option>TikTok</option><option>Facebook</option><option>LinkedIn</option></select>
+      </div>
+      <div class="input-group"><label class="input-label">Produto / serviço em foco</label><input id="copy-produto" placeholder="ex: Pão de queijo artesanal"></div>
+      <div class="input-group"><label class="input-label">Gancho emocional / ângulo</label>
+        <select id="copy-gancho"><option>Curiosidade ("Você sabia que...")</option><option>Urgência / Escassez</option><option>Prova social / Depoimento</option><option>Transformação antes/depois</option><option>Nos bastidores</option><option>Pergunta provocativa</option><option>Nostalgia / Emoção</option><option>Benefício direto</option></select>
+      </div>
+      <div class="input-group"><label class="input-label">CTA (chamada para ação)</label><input id="copy-cta" placeholder="ex: Peça pelo WhatsApp, Venha nos visitar"></div>
+      <div class="input-group"><label class="input-label">Contexto extra (opcional)</label><textarea id="copy-contexto" placeholder="ex: Semana do aniversário da loja..." style="min-height:52px"></textarea></div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn btn-primary" style="flex:1" onclick="runCopy(1)">✦ Gerar 1 versão</button>
+        <button class="btn btn-ghost" style="flex:1" onclick="runCopy(3)">✦✦✦ 3 variações</button>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><div class="card-title">Copy gerada</div><span class="tag tag-purple" id="copy-tag">aguardando</span></div>
+        <div class="loading-bar"><div class="loading-fill" id="copy-loading"></div></div>
+        <div class="output-box" id="copy-output" style="min-height:220px;font-size:12px">Preencha o brief ao lado e clique em gerar...</div>
+        <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap" id="copy-actions">
+          <button class="btn btn-ghost btn-sm" onclick="copyAll()">⎘ Copiar</button>
+          <button class="btn btn-ghost btn-sm" onclick="saveToHistory('copy')">≡ Salvar</button>
+          <button class="btn btn-ghost btn-sm" onclick="showPreview()">👁 Preview Instagram</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportCopyPDF()">⬇ PDF</button>
+        </div>
+      </div>
+
+      <!-- PREVIEW INSTAGRAM -->
+      <div class="card" id="ig-preview-card" style="display:none">
+        <div class="card-header"><div class="card-title">Preview — Instagram</div><button class="btn btn-ghost btn-sm" onclick="document.getElementById('ig-preview-card').style.display='none'">✕</button></div>
+        <div class="ig-preview" id="ig-preview-box">
+          <div class="ig-header">
+            <div class="ig-avatar" id="ig-av">?</div>
+            <div><div class="ig-username" id="ig-user">@usuario</div></div>
+            <div style="margin-left:auto;font-size:18px;color:#fff">···</div>
+          </div>
+          <div class="ig-image">🖼️</div>
+          <div class="ig-actions">❤️ 💬 📤 <span style="margin-left:auto">🔖</span></div>
+          <div class="ig-caption" id="ig-caption-text">O texto do post aparecerá aqui...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ORCHESTRATOR ══ -->
+<div class="page" id="page-orchestrator">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">⬡ Orquestrador</div><div class="card-sub" id="orc-client-indicator">contexto: nenhum cliente ativo</div></div></div>
+      <div class="input-group"><label class="input-label">Semana de referência</label><input id="orc-semana" placeholder="ex: 31 mar – 6 abr, ou deixe em branco"></div>
+      <div class="input-group"><label class="input-label">Redes para a pauta</label>
+        <select id="orc-redes"><option>Instagram + Facebook</option><option>Instagram + TikTok</option><option>Só Instagram</option><option>Todas as redes</option></select>
+      </div>
+      <div class="input-group"><label class="input-label">Objetivo da semana</label>
+        <select id="orc-objetivo"><option>Aumentar vendas</option><option>Crescer seguidores</option><option>Engajar comunidade</option><option>Lançar produto/serviço</option><option>Construir autoridade</option></select>
+      </div>
+      <div class="input-group"><label class="input-label">Posts por semana</label>
+        <select id="orc-freq"><option>3 posts</option><option>5 posts</option><option>7 posts (diário)</option><option>10+ posts</option></select>
+      </div>
+      <div class="input-group"><label class="input-label">Contexto especial</label><textarea id="orc-contexto" placeholder="ex: Dia das Mães, lançamento, promoção..."></textarea></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" style="flex:1" onclick="runOrchestrator()">⬡ Gerar pauta</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportPautaPDF()" title="Exportar PDF">⬇ PDF</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Pauta da semana</div><span class="tag tag-purple" id="orc-tag">aguardando</span></div>
+      <div class="loading-bar"><div class="loading-fill" id="orc-loading"></div></div>
+      <div class="output-box" id="orc-output" style="min-height:400px;font-size:12px">Preencha o brief e clique em gerar...</div>
+      <div style="display:flex;gap:6px;margin-top:12px">
+        <button class="btn btn-ghost btn-sm" onclick="copyOutput('orc-output')">⎘ Copiar</button>
+        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('orc')">≡ Salvar</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportPautaPDF()">⬇ Exportar PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VISUAL ══ -->
+<div class="page" id="page-visual">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">◉ Agente Visual</div><div class="card-sub" id="vis-client-indicator">contexto: nenhum cliente ativo</div></div></div>
+      <div class="input-group"><label class="input-label">Objetivo do visual</label>
+        <select id="vis-objetivo"><option>Apresentar produto</option><option>Promoção / Oferta</option><option>Conteúdo educativo</option><option>Bastidores</option><option>Depoimento / Prova social</option><option>Identidade de marca</option></select>
+      </div>
+      <div class="input-group"><label class="input-label">Formato</label>
+        <select id="vis-formato"><option>Feed quadrado 1:1</option><option>Story / Reels 9:16</option><option>Carrossel (até 10 slides)</option><option>Banner 16:9</option></select>
+      </div>
+      <div class="input-group"><label class="input-label">Estilo visual</label>
+        <select id="vis-estilo"><option>Fotografia real, luz natural</option><option>Flat design minimalista</option><option>Ilustração colorida</option><option>Dark & premium</option><option>Vintage / Retrô</option><option>Clean & corporativo</option></select>
+      </div>
+      <div class="input-group"><label class="input-label">Elemento principal</label><input id="vis-elemento" placeholder="ex: pão de queijo saindo do forno"></div>
+      <div class="input-group"><label class="input-label">Paleta de cores da marca</label><input id="vis-cores" placeholder="ex: marrom, bege, dourado"></div>
+      <div class="input-group"><label class="input-label">Mood / sensação</label>
+        <select id="vis-mood"><option>Aconchegante e familiar</option><option>Fresco e energético</option><option>Luxuoso e sofisticado</option><option>Divertido e jovem</option><option>Nostálgico e emocional</option><option>Limpo e confiável</option></select>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="runVisual()">◉ Gerar direção criativa</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Direção criativa + Prompt IA</div><span class="tag tag-blue" id="vis-tag">aguardando</span></div>
+      <div class="loading-bar"><div class="loading-fill" id="vis-loading"></div></div>
+      <div class="output-box" id="vis-output" style="min-height:400px;font-size:12px">Preencha o brief e clique em gerar...</div>
+      <div style="display:flex;gap:6px;margin-top:12px">
+        <button class="btn btn-ghost btn-sm" onclick="copyOutput('vis-output')">⎘ Copiar</button>
+        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('vis')">≡ Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ COMENTÁRIOS ══ -->
+<div class="page" id="page-comments">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">💬 Agente de Comentários</div><div class="card-sub" id="com-client-indicator">contexto: nenhum cliente ativo</div></div></div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.6">Cole comentários do Instagram, Facebook ou TikTok. A IA vai sugerir respostas no tom exato da marca do cliente.</div>
+
+      <div class="input-group">
+        <label class="input-label">Rede social</label>
+        <select id="com-rede"><option>Instagram</option><option>Facebook</option><option>TikTok</option><option>LinkedIn</option></select>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Contexto do post (opcional)</label>
+        <input id="com-post" placeholder="ex: Post de promoção do croissant">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Tom da resposta</label>
+        <select id="com-tom">
+          <option>Usar tom do DNA da marca</option>
+          <option>Mais formal e profissional</option>
+          <option>Mais descontraído e próximo</option>
+          <option>Empático e acolhedor</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Cole os comentários abaixo (um por linha)</label>
+        <textarea id="com-input" style="min-height:160px" placeholder="@usuario1: Amei o produto! Quanto custa?
+@usuario2: Onde vocês ficam?
+@usuario3: Já comprei e recomendo!
+@usuario4: Tem entrega?"></textarea>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%" onclick="runComments()">💬 Gerar respostas</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">Respostas sugeridas</div><span class="tag tag-green" id="com-tag">aguardando</span></div>
+      <div class="loading-bar"><div class="loading-fill" id="com-loading"></div></div>
+      <div id="com-output-area">
+        <div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center">Cole comentários ao lado e clique em gerar.<br><span style="font-size:11px">As respostas usarão o tom de voz do cliente ativo.</span></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:12px" id="com-actions" style="display:none">
+        <button class="btn btn-ghost btn-sm" onclick="copyOutput('com-raw')">⎘ Copiar tudo</button>
+        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('com')">≡ Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CLIENTS ══ -->
+<div class="page" id="page-clients">
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">Seus clientes</div><div class="card-sub" id="clients-sub">0 cadastrados</div></div><button class="btn btn-primary btn-sm" onclick="nav('onboarding',null)">+ Novo cliente</button></div>
+        <div id="clients-list"><div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center">Nenhum cliente ainda.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar agora →</span></div></div>
+      </div>
+    </div>
+    <div class="card" id="client-detail-card" style="display:none">
+      <div class="card-header">
+        <div><div class="card-title" id="cd-nome">—</div><div class="card-sub" id="cd-nicho">—</div></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-primary btn-sm" onclick="activateClientFromDetail()">Ativar</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--red)" id="cd-delete-btn">Remover</button>
+        </div>
+      </div>
+      <div class="memory-grid" id="cd-memory-grid"></div>
+    </div>
+    <div class="card" id="client-empty-card"><div style="color:var(--text3);font-size:12px;padding:32px;text-align:center;line-height:2">← Selecione um cliente para ver o DNA de marca salvo</div></div>
+  </div>
+</div>
+
+<!-- ══ ONBOARDING ══ -->
+<div class="page" id="page-onboarding">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title">★ Onboarding de Cliente</div><div class="card-sub">Cria o DNA de marca — usado por todos os agentes</div></div></div>
+      <div class="step-indicator" id="step-ind">
+        <div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div>
+      </div>
+      <div class="onboard-step active" id="step-1">
+        <div class="section-title">1 / 5 — Identidade</div>
+        <div class="input-group"><label class="input-label">Nome da empresa *</label><input id="ob-nome" placeholder="ex: Padaria Boa"></div>
+        <div class="input-group"><label class="input-label">Nicho</label>
+          <select id="ob-nicho"><option>Alimentação e Gastronomia</option><option>Moda e Beleza</option><option>Saúde e Bem-estar</option><option>Serviços Locais</option><option>Educação</option><option>Pet Shop</option><option>Varejo</option><option>Auto e Mecânica</option><option>Tecnologia</option><option>Outro</option></select>
+        </div>
+        <div class="input-group"><label class="input-label">Cidade / Região</label><input id="ob-cidade" placeholder="ex: São Paulo, SP"></div>
+        <div class="input-group"><label class="input-label">Tempo no mercado</label><select id="ob-anos"><option>Menos de 1 ano</option><option>1–3 anos</option><option>3–10 anos</option><option>Mais de 10 anos</option></select></div>
+        <div class="input-group"><label class="input-label">Slogan ou frase da marca</label><input id="ob-slogan" placeholder="ex: Feito com amor desde 1998"></div>
+        <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="stepNext(1)">Próximo →</button>
+      </div>
+      <div class="onboard-step" id="step-2">
+        <div class="section-title">2 / 5 — Público-Alvo</div>
+        <div class="input-group"><label class="input-label">Faixa etária</label><select id="ob-idade"><option>18–25 anos</option><option>25–35 anos</option><option>35–50 anos</option><option>50+ anos</option><option>Todas as idades</option></select></div>
+        <div class="input-group"><label class="input-label">Gênero predominante</label><select id="ob-genero"><option>Feminino</option><option>Masculino</option><option>Equilibrado</option></select></div>
+        <div class="input-group"><label class="input-label">Classe social</label><select id="ob-classe"><option>C / Popular</option><option>C/B — Médio</option><option>B/A — Médio-alto</option><option>A — Premium</option></select></div>
+        <div class="input-group"><label class="input-label">Principais dores do cliente ideal</label><textarea id="ob-dores" placeholder="ex: Quer produtos frescos perto de casa..."></textarea></div>
+        <div style="display:flex;gap:8px"><button class="btn btn-ghost" style="flex:1" onclick="stepPrev(2)">← Voltar</button><button class="btn btn-primary" style="flex:2" onclick="stepNext(2)">Próximo →</button></div>
+      </div>
+      <div class="onboard-step" id="step-3">
+        <div class="section-title">3 / 5 — Tom de Voz</div>
+        <div class="input-group"><label class="input-label">Tom principal</label><select id="ob-tom"><option>Amigável e acolhedor</option><option>Profissional e confiável</option><option>Jovem e descolado</option><option>Premium e sofisticado</option><option>Divertido e irreverente</option><option>Educativo e especialista</option></select></div>
+        <div class="input-group"><label class="input-label">Uso de emojis</label><select id="ob-emoji"><option>Sim, com moderação</option><option>Sim, bastante</option><option>Raramente</option><option>Nunca</option></select></div>
+        <div class="input-group"><label class="input-label">Trata o cliente como</label><select id="ob-trato"><option>Você (informal)</option><option>Você (formal)</option><option>Amigo / Parceiro</option></select></div>
+        <div class="input-group"><label class="input-label">Palavras PROIBIDAS</label><input id="ob-evitar" placeholder="ex: barato, genérico..."></div>
+        <div class="input-group"><label class="input-label">Palavras-chave obrigatórias</label><input id="ob-keywords" placeholder="ex: artesanal, amor, tradição..."></div>
+        <div style="display:flex;gap:8px"><button class="btn btn-ghost" style="flex:1" onclick="stepPrev(3)">← Voltar</button><button class="btn btn-primary" style="flex:2" onclick="stepNext(3)">Próximo →</button></div>
+      </div>
+      <div class="onboard-step" id="step-4">
+        <div class="section-title">4 / 5 — Produto & Diferencial</div>
+        <div class="input-group"><label class="input-label">Principais produtos / serviços</label><textarea id="ob-produtos" placeholder="Liste separados por vírgula..."></textarea></div>
+        <div class="input-group"><label class="input-label">Maior diferencial competitivo</label><textarea id="ob-diferencial" placeholder="O que faz esta empresa única?"></textarea></div>
+        <div class="input-group"><label class="input-label">Ticket médio</label><select id="ob-ticket"><option>Até R$ 30</option><option>R$ 30–100</option><option>R$ 100–500</option><option>Acima de R$ 500</option></select></div>
+        <div class="input-group"><label class="input-label">Sazonalidade importante</label><input id="ob-sazonal" placeholder="ex: Natal, Páscoa, Dia das Mães..."></div>
+        <div style="display:flex;gap:8px"><button class="btn btn-ghost" style="flex:1" onclick="stepPrev(4)">← Voltar</button><button class="btn btn-primary" style="flex:2" onclick="stepNext(4)">Próximo →</button></div>
+      </div>
+      <div class="onboard-step" id="step-5">
+        <div class="section-title">5 / 5 — Redes & Objetivo</div>
+        <div class="input-group"><label class="input-label">Redes ativas</label><select id="ob-redes"><option>Instagram + Facebook</option><option>Instagram + TikTok</option><option>Todas</option><option>Só Instagram</option></select></div>
+        <div class="input-group"><label class="input-label">Frequência desejada</label><select id="ob-freq"><option>3–4 posts/semana</option><option>5–7 posts/semana</option><option>1–2 posts/semana</option><option>Diário</option></select></div>
+        <div class="input-group"><label class="input-label">Meta principal</label><select id="ob-meta"><option>Aumentar vendas</option><option>Crescer seguidores</option><option>Construir autoridade</option><option>Engajar comunidade</option></select></div>
+        <div class="input-group"><label class="input-label">Observações extras</label><textarea id="ob-obs" placeholder="Qualquer detalhe adicional..."></textarea></div>
+        <div style="display:flex;gap:8px"><button class="btn btn-ghost" style="flex:1" onclick="stepPrev(5)">← Voltar</button><button class="btn btn-primary" style="flex:2" onclick="runOnboarding()">★ Gerar DNA de Marca</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">DNA de Marca</div><span class="tag tag-green" id="ob-tag">aguardando</span></div>
+      <div class="loading-bar"><div class="loading-fill" id="ob-loading"></div></div>
+      <div class="output-box" id="ob-output" style="min-height:400px;font-size:11.5px">Complete o onboarding e a IA vai gerar o DNA completo da marca...</div>
+      <div id="ob-memory-section" style="display:none;margin-top:16px">
+        <hr class="divider">
+        <div style="font-size:12px;font-weight:600;margin-bottom:10px;color:var(--text2)">Salvo na memória dos agentes</div>
+        <div class="memory-grid" id="ob-memory-grid"></div>
+        <button class="btn btn-green" style="width:100%;margin-top:12px" onclick="nav('copy',null)">Ir para Agente Copy com este contexto →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HISTORY ══ -->
+<div class="page" id="page-history">
+  <div class="card">
+    <div class="card-header"><div><div class="card-title">Histórico de Gerações</div><div class="card-sub" id="hist-sub">0 itens salvos</div></div><button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearHistory()">Limpar tudo</button></div>
+    <div id="history-list"><div style="color:var(--text3);font-size:12px;padding:32px;text-align:center">Suas gerações salvas aparecerão aqui.</div></div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div class="page" id="page-settings">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Configuração dos Agentes</div></div>
+      <div class="input-group">
+        <label class="input-label">🔑 Chave de API</label>
+        <input id="cfg-apikey" type="password" value="gerenciada pelo servidor" readonly style="opacity:.4;cursor:not-allowed">
+        <div style="font-size:10px;color:var(--green);font-family:var(--font-mono);margin-top:4px">✓ Chave segura — configurada no Netlify, nunca exposta no browser</div>
+      </div>
+      <div class="input-group"><label class="input-label">🤖 Modelo</label>
+        <select id="cfg-model">
+          <option value="llama-3.3-70b-versatile">Llama 3.3 70B (Groq · gratuito · recomendado)</option>
+          <option value="llama-3.1-8b-instant">Llama 3.1 8B (Groq · mais rápido)</option>
+          <option value="gemma2-9b-it">Gemma 2 9B (Groq · gratuito)</option>
+        </select>
+      </div>
+      <div class="input-group"><label class="input-label">Idioma padrão</label><select id="cfg-lang"><option>Português Brasileiro</option><option>Inglês</option><option>Espanhol</option></select></div>
+      <div class="input-group"><label class="input-label">Tamanho máximo da resposta</label>
+        <select id="cfg-tokens"><option value="800">Curto (800 tokens)</option><option value="1500" selected>Médio (1500 tokens)</option><option value="2500">Longo (2500 tokens)</option></select>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="saveSettings()">Salvar configurações</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Dados salvos</div></div>
+      <div class="notif"><span class="notif-icon">☁</span><div><div class="notif-text" style="color:var(--text)">Armazenamento em nuvem (Supabase)</div><div class="notif-text" style="font-size:11px;margin-top:2px">Clientes e DNA de marca salvos no servidor.</div></div></div>
+      <div class="notif" style="margin-top:6px"><span class="notif-icon">💾</span><div><div class="notif-text" style="color:var(--text)">Backup local (localStorage)</div><div class="notif-text" style="font-size:11px;margin-top:2px">Cópia local de segurança. Funciona offline.</div></div></div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="exportData()">⬇ Exportar dados</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearAllData()">✕ Apagar tudo</button>
+      </div>
+      <div class="divider"></div>
+      <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono)" id="storage-info">Calculando...</div>
+    </div>
+  </div>
+</div>
+
+  </div>
+</main>
+
 <script>
+// ══ SUPABASE ══
+const SUPABASE_URL = 'https://opigoplvnbcbtbgwgadb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_nlaH3jiD9uwNiRNdG4OR_g_AhZSkBII';
+let sbReady = false;
 
-function nav(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
+async function loadSupabase() {
+  return new Promise((resolve) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+    s.onload = () => { window._sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); sbReady = true; setSyncStatus('synced','nuvem ativa'); resolve(true); };
+    s.onerror = () => { setSyncStatus('error','offline — usando local'); resolve(false); };
+    document.head.appendChild(s);
+  });
 }
 
-async function runMaster() {
-  const objetivo = document.getElementById('objetivo').value;
-  const produto = document.getElementById('produto').value;
-
-  document.getElementById('output').innerText = "Gerando...";
-
-  const prompt = `
-Crie um plano de marketing completo.
-
-Objetivo: ${objetivo}
-Produto: ${produto}
-
-Inclua:
-- Persona
-- Plano semanal
-- 3 posts
-- Ideias de imagens
-- Respostas de comentários
-- Script de vendas
-`;
-
-  // SIMULAÇÃO (por enquanto)
-  const resposta = `
-📌 PERSONA:
-Pessoas que gostam de ${produto}
-
-📅 PLANO:
-Postar 3 vezes na semana focando em ${objetivo}
-
-📝 POSTS:
-1. Você já experimentou ${produto}?
-2. O segredo por trás de ${produto}
-3. Promoção especial hoje
-
-🎨 VISUAL:
-Fotos chamativas do produto
-
-💬 COMENTÁRIOS:
-"Chama no direct!"
-
-💰 VENDAS:
-"Oi! Vi que você se interessou, posso te ajudar?"
-`;
-
-  setTimeout(() => {
-    document.getElementById('output').innerText = resposta;
-  }, 1000);
+function setSyncStatus(state, label) {
+  document.getElementById('sync-dot').className = 'sync-dot ' + state;
+  document.getElementById('sync-label').textContent = label;
 }
 
+// ══ STORAGE ══
+const LS = {
+  get:(k,d=null)=>{ try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;} },
+  set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} },
+  del:(k)=>{ try{localStorage.removeItem(k);}catch(e){} }
+};
+
+async function sbSaveClient(c) {
+  if(!sbReady) return;
+  try { setSyncStatus('syncing','sincronizando...'); await window._sb.from('clients').upsert({nome:c.nome,nicho:c.nicho,dna:c.dna},{onConflict:'nome'}); setSyncStatus('synced','salvo na nuvem'); } catch(e) { setSyncStatus('error','erro ao salvar'); }
+}
+async function sbLoadClients() {
+  if(!sbReady) return;
+  try {
+    setSyncStatus('syncing','carregando...');
+    const {data,error} = await window._sb.from('clients').select('*').order('created_at',{ascending:true});
+    if(error) throw error;
+    if(data && data.length>0) {
+      data.forEach(r=>{ const li=clients.findIndex(c=>c.nome.toLowerCase()===r.nome.toLowerCase()); if(li>=0){clients[li]={nome:r.nome,nicho:r.nicho,dna:r.dna};}else{clients.push({nome:r.nome,nicho:r.nicho,dna:r.dna});} });
+      LS.set('aios_clients',clients); refreshClientSelect(); renderDashboard();
+    }
+    setSyncStatus('synced','nuvem ativa');
+  } catch(e) { setSyncStatus('error','offline — usando local'); }
+}
+async function sbSaveHistory(item) { if(!sbReady) return; try { await window._sb.from('history').insert({type:item.type,label:item.label,client_name:item.client,content:item.content}); } catch(e){} }
+async function sbDeleteClient(nome) { if(!sbReady) return; try { await window._sb.from('clients').delete().eq('nome',nome); } catch(e){} }
+
+// ══ STATE ══
+let clients = LS.get('aios_clients',[]);
+let chatHistory = LS.get('aios_history',[]);
+let activeIdx = LS.get('aios_active_idx',null);
+let sessionStats = {copies:0,pautas:0,briefs:0};
+let settings = LS.get('aios_settings',{});
+if(!settings.model) settings.model = 'llama-3.3-70b-versatile';
+if(!settings.tokens) settings.tokens = 1500;
+LS.set('aios_settings',settings);
+
+// ══ NAV ══
+const pageTitles = {dashboard:'Dashboard',copy:'Agente Copy',orchestrator:'Orquestrador',visual:'Agente Visual',comments:'Agente de Comentários',clients:'Clientes',onboarding:'Onboarding de Cliente',history:'Histórico',settings:'Configurações'};
+function nav(page, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('hdr').textContent = pageTitles[page]||page;
+  if(el) el.classList.add('active');
+  else document.querySelectorAll('.nav-item').forEach(n=>{ if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'")) n.classList.add('active'); });
+  if(page==='clients') renderClients();
+  if(page==='history') renderHistory();
+  if(page==='dashboard') renderDashboard();
+  updateClientIndicators();
+}
+
+// ══ CLIENT ══
+function getActiveClient() { if(activeIdx===null||!clients[activeIdx]) return null; return clients[activeIdx]; }
+function switchClient(idx) {
+  activeIdx = idx===''?null:parseInt(idx);
+  LS.set('aios_active_idx',activeIdx);
+  updateClientSwitcherUI(); updateClientIndicators(); renderDashboard();
+  showToast('✓ Cliente: '+(getActiveClient()?getActiveClient().nome:'nenhum'),'success');
+}
+function updateClientSwitcherUI() {
+  const sel=document.getElementById('global-client-select');
+  const pill=document.getElementById('active-client-pill');
+  const c=getActiveClient();
+  sel.value=activeIdx===null?'':activeIdx;
+  if(c){ pill.style.display='flex'; document.getElementById('active-client-avatar').textContent=c.nome.slice(0,2).toUpperCase(); document.getElementById('active-client-name').textContent=c.nome; document.getElementById('active-client-nicho').textContent=c.nicho||''; const b=document.getElementById('no-client-banner'); if(b) b.style.display='none'; }
+  else { pill.style.display='none'; const b=document.getElementById('no-client-banner'); if(b) b.style.display='flex'; }
+}
+function updateClientIndicators() {
+  const c=getActiveClient();
+  const label=c?`contexto: ${c.nome}`:'contexto: nenhum cliente ativo';
+  ['copy','orc','vis','com'].forEach(p=>{ const el=document.getElementById(p+'-client-indicator'); if(el){el.textContent=label;el.style.color=c?'var(--green)':'var(--text3)';} });
+}
+function refreshClientSelect() {
+  const sel=document.getElementById('global-client-select');
+  sel.innerHTML='<option value="">— Selecione um cliente —</option>';
+  clients.forEach((c,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=c.nome+' · '+(c.nicho||''); sel.appendChild(o); });
+  if(activeIdx!==null&&clients[activeIdx]) sel.value=activeIdx;
+  else { activeIdx=null; LS.set('aios_active_idx',null); }
+  updateClientSwitcherUI();
+}
+
+// ══ API ══
+async function callClaude(system, user, outEl, loadEl, tagEl, tagDone) {
+  const model = settings.model || 'llama-3.3-70b-versatile';
+  const tokens = settings.tokens || 1500;
+  outEl.textContent=''; loadEl.style.width='15%';
+  if(tagEl){tagEl.textContent='gerando...';tagEl.className='tag tag-orange';}
+  const cur=document.createElement('span'); cur.className='cursor'; outEl.appendChild(cur);
+  try {
+    loadEl.style.width='50%';
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system,user,model,max_tokens:tokens})});
+    const data=await res.json();
+    if(!res.ok||data.error) throw new Error(data.error||`Erro HTTP ${res.status}`);
+    const text=data.text||'';
+    cur.remove(); outEl.textContent=''; loadEl.style.width='90%';
+    let i=0; const speed=text.length>800?4:8;
+    const iv=setInterval(()=>{outEl.textContent+=text[i]||'';i++;if(i>=text.length)clearInterval(iv);},speed);
+    setTimeout(()=>{loadEl.style.width='0%';},800);
+    if(tagEl){tagEl.textContent=tagDone||'pronto';tagEl.className='tag tag-green';}
+    return text;
+  } catch(e) {
+    cur.remove(); outEl.textContent='⚠ Erro: '+e.message; loadEl.style.width='0%';
+    if(tagEl){tagEl.textContent='erro';tagEl.className='tag tag-red';}
+    return null;
+  }
+}
+
+// ══ BRAND CONTEXT ══
+function getBrandContext() {
+  const c=getActiveClient(); if(!c||!c.dna) return '';
+  const d=c.dna;
+  return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DNA DE MARCA — USE ESTAS INFORMAÇÕES EM TODO O CONTEÚDO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Empresa: ${d.nome||''} | Nicho: ${d.nicho||''} | Cidade: ${d.cidade||''}
+Slogan: ${d.slogan||''} | Tom de voz: ${d.tom||''}
+Trata o cliente como: ${d.trato||''} | Emojis: ${d.emoji||''}
+Público: ${d.idade||''} · ${d.genero||''} · Classe ${d.classe||''}
+Dores: ${d.dores||''} | Produtos: ${d.produtos||''}
+Diferencial: ${d.diferencial||''} | Ticket: ${d.ticket||''}
+Palavras OBRIGATÓRIAS: ${d.keywords||''} | PROIBIDAS: ${d.evitar||''}
+Sazonalidade: ${d.sazonal||''} | Meta: ${d.meta||''}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+}
+
+// ══ AGENTE COPY ══
+async function runCopy(n) {
+  const ctx=getBrandContext();
+  const sys=`Você é um copywriter sênior especializado em PMEs brasileiras. Crie textos que convertem com personalidade real.
+REGRAS: Use palavras-chave obrigatórias, NUNCA as proibidas. Tom exato do DNA. Soar humano como o dono da empresa. Hashtags: máx 5. NUNCA use clichês como "qualidade incomparável" ou "preço justo".`;
+  const usr=`${ctx}
+Tipo: ${document.getElementById('copy-tipo').value}
+Rede: ${document.getElementById('copy-rede').value}
+Produto: ${document.getElementById('copy-produto').value||'principal produto'}
+Gancho: ${document.getElementById('copy-gancho').value}
+CTA: ${document.getElementById('copy-cta').value||'entre em contato'}
+Contexto: ${document.getElementById('copy-contexto').value||'nenhum'}
+${n===1?'Crie 1 copy EXCELENTE pronta para publicar.':'Crie 3 variações:\nVARIAÇÃO 1 — Emocional/storytelling\nVARIAÇÃO 2 — Direto ao benefício\nVARIAÇÃO 3 — Prova social/curiosidade\nSepare com "---"'}`;
+  const result=await callClaude(sys,usr,document.getElementById('copy-output'),document.getElementById('copy-loading'),document.getElementById('copy-tag'),n===1?'copy pronta':'3 variações');
+  if(result){sessionStats.copies++;document.getElementById('dash-stat-copies').textContent=sessionStats.copies;addToHistory('copy',document.getElementById('copy-tipo').value,result,getActiveClient()?.nome);}
+}
+
+// ══ PREVIEW INSTAGRAM ══
+function showPreview() {
+  const text = document.getElementById('copy-output').textContent;
+  if(!text || text.includes('Preencha')) { showToast('⚠ Gere uma copy primeiro.','error'); return; }
+  const c = getActiveClient();
+  const username = c ? '@'+c.nome.toLowerCase().replace(/\s+/g,'').slice(0,15) : '@suamarca';
+  const initials = c ? c.nome.slice(0,2).toUpperCase() : 'MA';
+
+  // Separa texto de hashtags
+  const lines = text.split('\n');
+  const hashLines = lines.filter(l=>l.trim().startsWith('#'));
+  const mainLines = lines.filter(l=>!l.trim().startsWith('#'));
+  const mainText = mainLines.join('\n').trim();
+  const hashtags = hashLines.join(' ').trim();
+
+  document.getElementById('ig-av').textContent = initials;
+  document.getElementById('ig-user').textContent = username;
+  document.getElementById('ig-caption-text').innerHTML =
+    `<strong>${username}</strong> ${mainText.replace(/\n/g,'<br>')}` +
+    (hashtags ? `<div class="ig-hashtags">${hashtags}</div>` : '');
+
+  document.getElementById('ig-preview-card').style.display = 'block';
+  document.getElementById('ig-preview-card').scrollIntoView({behavior:'smooth'});
+}
+
+// ══ AGENTE ORQUESTRADOR ══
+async function runOrchestrator() {
+  const ctx=getBrandContext();
+  const sys=`Você é um estrategista de conteúdo digital sênior para PMEs brasileiras. Crie pautas editoriais REALISTAS e ESPECÍFICAS — nada genérico. Varie formatos. Use produtos reais do DNA.`;
+  const usr=`${ctx}
+Semana: ${document.getElementById('orc-semana').value||'próxima semana'}
+Redes: ${document.getElementById('orc-redes').value}
+Objetivo: ${document.getElementById('orc-objetivo').value}
+Frequência: ${document.getElementById('orc-freq').value}
+Contexto: ${document.getElementById('orc-contexto').value||'nenhum'}
+
+Crie a pauta no formato:
+━━━ PAUTA EDITORIAL ━━━
+Para cada post:
+📅 DIA E HORÁRIO | 📱 REDE E FORMATO | 🎯 OBJETIVO
+📝 TEMA/TÍTULO | 💡 GANCHO | 📋 ESTRUTURA (3 pontos) | #️⃣ HASHTAGS (máx 5)
+---
+Ao final: 🔑 ESTRATÉGIA DA SEMANA (3 linhas)`;
+  const result=await callClaude(sys,usr,document.getElementById('orc-output'),document.getElementById('orc-loading'),document.getElementById('orc-tag'),'pauta pronta');
+  if(result){sessionStats.pautas++;document.getElementById('dash-stat-pautas').textContent=sessionStats.pautas;addToHistory('orc','Pauta · '+document.getElementById('orc-redes').value,result,getActiveClient()?.nome);}
+}
+
+// ══ AGENTE VISUAL ══
+async function runVisual() {
+  const ctx=getBrandContext();
+  const sys=`Você é Diretor de Arte de uma agência digital. Crie briefings visuais detalhados e prompts para Midjourney/DALL-E. Seja técnico e específico.`;
+  const usr=`${ctx}
+Objetivo: ${document.getElementById('vis-objetivo').value}
+Formato: ${document.getElementById('vis-formato').value}
+Estilo: ${document.getElementById('vis-estilo').value}
+Elemento: ${document.getElementById('vis-elemento').value||'produto principal'}
+Cores: ${document.getElementById('vis-cores').value||'paleta da marca'}
+Mood: ${document.getElementById('vis-mood').value}
+
+Gere:
+🎨 CONCEITO CRIATIVO
+📐 COMPOSIÇÃO E LAYOUT
+💡 REFERÊNCIAS DE ESTILO (3)
+🤖 PROMPT PARA IA (inglês, técnico, mín 60 palavras)
+🎬 DICAS DE PRODUÇÃO (3 práticas)
+⚠️ EVITE (3 elementos)`;
+  const result=await callClaude(sys,usr,document.getElementById('vis-output'),document.getElementById('vis-loading'),document.getElementById('vis-tag'),'brief pronto');
+  if(result){sessionStats.briefs++;document.getElementById('dash-stat-briefs').textContent=sessionStats.briefs;addToHistory('vis',document.getElementById('vis-objetivo').value,result,getActiveClient()?.nome);}
+}
+
+// ══ AGENTE COMENTÁRIOS ══
+async function runComments() {
+  const ctx = getBrandContext();
+  const comentarios = document.getElementById('com-input').value.trim();
+  if(!comentarios) { showToast('⚠ Cole pelo menos um comentário.','error'); return; }
+  const rede = document.getElementById('com-rede').value;
+  const post = document.getElementById('com-post').value;
+  const tom = document.getElementById('com-tom').value;
+
+  const outArea = document.getElementById('com-output-area');
+  outArea.innerHTML = '<div class="output-box" id="com-raw" style="min-height:200px;font-size:12px"></div>';
+  const outEl = document.getElementById('com-raw');
+
+  const sys = `Você é um gestor de redes sociais especialista em relacionamento com clientes de PMEs brasileiras. Crie respostas que convertem, criam vínculo e são autênticas. NUNCA copie respostas genéricas.`;
+  const usr = `${ctx}
+Rede: ${rede}
+Contexto do post: ${post||'post da marca'}
+Tom preferido: ${tom}
+
+COMENTÁRIOS PARA RESPONDER:
+${comentarios}
+
+Para CADA comentário, responda no formato:
+👤 [comentário original]
+💬 Resposta sugerida: [sua resposta]
+---
+
+Regras:
+- Responda todos os comentários individualmente
+- Use o tom de voz exato do DNA da marca
+- Para perguntas sobre preço/local: seja específico se tiver a info, ou direcione para contato
+- Para elogios: agradeça com personalidade, não apenas "obrigado!"
+- Para críticas: responda com empatia e solução
+- Mantenha respostas curtas (máx 3 linhas) e naturais`;
+
+  const result = await callClaude(sys, usr, outEl, document.getElementById('com-loading'), document.getElementById('com-tag'), 'respostas prontas');
+  if(result) {
+    document.getElementById('com-actions').style.display='flex';
+    addToHistory('com','Comentários · '+rede, result, getActiveClient()?.nome);
+    // Formatar visualmente
+    renderCommentReplies(comentarios, result, outArea);
+  }
+}
+
+function renderCommentReplies(input, result, container) {
+  const lines = result.split('---').filter(b=>b.trim());
+  let html = '';
+  lines.forEach(block => {
+    const rows = block.trim().split('\n').filter(l=>l.trim());
+    if(!rows.length) return;
+    const orig = rows.find(r=>r.startsWith('👤'))||'';
+    const reply = rows.find(r=>r.startsWith('💬'))||'';
+    html += `<div class="comment-row">
+      <div style="flex:1">
+        <div class="comment-author">${orig.replace('👤','').trim()}</div>
+        <div class="reply-box">${reply.replace('💬 Resposta sugerida:','').trim()}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="flex-shrink:0;margin-top:auto" onclick="navigator.clipboard.writeText(this.previousElementSibling.querySelector('.reply-box').textContent);showToast('✓ Copiado!','success')">⎘</button>
+    </div>`;
+  });
+  if(html) container.innerHTML = html + `<textarea id="com-raw" style="display:none">${result}</textarea>`;
+}
+
+// ══ EXPORT PDF PAUTA ══
+function exportPautaPDF() {
+  const content = document.getElementById('orc-output').textContent;
+  if(!content || content.includes('Preencha')) { showToast('⚠ Gere uma pauta primeiro.','error'); return; }
+  const c = getActiveClient();
+  const empresa = c ? c.nome : 'Empresa';
+  const data = new Date().toLocaleDateString('pt-BR');
+
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pauta — ${empresa}</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:800px;margin:40px auto;color:#1a1a1a;line-height:1.7;padding:0 20px;}
+    h1{font-size:22px;margin-bottom:4px;color:#7A00FF;}
+    .sub{font-size:12px;color:#666;margin-bottom:32px;}
+    pre{white-space:pre-wrap;font-family:Arial,sans-serif;font-size:13px;line-height:1.8;}
+    .footer{margin-top:40px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;}
+    @media print{body{margin:20px;}}
+  </style></head><body>
+  <h1>▲ VÉRTICE — Pauta Editorial</h1>
+  <div class="sub">${empresa} · Gerado em ${data}</div>
+  <pre>${content}</pre>
+  <div class="footer">Gerado pela plataforma Vértice AI · vertice.io</div>
+  <script>window.onload=()=>{window.print();}<\/script>
+  </body></html>`);
+  w.document.close();
+}
+
+function exportCopyPDF() {
+  const content = document.getElementById('copy-output').textContent;
+  if(!content || content.includes('Preencha')) { showToast('⚠ Gere uma copy primeiro.','error'); return; }
+  const c = getActiveClient();
+  const empresa = c ? c.nome : 'Empresa';
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Copy — ${empresa}</title>
+  <style>body{font-family:Arial,sans-serif;max-width:600px;margin:40px auto;color:#1a1a1a;line-height:1.8;padding:0 20px;}h1{color:#7A00FF;font-size:20px;}pre{white-space:pre-wrap;font-size:14px;background:#f9f9f9;padding:20px;border-radius:8px;border-left:4px solid #7A00FF;}.footer{margin-top:32px;font-size:11px;color:#999;text-align:center;}</style></head><body>
+  <h1>✦ Copy — ${empresa}</h1><p style="font-size:11px;color:#666">${new Date().toLocaleDateString('pt-BR')}</p>
+  <pre>${content}</pre>
+  <div class="footer">Gerado pela plataforma Vértice AI</div>
+  <script>window.onload=()=>{window.print();}<\/script></body></html>`);
+  w.document.close();
+}
+
+// ══ ONBOARDING ══
+let currentStep=1;
+function stepNext(n){goStep(n+1);}
+function stepPrev(n){goStep(n-1);}
+function goStep(n){
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep=n;
+  document.getElementById('step-'+n).classList.add('active');
+  document.querySelectorAll('#step-ind .step-dot').forEach((d,i)=>{d.classList.remove('active','done');if(i<n-1)d.classList.add('done');else if(i===n-1)d.classList.add('active');});
+}
+
+async function runOnboarding() {
+  const nome=document.getElementById('ob-nome').value.trim();
+  if(!nome){showToast('⚠ Digite o nome da empresa.','error');return;}
+  const dna={nome,nicho:document.getElementById('ob-nicho').value,cidade:document.getElementById('ob-cidade').value,anos:document.getElementById('ob-anos').value,slogan:document.getElementById('ob-slogan').value,idade:document.getElementById('ob-idade').value,genero:document.getElementById('ob-genero').value,classe:document.getElementById('ob-classe').value,dores:document.getElementById('ob-dores').value,tom:document.getElementById('ob-tom').value,emoji:document.getElementById('ob-emoji').value,trato:document.getElementById('ob-trato').value,evitar:document.getElementById('ob-evitar').value,keywords:document.getElementById('ob-keywords').value,produtos:document.getElementById('ob-produtos').value,diferencial:document.getElementById('ob-diferencial').value,ticket:document.getElementById('ob-ticket').value,sazonal:document.getElementById('ob-sazonal').value,redes:document.getElementById('ob-redes').value,freq:document.getElementById('ob-freq').value,meta:document.getElementById('ob-meta').value,obs:document.getElementById('ob-obs').value};
+  const sys=`Você é estrategista de marca de uma agência digital. Crie DNA de marca completo, estruturado e acionável. Responda em português.`;
+  const usr=`Briefing completo:\n${JSON.stringify(dna,null,2)}\n\nEstruture:\n🏢 PERFIL DA MARCA\n🗣️ VOZ E TOM (regras claras)\n👤 PERSONA DO CLIENTE IDEAL\n📋 DIRETRIZES EDITORIAIS\n🔑 GANCHO EMOCIONAL\n📅 CALENDÁRIO BASE`;
+  const result=await callClaude(sys,usr,document.getElementById('ob-output'),document.getElementById('ob-loading'),document.getElementById('ob-tag'),'DNA salvo');
+  if(result){
+    dna.dnaText=result;
+    const ei=clients.findIndex(c=>c.nome.toLowerCase()===nome.toLowerCase());
+    if(ei>=0){clients[ei].dna=dna;activeIdx=ei;}else{clients.push({nome,nicho:dna.nicho,dna});activeIdx=clients.length-1;}
+    LS.set('aios_clients',clients);LS.set('aios_active_idx',activeIdx);
+    await sbSaveClient({nome,nicho:dna.nicho,dna});
+    refreshClientSelect();updateClientSwitcherUI();updateClientIndicators();
+    document.getElementById('ob-memory-grid').innerHTML=[{k:'Empresa',v:dna.nome},{k:'Nicho',v:dna.nicho},{k:'Tom',v:dna.tom},{k:'Público',v:`${dna.idade}·${dna.genero}`},{k:'Keywords',v:dna.keywords||'—'},{k:'Proibido',v:dna.evitar||'—'},{k:'Redes',v:dna.redes},{k:'Meta',v:dna.meta}].map(it=>`<div class="memory-card"><div class="memory-key">${it.k}</div><div class="memory-val">${it.v}</div></div>`).join('');
+    document.getElementById('ob-memory-section').style.display='block';
+    showToast(`✓ ${nome} salvo na nuvem!`,'success');
+    document.getElementById('dash-stat-clients').textContent=clients.length;
+  }
+}
+
+// ══ CLIENTS ══
+let selectedClientIdx=null;
+function renderClients(){
+  const list=document.getElementById('clients-list');
+  const sub=document.getElementById('clients-sub');
+  sub.textContent=clients.length+' cliente'+(clients.length!==1?'s':'')+' cadastrado'+(clients.length!==1?'s':'');
+  if(!clients.length){list.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center">Nenhum cliente ainda.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar agora →</span></div>`;return;}
+  list.innerHTML=clients.map((c,i)=>`<div class="client-row" onclick="selectClient(${i})" style="${activeIdx===i?'border-color:rgba(122,0,255,.4);':''}"><div class="client-row-avatar" style="background:linear-gradient(135deg,var(--accent),var(--pink))">${c.nome.slice(0,2).toUpperCase()}</div><div class="client-row-info"><div class="client-row-name">${c.nome}${activeIdx===i?' <span class="tag tag-green" style="padding:1px 6px;font-size:8px;margin-left:4px">ativo</span>':''}</div><div class="client-row-meta">${c.nicho||'—'} · ${c.dna?'DNA salvo':'sem DNA'}</div></div><div style="font-size:18px;color:var(--text3)">›</div></div>`).join('');
+}
+function selectClient(i){
+  selectedClientIdx=i;const c=clients[i];
+  document.getElementById('client-empty-card').style.display='none';
+  document.getElementById('client-detail-card').style.display='block';
+  document.getElementById('cd-nome').textContent=c.nome;
+  document.getElementById('cd-nicho').textContent=c.nicho||'—';
+  document.getElementById('cd-delete-btn').onclick=()=>deleteClient(i);
+  const d=c.dna;
+  document.getElementById('cd-memory-grid').innerHTML=d?[{k:'Tom',v:d.tom},{k:'Público',v:`${d.idade||''}·${d.genero||''}`},{k:'Redes',v:d.redes||'—'},{k:'Meta',v:d.meta||'—'},{k:'Keywords',v:d.keywords||'—'},{k:'Proibido',v:d.evitar||'—'},{k:'Ticket',v:d.ticket||'—'},{k:'Diferencial',v:d.diferencial||'—'}].map(it=>`<div class="memory-card"><div class="memory-key">${it.k}</div><div class="memory-val">${it.v||'—'}</div></div>`).join(''):`<div style="color:var(--text3);font-size:12px;padding:12px">DNA não gerado. <span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Fazer onboarding →</span></div>`;
+}
+function activateClientFromDetail(){if(selectedClientIdx===null)return;switchClient(selectedClientIdx);renderClients();}
+async function deleteClient(i){
+  if(!confirm(`Remover "${clients[i].nome}"?`))return;
+  const nome=clients[i].nome;
+  clients.splice(i,1);
+  if(activeIdx===i){activeIdx=null;LS.set('aios_active_idx',null);}else if(activeIdx>i){activeIdx--;LS.set('aios_active_idx',activeIdx);}
+  LS.set('aios_clients',clients);await sbDeleteClient(nome);
+  refreshClientSelect();updateClientSwitcherUI();selectedClientIdx=null;
+  document.getElementById('client-detail-card').style.display='none';
+  document.getElementById('client-empty-card').style.display='block';
+  renderClients();showToast('Cliente removido.','success');
+}
+
+// ══ HISTORY ══
+const typeLabels={copy:'✦ Copy',orc:'⬡ Pauta',vis:'◉ Visual',com:'💬 Comentários'};
+const typeTags={copy:'tag-pink',orc:'tag-purple',vis:'tag-blue',com:'tag-green'};
+function addToHistory(type,label,content,clientName){
+  chatHistory.unshift({id:Date.now(),type,label,client:clientName||'—',content,date:new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})});
+  if(chatHistory.length>50)chatHistory.pop();
+  LS.set('aios_history',chatHistory);
+  const el=document.getElementById('hist-sub');if(el)el.textContent=chatHistory.length+' itens salvos';
+  sbSaveHistory({type,label,client:clientName||'—',content});
+}
+function saveToHistory(type){
+  const ids={copy:'copy-output',orc:'orc-output',vis:'vis-output',com:'com-raw'};
+  const content=document.getElementById(ids[type])?.textContent;
+  if(!content||content.includes('Preencha'))return showToast('⚠ Nenhum conteúdo para salvar.','error');
+  addToHistory(type,'Salvo manualmente',content,getActiveClient()?.nome);
+  showToast('✓ Salvo no histórico!','success');
+}
+function renderHistory(){
+  const list=document.getElementById('history-list');
+  const sub=document.getElementById('hist-sub');
+  if(sub)sub.textContent=chatHistory.length+' itens salvos';
+  if(!chatHistory.length){list.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:32px;text-align:center">Nenhum item no histórico ainda.</div>`;return;}
+  list.innerHTML=chatHistory.map(h=>`<div class="history-item"><div class="history-thumb">${{copy:'✦',orc:'⬡',vis:'◉',com:'💬'}[h.type]||'★'}</div><div class="history-meta"><div class="history-title">${typeLabels[h.type]||h.type} — ${h.label}</div><div class="history-excerpt">${h.content}</div><div class="history-footer"><span class="tag ${typeTags[h.type]||'tag-purple'}">${h.client}</span><span style="font-size:10px;font-family:var(--font-mono);color:var(--text3);margin-left:auto">${h.date}</span><button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(chatHistory.find(x=>x.id==${h.id})?.content||'');showToast('✓ Copiado!','success')">⎘</button></div></div></div>`).join('');
+}
+function clearHistory(){if(!confirm('Limpar todo o histórico?'))return;chatHistory=[];LS.set('aios_history',[]);renderHistory();}
+
+// ══ DASHBOARD ══
+function renderDashboard(){
+  document.getElementById('dash-stat-clients').textContent=clients.length;
+  document.getElementById('dash-stat-copies').textContent=sessionStats.copies;
+  document.getElementById('dash-stat-pautas').textContent=sessionStats.pautas;
+  document.getElementById('dash-stat-briefs').textContent=sessionStats.briefs;
+  const dcl=document.getElementById('dash-clients-list');
+  if(!clients.length){dcl.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:16px 0;text-align:center">Nenhum cliente cadastrado.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar →</span></div>`;}
+  else{dcl.innerHTML=clients.slice(0,4).map((c,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="switchClient(${i});nav('copy',null)"><div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${c.nome.slice(0,2).toUpperCase()}</div><div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--text)">${c.nome}</div><div style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">${c.nicho||'—'}</div></div>${activeIdx===i?'<span class="tag tag-green" style="font-size:8px">ativo</span>':'<span style="font-size:10px;color:var(--text3)">›</span>'}</div>`).join('');}
+  const drl=document.getElementById('dash-recent-list');
+  const recent=chatHistory.slice(0,3);
+  if(!recent.length){drl.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:16px 0;text-align:center">Suas gerações aparecerão aqui.</div>`;}
+  else{drl.innerHTML=recent.map(h=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div style="width:32px;height:32px;border-radius:7px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${{copy:'✦',orc:'⬡',vis:'◉',com:'💬'}[h.type]}</div><div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--text)">${typeLabels[h.type]||h.type} — ${h.label}</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">${h.client} · ${h.date}</div></div></div>`).join('');}
+  const b=document.getElementById('no-client-banner');if(b)b.style.display=getActiveClient()?'none':'flex';
+}
+
+// ══ UTILS ══
+function copyOutput(id){const t=document.getElementById(id)?.textContent;if(t){navigator.clipboard.writeText(t);showToast('✓ Copiado!','success');}}
+function copyAll(){copyOutput('copy-output');}
+function showToast(msg,type='success'){const t=document.createElement('div');t.className=`toast toast-${type}`;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(10px)';setTimeout(()=>t.remove(),400);},2400);}
+function saveSettings(){settings.model=document.getElementById('cfg-model').value;settings.tokens=parseInt(document.getElementById('cfg-tokens').value);LS.set('aios_settings',settings);showToast('✓ Configurações salvas!','success');}
+function exportData(){const d={clients,history:chatHistory,settings,exportedAt:new Date().toISOString()};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='vertice-backup.json';a.click();}
+function clearAllData(){if(!confirm('⚠ Apagar TODOS os dados locais?'))return;['aios_clients','aios_history','aios_active_idx','aios_settings'].forEach(k=>LS.del(k));clients=[];chatHistory=[];activeIdx=null;sessionStats={copies:0,pautas:0,briefs:0};refreshClientSelect();renderDashboard();renderClients();renderHistory();showToast('Dados apagados.','success');}
+function updateStorageInfo(){try{const u=JSON.stringify(localStorage).length;document.getElementById('storage-info').textContent=`${clients.length} clientes · ${chatHistory.length} histórico · ~${(u/1024).toFixed(1)}KB local · ☁ Supabase ativo`;}catch(e){}}
+
+// ══ INIT ══
+async function init(){
+  refreshClientSelect();updateClientSwitcherUI();updateClientIndicators();renderDashboard();updateStorageInfo();
+  if(settings.model)document.getElementById('cfg-model').value=settings.model;
+  if(settings.tokens)document.getElementById('cfg-tokens').value=settings.tokens;
+  setSyncStatus('','conectando...');
+  await loadSupabase();
+  if(sbReady){await sbLoadClients();updateStorageInfo();}
+}
+init();
 </script>
-
 </body>
 </html>
