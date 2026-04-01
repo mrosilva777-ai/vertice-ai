@@ -3,18 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Agency OS · v4</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Vértice</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000000'/%3E%3Cpolygon points='4,6 16,26 28,6 23,6 16,18 9,6' fill='%23F5F5F5'/%3E%3Cpolygon points='14,6 16,10 18,6' fill='%237A00FF'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#08080d; --surface:#0f0f18; --surface2:#16161f; --surface3:#1e1e2a;
+  --bg:#000000; --surface:#0a0a0a; --surface2:#1A1A1A; --surface3:#2A2A2A;
   --border:rgba(255,255,255,0.055); --border2:rgba(255,255,255,0.11);
-  --accent:#7c5cfc; --accent2:#a78bfa; --accent3:#c4b5fd;
+  --accent:#7A00FF; --accent2:#9333ea; --accent3:#c4b5fd;
   --green:#2dd4a0; --orange:#fb923c; --pink:#f472b6; --blue:#60a5fa;
   --yellow:#fbbf24; --red:#f87171;
-  --text:#eeecff; --text2:#8e8ea8; --text3:#4a4a62;
+  --text:#F5F5F5; --text2:#8e8ea8; --text3:#4a4a62;
   --radius:14px; --radius-sm:8px;
-  --font-display:'Syne',sans-serif; --font-body:'DM Sans',sans-serif; --font-mono:'DM Mono',monospace;
+  --font-display:'Inter',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.6;min-height:100vh;display:flex;overflow-x:hidden;}
@@ -22,9 +23,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 /* SIDEBAR */
 .sidebar{width:232px;min-width:232px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
 .logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
-.logo-mark{font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--text);letter-spacing:-.5px;display:flex;align-items:center;gap:8px;}
-.logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 14px var(--accent);}
-.logo-sub{font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase;}
+.logo-mark{font-family:var(--font-display);font-weight:900;font-size:15px;color:var(--text);letter-spacing:.5px;display:flex;align-items:center;gap:9px;}
+.logo-sub{font-size:8.5px;color:var(--text3);font-family:var(--font-mono);margin-top:4px;letter-spacing:.5px;}
 .nav{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:1px;overflow-y:auto;}
 .nav-section{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;padding:12px 10px 5px;}
 .nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:12.5px;transition:all .15s;border:1px solid transparent;user-select:none;}
@@ -194,8 +194,14 @@ tr:hover td{background:var(--surface2);}
 <!-- ══ SIDEBAR ══ -->
 <aside class="sidebar">
   <div class="logo">
-    <div class="logo-mark"><span class="logo-dot"></span>AI Agency OS</div>
-    <div class="logo-sub">v4.0 · Freelancer Edition</div>
+    <div class="logo-mark">
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+        <polygon points="2,4 16,28 30,4 25,4 16,20 7,4" fill="#F5F5F5"/>
+        <polygon points="13,4 16,9.5 19,4" fill="#7A00FF"/>
+      </svg>
+      VÉRTICE
+    </div>
+    <div class="logo-sub">Engenharia de crescimento previsível.</div>
   </div>
   <nav class="nav">
     <div class="nav-section">Principal</div>
@@ -1332,7 +1338,7 @@ function renderDashboard() {
   const banner = document.getElementById('no-client-banner');
   if(banner) banner.style.display = getActiveClient()?'none':'flex';
   const keyBanner = document.getElementById('no-apikey-banner');
-  if(keyBanner) keyBanner.style.display = 'none';
+  if(keyBanner) keyBanner.style.display = settings.apikey?'none':'flex';
 }
 
 // ══════════════════════════════════════════════
@@ -1402,7 +1408,7 @@ updateStorageInfo();
 // Apply saved settings to selects
 if(settings.model) document.getElementById('cfg-model').value = settings.model;
 if(settings.tokens) document.getElementById('cfg-tokens').value = settings.tokens;
-
+if(settings.apikey) document.getElementById('cfg-apikey').value = settings.apikey;
 </script>
 </body>
 </html>
