@@ -254,13 +254,7 @@ tr:hover td{background:var(--surface2);}
       <div style="font-size:11px;color:var(--text3);margin-top:2px">Selecione um cliente na barra lateral ou <span style="color:var(--accent3);cursor:pointer;text-decoration:underline" onclick="nav('onboarding',null)">cadastre um novo</span> para os agentes usarem o contexto de marca.</div>
     </div>
   </div>
-  <div id="no-apikey-banner" style="display:none;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:20px;align-items:center;gap:12px;">
-    <span style="font-size:18px">🔑</span>
-    <div>
-      <div style="font-size:12.5px;font-weight:500;color:var(--red)">Chave de API não configurada</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px">Os agentes de IA precisam de uma chave. <span style="color:var(--accent3);cursor:pointer;text-decoration:underline" onclick="nav('settings',null)">Clique aqui para configurar →</span></div>
-    </div>
-  </div>
+
 
   <div class="grid-4 section">
     <div class="stat-card"><div class="stat-label">Clientes ativos</div><div class="stat-value" id="dash-stat-clients">0</div><div class="stat-change" style="color:var(--text3)">cadastrados</div></div>
@@ -1337,8 +1331,7 @@ function renderDashboard() {
 
   const banner = document.getElementById('no-client-banner');
   if(banner) banner.style.display = getActiveClient()?'none':'flex';
-  const keyBanner = document.getElementById('no-apikey-banner');
-  if(keyBanner) keyBanner.style.display = settings.apikey?'none':'flex';
+
 }
 
 // ══════════════════════════════════════════════
