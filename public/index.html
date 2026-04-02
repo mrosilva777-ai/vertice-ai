@@ -176,7 +176,6 @@ tr:hover td{background:var(--surface2);}
     <div class="nav-item" onclick="nav('orchestrator',this)"><span class="nav-icon">⬡</span>Orquestrador<span class="nav-badge">IA</span></div>
     <div class="nav-item" onclick="nav('visual',this)"><span class="nav-icon">◉</span>Agente Visual<span class="nav-badge">IA</span></div>
     <div class="nav-item" onclick="nav('comments',this)"><span class="nav-icon">💬</span>Comentários<span class="nav-badge-new">novo</span></div>
-    <div class="nav-item" onclick="nav('master',this)" style="background:rgba(122,0,255,.07);border:1px solid rgba(122,0,255,.18);"><span class="nav-icon">🧠</span>Master IA<span class="nav-badge">IA</span></div>
     <div class="nav-section">Gestão</div>
     <div class="nav-item" onclick="nav('clients',this)"><span class="nav-icon">◈</span>Clientes</div>
     <div class="nav-item" onclick="nav('onboarding',this)"><span class="nav-icon">★</span>Onboarding<span class="nav-badge-new">novo</span></div>
@@ -421,97 +420,6 @@ tr:hover td{background:var(--surface2);}
   </div>
 </div>
 
-<!-- ══ MASTER IA ══ -->
-<div class="page" id="page-master">
-  <div style="background:linear-gradient(135deg,rgba(122,0,255,.12),rgba(244,114,182,.08));border:1px solid rgba(122,0,255,.25);border-radius:var(--radius);padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
-    <div style="font-size:32px;line-height:1">🧠</div>
-    <div>
-      <div style="font-family:var(--font-display);font-size:15px;font-weight:800;color:var(--accent3);letter-spacing:-.3px">Agente Master — Inteligência Central</div>
-      <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:3px">Um único agente que substitui todos os outros. Gera persona, pauta, conteúdos, visuais, respostas e script de vendas.</div>
-    </div>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:5px;font-size:9.5px;font-family:var(--font-mono);color:var(--green);flex-shrink:0"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite"></span>online</div>
-  </div>
-
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header">
-        <div><div class="card-title">🧠 Brief do Agente Master</div><div class="card-sub" id="master-client-indicator">contexto: nenhum cliente ativo</div></div>
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Objetivo principal</label>
-        <select id="master-objetivo">
-          <option>Aumentar vendas</option>
-          <option>Crescer seguidores</option>
-          <option>Construir autoridade</option>
-          <option>Engajar comunidade</option>
-          <option>Lançar produto/serviço</option>
-          <option>Reativar clientes antigos</option>
-        </select>
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Produto ou serviço em foco</label>
-        <input id="master-produto" placeholder="ex: Pão de queijo artesanal, Curso de Excel, Corte masculino...">
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Redes sociais</label>
-        <select id="master-redes">
-          <option>Instagram + Facebook</option>
-          <option>Instagram + TikTok</option>
-          <option>Só Instagram</option>
-          <option>Todas as redes</option>
-        </select>
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Contexto especial (opcional)</label>
-        <textarea id="master-contexto" style="min-height:52px" placeholder="ex: Semana do aniversário, lançamento, promoção, data comemorativa..."></textarea>
-      </div>
-
-      <button class="btn btn-primary" style="width:100%;margin-top:8px;padding:11px;font-size:13px;font-weight:700;" onclick="runMaster()">
-        🧠 Executar IA — Geração Completa
-      </button>
-
-      <div style="margin-top:10px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius-sm);font-size:10.5px;color:var(--text3);line-height:1.8;font-family:var(--font-mono)">
-        O que será gerado:<br>
-        ✦ Persona &amp; Estratégia da semana<br>
-        ✦ 5 conteúdos prontos para postar<br>
-        ✦ Ideias visuais para cada post<br>
-        ✦ Respostas para comentários<br>
-        ✦ Script de vendas (DM / WhatsApp)<br>
-        ✦ Recomendações estratégicas
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div><div class="card-title">Resultado completo</div></div>
-        <span class="tag tag-purple" id="master-tag">aguardando</span>
-      </div>
-      <div class="loading-bar"><div class="loading-fill" id="master-loading"></div></div>
-      <div class="output-box" id="master-output" style="min-height:500px;font-size:12px;line-height:2">Preencha o brief ao lado e clique em "Executar IA" para gerar o pacote completo de marketing...</div>
-      <div style="display:flex;gap:6px;margin-top:12px">
-        <button class="btn btn-ghost btn-sm" onclick="copyOutput('master-output')">⎘ Copiar tudo</button>
-        <button class="btn btn-ghost btn-sm" onclick="saveMasterToHistory()">≡ Salvar no histórico</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportMasterPDF()">⬇ Exportar PDF</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Cards de acesso rápido para outros agentes -->
-  <div class="card" style="margin-top:16px">
-    <div class="card-header"><div class="card-title">Quer ir mais fundo? Use os agentes especializados</div></div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-      <div class="agent-card" onclick="nav('copy',null)"><div class="agent-icon" style="background:rgba(244,114,182,.12)">✦</div><div><div style="font-weight:600;font-size:12px">Copy</div><div style="font-size:10px;color:var(--text3)">variações detalhadas</div></div></div>
-      <div class="agent-card" onclick="nav('orchestrator',null)"><div class="agent-icon" style="background:rgba(122,0,255,.14)">⬡</div><div><div style="font-weight:600;font-size:12px">Orquestrador</div><div style="font-size:10px;color:var(--text3)">pauta da semana</div></div></div>
-      <div class="agent-card" onclick="nav('visual',null)"><div class="agent-icon" style="background:rgba(96,165,250,.12)">◉</div><div><div style="font-weight:600;font-size:12px">Visual</div><div style="font-size:10px;color:var(--text3)">prompts de imagem</div></div></div>
-      <div class="agent-card" onclick="nav('comments',null)"><div class="agent-icon" style="background:rgba(45,212,160,.12)">💬</div><div><div style="font-weight:600;font-size:12px">Comentários</div><div style="font-size:10px;color:var(--text3)">respostas personalizadas</div></div></div>
-    </div>
-  </div>
-</div>
-
 <!-- ══ CLIENTS ══ -->
 <div class="page" id="page-clients">
   <div class="grid-2">
@@ -709,7 +617,7 @@ if(!settings.tokens) settings.tokens = 1500;
 LS.set('aios_settings',settings);
 
 // ══ NAV ══
-const pageTitles = {dashboard:'Dashboard',copy:'Agente Copy',orchestrator:'Orquestrador',visual:'Agente Visual',comments:'Agente de Comentários',master:'🧠 Agente Master',clients:'Clientes',onboarding:'Onboarding de Cliente',history:'Histórico',settings:'Configurações'};
+const pageTitles = {dashboard:'Dashboard',copy:'Agente Copy',orchestrator:'Orquestrador',visual:'Agente Visual',comments:'Agente de Comentários',clients:'Clientes',onboarding:'Onboarding de Cliente',history:'Histórico',settings:'Configurações'};
 function nav(page, el) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -742,7 +650,7 @@ function updateClientSwitcherUI() {
 function updateClientIndicators() {
   const c=getActiveClient();
   const label=c?`contexto: ${c.nome}`:'contexto: nenhum cliente ativo';
-  ['copy','orc','vis','com','master'].forEach(p=>{ const el=document.getElementById(p+'-client-indicator'); if(el){el.textContent=label;el.style.color=c?'var(--green)':'var(--text3)';} });
+  ['copy','orc','vis','com'].forEach(p=>{ const el=document.getElementById(p+'-client-indicator'); if(el){el.textContent=label;el.style.color=c?'var(--green)':'var(--text3)';} });
 }
 function refreshClientSelect() {
   const sel=document.getElementById('global-client-select');
@@ -929,105 +837,7 @@ Regras:
   }
 }
 
-// ══ AGENTE MASTER ══
-async function runMaster() {
-  const produto = document.getElementById('master-produto').value.trim();
-  if(!produto) { showToast('⚠ Informe o produto ou serviço em foco.','error'); return; }
-  const ctx = getBrandContext();
-  const objetivo = document.getElementById('master-objetivo').value;
-  const redes = document.getElementById('master-redes').value;
-  const contexto = document.getElementById('master-contexto').value || 'nenhum';
-  const c = getActiveClient();
-  const marcaNome = c ? c.nome : 'a marca';
-
-  const sys = `Você é o Agente Master de Marketing Digital — o mais completo e estratégico da plataforma Vértice. Sua missão é entregar um pacote COMPLETO de marketing em uma única resposta. Seja específico, criativo e prático. Tudo em português brasileiro. NUNCA use termos genéricos como "qualidade incomparável" ou "preço justo". Use o DNA da marca se disponível.`;
-
-  const usr = `${ctx}
-MISSÃO: Criar pacote completo de marketing para "${marcaNome}"
-Produto/Serviço em foco: ${produto}
-Objetivo: ${objetivo}
-Redes: ${redes}
-Contexto especial: ${contexto}
-
-Gere EXATAMENTE nesta estrutura:
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧠 PERSONA & ESTRATÉGIA DA SEMANA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Defina a persona do cliente ideal desta semana: nome fictício, idade, desejo, dor principal]
-[Estratégia: 3 pilares de conteúdo para a semana]
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✦ 5 CONTEÚDOS PRONTOS PARA POSTAR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Para cada post use este formato:
-📅 POST [número] | [FORMATO: feed/reels/story] | [REDE]
-📝 COPY COMPLETA:
-[texto pronto para publicar com emojis e hashtags]
----
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-◉ IDEIAS VISUAIS (um para cada post)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Para cada post: descreva a imagem/vídeo ideal em 2 linhas]
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💬 RESPOSTAS PARA COMENTÁRIOS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Crie 5 respostas modelo para os comentários mais comuns: elogio, pergunta de preço, pergunta de endereço, crítica, pedido de informação]
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💰 SCRIPT DE VENDAS (DM / WhatsApp)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[Script completo de 5 mensagens sequenciais para converter lead em cliente]
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔑 RECOMENDAÇÕES ESTRATÉGICAS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[3 ações prioritárias que a marca deve tomar esta semana para atingir o objetivo de "${objetivo}"]`;
-
-  const result = await callClaude(
-    sys, usr,
-    document.getElementById('master-output'),
-    document.getElementById('master-loading'),
-    document.getElementById('master-tag'),
-    'pacote completo'
-  );
-  if(result) {
-    sessionStats.copies++;
-    document.getElementById('dash-stat-copies').textContent = sessionStats.copies;
-    addToHistory('copy', '🧠 Master · '+produto, result, getActiveClient()?.nome);
-    showToast('✓ Pacote completo gerado!','success');
-  }
-}
-
-function saveMasterToHistory() {
-  const content = document.getElementById('master-output').textContent;
-  if(!content || content.includes('Preencha')) return showToast('⚠ Nenhum conteúdo para salvar.','error');
-  addToHistory('copy','🧠 Master salvo',content,getActiveClient()?.nome);
-  showToast('✓ Salvo no histórico!','success');
-}
-
-function exportMasterPDF() {
-  const content = document.getElementById('master-output').textContent;
-  if(!content || content.includes('Preencha')) { showToast('⚠ Gere o conteúdo primeiro.','error'); return; }
-  const c = getActiveClient();
-  const empresa = c ? c.nome : 'Empresa';
-  const data = new Date().toLocaleDateString('pt-BR');
-  const w = window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Master IA — ${empresa}</title>
-  <style>body{font-family:Arial,sans-serif;max-width:820px;margin:40px auto;color:#1a1a1a;line-height:1.8;padding:0 24px;}h1{font-size:22px;margin-bottom:4px;color:#7A00FF;}h1 span{font-size:14px;font-weight:400;color:#888;margin-left:8px;}.sub{font-size:12px;color:#666;margin-bottom:32px;}pre{white-space:pre-wrap;font-family:Arial,sans-serif;font-size:13px;line-height:1.9;background:#fafafa;padding:24px;border-radius:10px;border-left:4px solid #7A00FF;}.footer{margin-top:40px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;}@media print{body{margin:20px;}}</style>
-  </head><body>
-  <h1>🧠 Agente Master<span>Vértice AI</span></h1>
-  <div class="sub">${empresa} · Gerado em ${data}</div>
-  <pre>${content}</pre>
-  <div class="footer">Gerado pela plataforma Vértice AI</div>
-  <script>window.onload=()=>{window.print();}<\/script>
-  </body></html>`);
-  w.document.close();
-}
-
-(input, result, container) {
+function renderCommentReplies(input, result, container) {
   const lines = result.split('---').filter(b=>b.trim());
   let html = '';
   lines.forEach(block => {
