@@ -6,6 +6,7 @@
 <title>Vértice</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000000'/%3E%3Cpolygon points='4,6 16,26 28,6 23,6 16,18 9,6' fill='%23F5F5F5'/%3E%3Cpolygon points='14,6 16,10 18,6' fill='%237A00FF'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
   --bg:#000000; --surface:#0a0a0a; --surface2:#1A1A1A; --surface3:#2A2A2A;
@@ -33,7 +34,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .nav-badge-new{margin-left:auto;background:var(--green);color:#000;font-size:9px;font-family:var(--font-mono);padding:1px 6px;border-radius:20px;font-weight:600;}
 .client-switcher{padding:12px;border-top:1px solid var(--border);}
 .switcher-label{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;padding:0 2px;}
-.switcher-select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:12px;padding:8px 10px;outline:none;cursor:pointer;}
+.switcher-select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:12px;padding:8px 10px;outline:none;cursor:pointer;transition:border-color .15s;}
+.switcher-select:focus{border-color:var(--accent);}
 .active-client-pill{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(122,0,255,.1);border:1px solid rgba(122,0,255,.2);border-radius:var(--radius-sm);margin-top:6px;}
 .client-avatar-mini{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--pink));}
 .client-active-name{font-size:11.5px;font-weight:500;color:var(--accent3);}
@@ -119,6 +121,13 @@ tr:hover td{background:var(--surface2);}
 .client-row-info{flex:1;}
 .client-row-name{font-size:12.5px;font-weight:600;color:var(--text);}
 .client-row-meta{font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:1px;}
+.modal-overlay{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:26px;width:540px;max-width:95vw;max-height:90vh;overflow-y:auto;position:relative;}
+.modal-title{font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:4px;}
+.modal-sub{font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-bottom:20px;}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.modal-close:hover{color:var(--text);}
 .toast{position:fixed;bottom:24px;right:24px;padding:11px 18px;border-radius:9px;font-size:12px;font-family:var(--font-mono);z-index:9999;transition:all .4s;pointer-events:none;}
 .toast-success{background:rgba(45,212,160,.15);border:1px solid rgba(45,212,160,.35);color:var(--green);}
 .toast-error{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--red);}
@@ -137,22 +146,25 @@ tr:hover td{background:var(--surface2);}
 .notif-icon{font-size:14px;flex-shrink:0;}
 .notif-text{font-size:12px;color:var(--text2);}
 
-/* ── PREVIEW INSTAGRAM ── */
-.ig-preview{background:#1a1a1a;border:1px solid var(--border2);border-radius:12px;overflow:hidden;max-width:360px;margin:0 auto;}
+/* ── INSTAGRAM PREVIEW ── */
+.ig-preview{background:#000;border:1px solid #262626;border-radius:12px;max-width:340px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;}
 .ig-header{display:flex;align-items:center;gap:10px;padding:12px 14px;}
-.ig-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
-.ig-username{font-size:12px;font-weight:600;color:#fff;}
-.ig-image{width:100%;height:200px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:40px;}
-.ig-actions{display:flex;gap:14px;padding:10px 14px 6px;font-size:18px;}
-.ig-caption{padding:0 14px 14px;font-size:12px;color:#fff;line-height:1.6;white-space:pre-wrap;}
-.ig-hashtags{color:#60a5fa;font-size:11px;margin-top:4px;}
+.ig-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+.ig-username{font-size:13px;font-weight:600;color:#fff;}
+.ig-follow{font-size:12px;color:#0095f6;margin-left:auto;cursor:pointer;}
+.ig-image{width:100%;aspect-ratio:1;background:linear-gradient(135deg,var(--surface2),var(--surface3));display:flex;align-items:center;justify-content:center;font-size:48px;}
+.ig-actions{padding:10px 14px 4px;display:flex;gap:16px;}
+.ig-action{font-size:22px;cursor:pointer;color:#fff;}
+.ig-likes{padding:0 14px;font-size:13px;font-weight:600;color:#fff;margin-bottom:4px;}
+.ig-caption{padding:0 14px 14px;font-size:13px;color:#fff;line-height:1.5;white-space:pre-wrap;word-break:break-word;}
 .ig-caption strong{font-weight:600;}
+.ig-hashtags{color:#0095f6;}
 
-/* ── COMENTÁRIOS ── */
-.comment-row{display:flex;gap:10px;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;}
-.comment-author{font-size:11px;font-weight:600;color:var(--accent3);margin-bottom:3px;}
-.comment-text{font-size:12px;color:var(--text2);line-height:1.5;}
-.reply-box{background:rgba(45,212,160,.05);border:1px solid rgba(45,212,160,.2);border-radius:var(--radius-sm);padding:10px;margin-top:8px;font-size:12px;color:var(--green);line-height:1.6;white-space:pre-wrap;}
+/* ── COMMENTS AGENT ── */
+.comment-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;}
+.comment-text{font-size:12.5px;color:var(--text);margin-bottom:8px;line-height:1.6;}
+.comment-reply{font-size:12px;color:var(--green);background:rgba(45,212,160,.07);border:1px solid rgba(45,212,160,.15);border-radius:6px;padding:8px 12px;line-height:1.6;white-space:pre-wrap;}
+.comment-meta{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
 </style>
 </head>
 <body>
@@ -178,7 +190,7 @@ tr:hover td{background:var(--surface2);}
     <div class="nav-item" onclick="nav('comments',this)"><span class="nav-icon">💬</span>Comentários<span class="nav-badge-new">novo</span></div>
     <div class="nav-section">Gestão</div>
     <div class="nav-item" onclick="nav('clients',this)"><span class="nav-icon">◈</span>Clientes</div>
-    <div class="nav-item" onclick="nav('onboarding',this)"><span class="nav-icon">★</span>Onboarding<span class="nav-badge-new">novo</span></div>
+    <div class="nav-item" onclick="nav('onboarding',this)"><span class="nav-icon">★</span>Onboarding</div>
     <div class="nav-item" onclick="nav('history',this)"><span class="nav-icon">≡</span>Histórico</div>
     <div class="nav-item" onclick="nav('settings',this)"><span class="nav-icon">⊙</span>Config</div>
   </nav>
@@ -264,7 +276,7 @@ tr:hover td{background:var(--surface2);}
         <select id="copy-gancho"><option>Curiosidade ("Você sabia que...")</option><option>Urgência / Escassez</option><option>Prova social / Depoimento</option><option>Transformação antes/depois</option><option>Nos bastidores</option><option>Pergunta provocativa</option><option>Nostalgia / Emoção</option><option>Benefício direto</option></select>
       </div>
       <div class="input-group"><label class="input-label">CTA (chamada para ação)</label><input id="copy-cta" placeholder="ex: Peça pelo WhatsApp, Venha nos visitar"></div>
-      <div class="input-group"><label class="input-label">Contexto extra (opcional)</label><textarea id="copy-contexto" placeholder="ex: Semana do aniversário da loja..." style="min-height:52px"></textarea></div>
+      <div class="input-group"><label class="input-label">Contexto extra (opcional)</label><textarea id="copy-contexto" placeholder="ex: Semana do aniversário, produto esgotando..." style="min-height:52px"></textarea></div>
       <div style="display:flex;gap:8px;margin-top:4px">
         <button class="btn btn-primary" style="flex:1" onclick="runCopy(1)">✦ Gerar 1 versão</button>
         <button class="btn btn-ghost" style="flex:1" onclick="runCopy(3)">✦✦✦ 3 variações</button>
@@ -274,27 +286,33 @@ tr:hover td{background:var(--surface2);}
       <div class="card" style="margin-bottom:16px">
         <div class="card-header"><div class="card-title">Copy gerada</div><span class="tag tag-purple" id="copy-tag">aguardando</span></div>
         <div class="loading-bar"><div class="loading-fill" id="copy-loading"></div></div>
-        <div class="output-box" id="copy-output" style="min-height:220px;font-size:12px">Preencha o brief ao lado e clique em gerar...</div>
+        <div class="output-box" id="copy-output" style="min-height:260px;font-size:12px">Preencha o brief ao lado e clique em gerar...</div>
         <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap" id="copy-actions">
           <button class="btn btn-ghost btn-sm" onclick="copyAll()">⎘ Copiar</button>
-          <button class="btn btn-ghost btn-sm" onclick="saveToHistory('copy')">≡ Salvar</button>
-          <button class="btn btn-ghost btn-sm" onclick="showPreview()">👁 Preview Instagram</button>
-          <button class="btn btn-ghost btn-sm" onclick="exportCopyPDF()">⬇ PDF</button>
+          <button class="btn btn-ghost btn-sm" onclick="saveToHistory('copy')">≡ Histórico</button>
+          <button class="btn btn-ghost btn-sm" onclick="showPreview()">👁 Preview</button>
         </div>
       </div>
-
-      <!-- PREVIEW INSTAGRAM -->
-      <div class="card" id="ig-preview-card" style="display:none">
-        <div class="card-header"><div class="card-title">Preview — Instagram</div><button class="btn btn-ghost btn-sm" onclick="document.getElementById('ig-preview-card').style.display='none'">✕</button></div>
-        <div class="ig-preview" id="ig-preview-box">
+      <!-- Instagram Preview -->
+      <div class="card" id="preview-card" style="display:none">
+        <div class="card-header"><div class="card-title">Preview — Instagram</div><button class="btn btn-ghost btn-sm" onclick="document.getElementById('preview-card').style.display='none'">✕</button></div>
+        <div class="ig-preview">
           <div class="ig-header">
-            <div class="ig-avatar" id="ig-av">?</div>
-            <div><div class="ig-username" id="ig-user">@usuario</div></div>
-            <div style="margin-left:auto;font-size:18px;color:#fff">···</div>
+            <div class="ig-avatar" id="prev-avatar">??</div>
+            <div>
+              <div class="ig-username" id="prev-username">@empresa</div>
+              <div style="font-size:11px;color:#8e8e8e">Patrocinado</div>
+            </div>
+            <div class="ig-follow">Seguir</div>
           </div>
-          <div class="ig-image">🖼️</div>
-          <div class="ig-actions">❤️ 💬 📤 <span style="margin-left:auto">🔖</span></div>
-          <div class="ig-caption" id="ig-caption-text">O texto do post aparecerá aqui...</div>
+          <div class="ig-image" id="prev-emoji">🏪</div>
+          <div class="ig-actions">
+            <span class="ig-action">🤍</span>
+            <span class="ig-action">💬</span>
+            <span class="ig-action">📤</span>
+          </div>
+          <div class="ig-likes">247 curtidas</div>
+          <div class="ig-caption" id="prev-caption">Sua copy aparecerá aqui...</div>
         </div>
       </div>
     </div>
@@ -306,7 +324,7 @@ tr:hover td{background:var(--surface2);}
   <div class="grid-2">
     <div class="card">
       <div class="card-header"><div><div class="card-title">⬡ Orquestrador</div><div class="card-sub" id="orc-client-indicator">contexto: nenhum cliente ativo</div></div></div>
-      <div class="input-group"><label class="input-label">Semana de referência</label><input id="orc-semana" placeholder="ex: 31 mar – 6 abr, ou deixe em branco"></div>
+      <div class="input-group"><label class="input-label">Semana de referência</label><input id="orc-semana" placeholder="ex: 07–13 abr, ou deixe em branco para esta semana"></div>
       <div class="input-group"><label class="input-label">Redes para a pauta</label>
         <select id="orc-redes"><option>Instagram + Facebook</option><option>Instagram + TikTok</option><option>Só Instagram</option><option>Todas as redes</option></select>
       </div>
@@ -317,19 +335,16 @@ tr:hover td{background:var(--surface2);}
         <select id="orc-freq"><option>3 posts</option><option>5 posts</option><option>7 posts (diário)</option><option>10+ posts</option></select>
       </div>
       <div class="input-group"><label class="input-label">Contexto especial</label><textarea id="orc-contexto" placeholder="ex: Dia das Mães, lançamento, promoção..."></textarea></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-primary" style="flex:1" onclick="runOrchestrator()">⬡ Gerar pauta</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportPautaPDF()" title="Exportar PDF">⬇ PDF</button>
-      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="runOrchestrator()">⬡ Gerar pauta completa</button>
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title">Pauta da semana</div><span class="tag tag-purple" id="orc-tag">aguardando</span></div>
       <div class="loading-bar"><div class="loading-fill" id="orc-loading"></div></div>
-      <div class="output-box" id="orc-output" style="min-height:400px;font-size:12px">Preencha o brief e clique em gerar...</div>
-      <div style="display:flex;gap:6px;margin-top:12px">
+      <div class="output-box" id="orc-output" style="min-height:380px;font-size:12px">Preencha o brief e clique em gerar...</div>
+      <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
         <button class="btn btn-ghost btn-sm" onclick="copyOutput('orc-output')">⎘ Copiar</button>
-        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('orc')">≡ Salvar</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportPautaPDF()">⬇ Exportar PDF</button>
+        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('orc')">≡ Histórico</button>
+        <button class="btn btn-primary btn-sm" onclick="exportPDF()">📄 Exportar PDF</button>
       </div>
     </div>
   </div>
@@ -341,7 +356,7 @@ tr:hover td{background:var(--surface2);}
     <div class="card">
       <div class="card-header"><div><div class="card-title">◉ Agente Visual</div><div class="card-sub" id="vis-client-indicator">contexto: nenhum cliente ativo</div></div></div>
       <div class="input-group"><label class="input-label">Objetivo do visual</label>
-        <select id="vis-objetivo"><option>Apresentar produto</option><option>Promoção / Oferta</option><option>Conteúdo educativo</option><option>Bastidores</option><option>Depoimento / Prova social</option><option>Identidade de marca</option></select>
+        <select id="vis-objetivo"><option>Apresentar produto</option><option>Promoção / Oferta</option><option>Conteúdo educativo</option><option>Bastidores</option><option>Depoimento</option><option>Identidade de marca</option></select>
       </div>
       <div class="input-group"><label class="input-label">Formato</label>
         <select id="vis-formato"><option>Feed quadrado 1:1</option><option>Story / Reels 9:16</option><option>Carrossel (até 10 slides)</option><option>Banner 16:9</option></select>
@@ -362,59 +377,38 @@ tr:hover td{background:var(--surface2);}
       <div class="output-box" id="vis-output" style="min-height:400px;font-size:12px">Preencha o brief e clique em gerar...</div>
       <div style="display:flex;gap:6px;margin-top:12px">
         <button class="btn btn-ghost btn-sm" onclick="copyOutput('vis-output')">⎘ Copiar</button>
-        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('vis')">≡ Salvar</button>
+        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('vis')">≡ Histórico</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══ COMENTÁRIOS ══ -->
+<!-- ══ COMMENTS ══ -->
 <div class="page" id="page-comments">
   <div class="grid-2">
     <div class="card">
       <div class="card-header"><div><div class="card-title">💬 Agente de Comentários</div><div class="card-sub" id="com-client-indicator">contexto: nenhum cliente ativo</div></div></div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.6">Cole comentários do Instagram, Facebook ou TikTok. A IA vai sugerir respostas no tom exato da marca do cliente.</div>
-
-      <div class="input-group">
-        <label class="input-label">Rede social</label>
-        <select id="com-rede"><option>Instagram</option><option>Facebook</option><option>TikTok</option><option>LinkedIn</option></select>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">Cole os comentários do Instagram ou TikTok abaixo. O agente vai gerar respostas no tom exato da marca para cada um.</div>
+      <div class="input-group"><label class="input-label">Comentários (um por linha)</label>
+        <textarea id="com-input" style="min-height:140px" placeholder="ex:
+Que preço tem o pão de queijo?
+Vocês entregam?
+Amei demais, melhor padaria da cidade!
+Quando abre no domingo?"></textarea>
       </div>
-
-      <div class="input-group">
-        <label class="input-label">Contexto do post (opcional)</label>
-        <input id="com-post" placeholder="ex: Post de promoção do croissant">
+      <div class="input-group"><label class="input-label">Tom para as respostas</label>
+        <select id="com-tom"><option>Mesmo tom do DNA da marca</option><option>Mais formal</option><option>Mais descontraído</option><option>Muito breve (1 linha)</option></select>
       </div>
-
-      <div class="input-group">
-        <label class="input-label">Tom da resposta</label>
-        <select id="com-tom">
-          <option>Usar tom do DNA da marca</option>
-          <option>Mais formal e profissional</option>
-          <option>Mais descontraído e próximo</option>
-          <option>Empático e acolhedor</option>
-        </select>
-      </div>
-
-      <div class="input-group">
-        <label class="input-label">Cole os comentários abaixo (um por linha)</label>
-        <textarea id="com-input" style="min-height:160px" placeholder="@usuario1: Amei o produto! Quanto custa?
-@usuario2: Onde vocês ficam?
-@usuario3: Já comprei e recomendo!
-@usuario4: Tem entrega?"></textarea>
-      </div>
-
-      <button class="btn btn-primary" style="width:100%" onclick="runComments()">💬 Gerar respostas</button>
+      <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="runComments()">💬 Gerar respostas</button>
     </div>
-
     <div class="card">
-      <div class="card-header"><div class="card-title">Respostas sugeridas</div><span class="tag tag-green" id="com-tag">aguardando</span></div>
+      <div class="card-header"><div class="card-title">Respostas geradas</div><span class="tag tag-green" id="com-tag">aguardando</span></div>
       <div class="loading-bar"><div class="loading-fill" id="com-loading"></div></div>
       <div id="com-output-area">
-        <div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center">Cole comentários ao lado e clique em gerar.<br><span style="font-size:11px">As respostas usarão o tom de voz do cliente ativo.</span></div>
+        <div style="color:var(--text3);font-size:12px;padding:32px;text-align:center">Cole os comentários ao lado e clique em gerar...</div>
       </div>
       <div style="display:flex;gap:6px;margin-top:12px" id="com-actions" style="display:none">
         <button class="btn btn-ghost btn-sm" onclick="copyOutput('com-raw')">⎘ Copiar tudo</button>
-        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('com')">≡ Salvar</button>
       </div>
     </div>
   </div>
@@ -425,7 +419,10 @@ tr:hover td{background:var(--surface2);}
   <div class="grid-2">
     <div>
       <div class="card">
-        <div class="card-header"><div><div class="card-title">Seus clientes</div><div class="card-sub" id="clients-sub">0 cadastrados</div></div><button class="btn btn-primary btn-sm" onclick="nav('onboarding',null)">+ Novo cliente</button></div>
+        <div class="card-header">
+          <div><div class="card-title">Seus clientes</div><div class="card-sub" id="clients-sub">0 cadastrados</div></div>
+          <button class="btn btn-primary btn-sm" onclick="nav('onboarding',null)">+ Novo cliente</button>
+        </div>
         <div id="clients-list"><div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center">Nenhum cliente ainda.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar agora →</span></div></div>
       </div>
     </div>
@@ -439,7 +436,9 @@ tr:hover td{background:var(--surface2);}
       </div>
       <div class="memory-grid" id="cd-memory-grid"></div>
     </div>
-    <div class="card" id="client-empty-card"><div style="color:var(--text3);font-size:12px;padding:32px;text-align:center;line-height:2">← Selecione um cliente para ver o DNA de marca salvo</div></div>
+    <div class="card" id="client-empty-card">
+      <div style="color:var(--text3);font-size:12px;padding:32px;text-align:center;line-height:2">← Selecione um cliente para ver o DNA de marca salvo</div>
+    </div>
   </div>
 </div>
 
@@ -454,9 +453,7 @@ tr:hover td{background:var(--surface2);}
       <div class="onboard-step active" id="step-1">
         <div class="section-title">1 / 5 — Identidade</div>
         <div class="input-group"><label class="input-label">Nome da empresa *</label><input id="ob-nome" placeholder="ex: Padaria Boa"></div>
-        <div class="input-group"><label class="input-label">Nicho</label>
-          <select id="ob-nicho"><option>Alimentação e Gastronomia</option><option>Moda e Beleza</option><option>Saúde e Bem-estar</option><option>Serviços Locais</option><option>Educação</option><option>Pet Shop</option><option>Varejo</option><option>Auto e Mecânica</option><option>Tecnologia</option><option>Outro</option></select>
-        </div>
+        <div class="input-group"><label class="input-label">Nicho</label><select id="ob-nicho"><option>Alimentação e Gastronomia</option><option>Moda e Beleza</option><option>Saúde e Bem-estar</option><option>Serviços Locais</option><option>Educação</option><option>Pet Shop</option><option>Varejo</option><option>Auto e Mecânica</option><option>Tecnologia</option><option>Outro</option></select></div>
         <div class="input-group"><label class="input-label">Cidade / Região</label><input id="ob-cidade" placeholder="ex: São Paulo, SP"></div>
         <div class="input-group"><label class="input-label">Tempo no mercado</label><select id="ob-anos"><option>Menos de 1 ano</option><option>1–3 anos</option><option>3–10 anos</option><option>Mais de 10 anos</option></select></div>
         <div class="input-group"><label class="input-label">Slogan ou frase da marca</label><input id="ob-slogan" placeholder="ex: Feito com amor desde 1998"></div>
@@ -513,7 +510,10 @@ tr:hover td{background:var(--surface2);}
 <!-- ══ HISTORY ══ -->
 <div class="page" id="page-history">
   <div class="card">
-    <div class="card-header"><div><div class="card-title">Histórico de Gerações</div><div class="card-sub" id="hist-sub">0 itens salvos</div></div><button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearHistory()">Limpar tudo</button></div>
+    <div class="card-header">
+      <div><div class="card-title">Histórico de Gerações</div><div class="card-sub" id="hist-sub">0 itens salvos</div></div>
+      <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearHistory()">Limpar tudo</button>
+    </div>
     <div id="history-list"><div style="color:var(--text3);font-size:12px;padding:32px;text-align:center">Suas gerações salvas aparecerão aqui.</div></div>
   </div>
 </div>
@@ -526,16 +526,19 @@ tr:hover td{background:var(--surface2);}
       <div class="input-group">
         <label class="input-label">🔑 Chave de API</label>
         <input id="cfg-apikey" type="password" value="gerenciada pelo servidor" readonly style="opacity:.4;cursor:not-allowed">
-        <div style="font-size:10px;color:var(--green);font-family:var(--font-mono);margin-top:4px">✓ Chave segura — configurada no Netlify, nunca exposta no browser</div>
+        <div style="font-size:10px;color:var(--green);font-family:var(--font-mono);margin-top:4px">✓ Chave segura — configurada no Netlify</div>
       </div>
-      <div class="input-group"><label class="input-label">🤖 Modelo</label>
+      <div class="input-group"><label class="input-label">🤖 Modelo Groq</label>
         <select id="cfg-model">
-          <option value="llama-3.3-70b-versatile">Llama 3.3 70B (Groq · gratuito · recomendado)</option>
-          <option value="llama-3.1-8b-instant">Llama 3.1 8B (Groq · mais rápido)</option>
-          <option value="gemma2-9b-it">Gemma 2 9B (Groq · gratuito)</option>
+          <option value="llama-3.3-70b-versatile">Llama 3.3 70B (recomendado)</option>
+          <option value="llama-3.1-8b-instant">Llama 3.1 8B (mais rápido)</option>
+          <option value="mixtral-8x7b-32768">Mixtral 8x7B (contexto longo)</option>
+          <option value="gemma2-9b-it">Gemma 2 9B (Google)</option>
         </select>
       </div>
-      <div class="input-group"><label class="input-label">Idioma padrão</label><select id="cfg-lang"><option>Português Brasileiro</option><option>Inglês</option><option>Espanhol</option></select></div>
+      <div class="input-group"><label class="input-label">Idioma padrão dos agentes</label>
+        <select id="cfg-lang"><option>Português Brasileiro</option><option>Inglês</option><option>Espanhol</option></select>
+      </div>
       <div class="input-group"><label class="input-label">Tamanho máximo da resposta</label>
         <select id="cfg-tokens"><option value="800">Curto (800 tokens)</option><option value="1500" selected>Médio (1500 tokens)</option><option value="2500">Longo (2500 tokens)</option></select>
       </div>
@@ -543,8 +546,20 @@ tr:hover td{background:var(--surface2);}
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title">Dados salvos</div></div>
-      <div class="notif"><span class="notif-icon">☁</span><div><div class="notif-text" style="color:var(--text)">Armazenamento em nuvem (Supabase)</div><div class="notif-text" style="font-size:11px;margin-top:2px">Clientes e DNA de marca salvos no servidor.</div></div></div>
-      <div class="notif" style="margin-top:6px"><span class="notif-icon">💾</span><div><div class="notif-text" style="color:var(--text)">Backup local (localStorage)</div><div class="notif-text" style="font-size:11px;margin-top:2px">Cópia local de segurança. Funciona offline.</div></div></div>
+      <div class="notif">
+        <span class="notif-icon">☁</span>
+        <div>
+          <div class="notif-text" style="color:var(--text)">Armazenamento em nuvem (Supabase)</div>
+          <div class="notif-text" style="font-size:11px;margin-top:2px">Clientes e histórico salvos no servidor.</div>
+        </div>
+      </div>
+      <div class="notif" style="margin-top:6px">
+        <span class="notif-icon">💾</span>
+        <div>
+          <div class="notif-text" style="color:var(--text)">Backup local (localStorage)</div>
+          <div class="notif-text" style="font-size:11px;margin-top:2px">Funciona mesmo offline.</div>
+        </div>
+      </div>
       <div style="margin-top:12px;display:flex;gap:8px">
         <button class="btn btn-ghost btn-sm" onclick="exportData()">⬇ Exportar dados</button>
         <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearAllData()">✕ Apagar tudo</button>
@@ -559,7 +574,7 @@ tr:hover td{background:var(--surface2);}
 </main>
 
 <script>
-// ══ SUPABASE ══
+// ── SUPABASE ──
 const SUPABASE_URL = 'https://opigoplvnbcbtbgwgadb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_nlaH3jiD9uwNiRNdG4OR_g_AhZSkBII';
 let sbReady = false;
@@ -568,7 +583,12 @@ async function loadSupabase() {
   return new Promise((resolve) => {
     const s = document.createElement('script');
     s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-    s.onload = () => { window._sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); sbReady = true; setSyncStatus('synced','nuvem ativa'); resolve(true); };
+    s.onload = () => {
+      window._sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      sbReady = true;
+      setSyncStatus('synced','nuvem ativa');
+      resolve(true);
+    };
     s.onerror = () => { setSyncStatus('error','offline — usando local'); resolve(false); };
     document.head.appendChild(s);
   });
@@ -579,179 +599,237 @@ function setSyncStatus(state, label) {
   document.getElementById('sync-label').textContent = label;
 }
 
-// ══ STORAGE ══
-const LS = {
-  get:(k,d=null)=>{ try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;} },
-  set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} },
-  del:(k)=>{ try{localStorage.removeItem(k);}catch(e){} }
-};
-
 async function sbSaveClient(c) {
   if(!sbReady) return;
-  try { setSyncStatus('syncing','sincronizando...'); await window._sb.from('clients').upsert({nome:c.nome,nicho:c.nicho,dna:c.dna},{onConflict:'nome'}); setSyncStatus('synced','salvo na nuvem'); } catch(e) { setSyncStatus('error','erro ao salvar'); }
+  try {
+    setSyncStatus('syncing','sincronizando...');
+    await window._sb.from('clients').upsert({nome:c.nome,nicho:c.nicho,dna:c.dna},{onConflict:'nome'});
+    setSyncStatus('synced','salvo na nuvem');
+  } catch(e) { setSyncStatus('error','erro ao salvar'); }
 }
+
 async function sbLoadClients() {
   if(!sbReady) return;
   try {
     setSyncStatus('syncing','carregando...');
     const {data,error} = await window._sb.from('clients').select('*').order('created_at',{ascending:true});
     if(error) throw error;
-    if(data && data.length>0) {
-      data.forEach(r=>{ const li=clients.findIndex(c=>c.nome.toLowerCase()===r.nome.toLowerCase()); if(li>=0){clients[li]={nome:r.nome,nicho:r.nicho,dna:r.dna};}else{clients.push({nome:r.nome,nicho:r.nicho,dna:r.dna});} });
-      LS.set('aios_clients',clients); refreshClientSelect(); renderDashboard();
+    if(data && data.length > 0) {
+      data.forEach(remote => {
+        const idx = clients.findIndex(c=>c.nome.toLowerCase()===remote.nome.toLowerCase());
+        if(idx>=0) clients[idx]={nome:remote.nome,nicho:remote.nicho,dna:remote.dna};
+        else clients.push({nome:remote.nome,nicho:remote.nicho,dna:remote.dna});
+      });
+      LS.set('aios_clients',clients);
+      refreshClientSelect(); renderDashboard();
     }
     setSyncStatus('synced','nuvem ativa');
   } catch(e) { setSyncStatus('error','offline — usando local'); }
 }
-async function sbSaveHistory(item) { if(!sbReady) return; try { await window._sb.from('history').insert({type:item.type,label:item.label,client_name:item.client,content:item.content}); } catch(e){} }
-async function sbDeleteClient(nome) { if(!sbReady) return; try { await window._sb.from('clients').delete().eq('nome',nome); } catch(e){} }
 
-// ══ STATE ══
-let clients = LS.get('aios_clients',[]);
-let chatHistory = LS.get('aios_history',[]);
-let activeIdx = LS.get('aios_active_idx',null);
-let sessionStats = {copies:0,pautas:0,briefs:0};
-let settings = LS.get('aios_settings',{});
-if(!settings.model) settings.model = 'llama-3.3-70b-versatile';
-if(!settings.tokens) settings.tokens = 1500;
+async function sbSaveHistory(item) {
+  if(!sbReady) return;
+  try { await window._sb.from('history').insert({type:item.type,label:item.label,client_name:item.client,content:item.content}); } catch(e) {}
+}
+
+async function sbDeleteClient(nome) {
+  if(!sbReady) return;
+  try { await window._sb.from('clients').delete().eq('nome',nome); } catch(e) {}
+}
+
+// ── STORAGE ──
+const LS = {
+  get:(k,def=null)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}},
+  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}},
+  del:(k)=>{try{localStorage.removeItem(k);}catch(e){}}
+};
+
+// ── STATE ──
+let clients=LS.get('aios_clients',[]);
+let chatHistory=LS.get('aios_history',[]);
+let activeIdx=LS.get('aios_active_idx',null);
+let sessionStats={copies:0,pautas:0,briefs:0};
+let settings=LS.get('aios_settings',{});
+if(!settings.model||settings.model.includes('claude')||settings.model.includes('gemini')) settings.model='llama-3.3-70b-versatile';
+if(!settings.tokens) settings.tokens=1500;
 LS.set('aios_settings',settings);
 
-// ══ NAV ══
-const pageTitles = {dashboard:'Dashboard',copy:'Agente Copy',orchestrator:'Orquestrador',visual:'Agente Visual',comments:'Agente de Comentários',clients:'Clientes',onboarding:'Onboarding de Cliente',history:'Histórico',settings:'Configurações'};
-function nav(page, el) {
+// ── NAV ──
+const pageTitles={dashboard:'Dashboard',copy:'Agente Copy',orchestrator:'Orquestrador',visual:'Agente Visual',comments:'Agente de Comentários',clients:'Clientes',onboarding:'Onboarding de Cliente',history:'Histórico',settings:'Configurações'};
+function nav(page,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
-  document.getElementById('hdr').textContent = pageTitles[page]||page;
+  document.getElementById('hdr').textContent=pageTitles[page]||page;
   if(el) el.classList.add('active');
-  else document.querySelectorAll('.nav-item').forEach(n=>{ if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'")) n.classList.add('active'); });
+  else document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'"))n.classList.add('active');});
   if(page==='clients') renderClients();
   if(page==='history') renderHistory();
   if(page==='dashboard') renderDashboard();
   updateClientIndicators();
 }
 
-// ══ CLIENT ══
-function getActiveClient() { if(activeIdx===null||!clients[activeIdx]) return null; return clients[activeIdx]; }
-function switchClient(idx) {
-  activeIdx = idx===''?null:parseInt(idx);
-  LS.set('aios_active_idx',activeIdx);
-  updateClientSwitcherUI(); updateClientIndicators(); renderDashboard();
-  showToast('✓ Cliente: '+(getActiveClient()?getActiveClient().nome:'nenhum'),'success');
-}
-function updateClientSwitcherUI() {
+// ── CLIENT ──
+function getActiveClient(){return(activeIdx===null||!clients[activeIdx])?null:clients[activeIdx];}
+function switchClient(idx){activeIdx=idx===''?null:parseInt(idx);LS.set('aios_active_idx',activeIdx);updateClientSwitcherUI();updateClientIndicators();renderDashboard();showToast('✓ Cliente: '+(getActiveClient()?getActiveClient().nome:'nenhum'),'success');}
+function updateClientSwitcherUI(){
   const sel=document.getElementById('global-client-select');
   const pill=document.getElementById('active-client-pill');
   const c=getActiveClient();
   sel.value=activeIdx===null?'':activeIdx;
-  if(c){ pill.style.display='flex'; document.getElementById('active-client-avatar').textContent=c.nome.slice(0,2).toUpperCase(); document.getElementById('active-client-name').textContent=c.nome; document.getElementById('active-client-nicho').textContent=c.nicho||''; const b=document.getElementById('no-client-banner'); if(b) b.style.display='none'; }
-  else { pill.style.display='none'; const b=document.getElementById('no-client-banner'); if(b) b.style.display='flex'; }
+  if(c){
+    pill.style.display='flex';
+    document.getElementById('active-client-avatar').textContent=c.nome.slice(0,2).toUpperCase();
+    document.getElementById('active-client-name').textContent=c.nome;
+    document.getElementById('active-client-nicho').textContent=c.nicho||'';
+    const b=document.getElementById('no-client-banner');if(b)b.style.display='none';
+  } else {
+    pill.style.display='none';
+    const b=document.getElementById('no-client-banner');if(b)b.style.display='flex';
+  }
 }
-function updateClientIndicators() {
+function updateClientIndicators(){
   const c=getActiveClient();
   const label=c?`contexto: ${c.nome}`:'contexto: nenhum cliente ativo';
-  ['copy','orc','vis','com'].forEach(p=>{ const el=document.getElementById(p+'-client-indicator'); if(el){el.textContent=label;el.style.color=c?'var(--green)':'var(--text3)';} });
+  ['copy','orc','vis','com'].forEach(p=>{const el=document.getElementById(p+'-client-indicator');if(el){el.textContent=label;el.style.color=c?'var(--green)':'var(--text3)';}});
 }
-function refreshClientSelect() {
+function refreshClientSelect(){
   const sel=document.getElementById('global-client-select');
   sel.innerHTML='<option value="">— Selecione um cliente —</option>';
-  clients.forEach((c,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=c.nome+' · '+(c.nicho||''); sel.appendChild(o); });
-  if(activeIdx!==null&&clients[activeIdx]) sel.value=activeIdx;
-  else { activeIdx=null; LS.set('aios_active_idx',null); }
+  clients.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.nome+' · '+(c.nicho||'');sel.appendChild(o);});
+  if(activeIdx!==null&&clients[activeIdx])sel.value=activeIdx;
+  else{activeIdx=null;LS.set('aios_active_idx',null);}
   updateClientSwitcherUI();
 }
 
-// ══ API ══
-async function callClaude(system, user, outEl, loadEl, tagEl, tagDone) {
-  const model = settings.model || 'llama-3.3-70b-versatile';
-  const tokens = settings.tokens || 1500;
-  outEl.textContent=''; loadEl.style.width='15%';
+// ── API ──
+async function callClaude(system,user,outEl,loadEl,tagEl,tagDone){
+  const model=settings.model||'llama-3.3-70b-versatile';
+  const tokens=settings.tokens||1500;
+  outEl.textContent='';loadEl.style.width='15%';
   if(tagEl){tagEl.textContent='gerando...';tagEl.className='tag tag-orange';}
-  const cur=document.createElement('span'); cur.className='cursor'; outEl.appendChild(cur);
-  try {
+  const cur=document.createElement('span');cur.className='cursor';outEl.appendChild(cur);
+  try{
     loadEl.style.width='50%';
     const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system,user,model,max_tokens:tokens})});
     const data=await res.json();
-    if(!res.ok||data.error) throw new Error(data.error||`Erro HTTP ${res.status}`);
+    if(!res.ok||data.error)throw new Error(data.error||`Erro HTTP ${res.status}`);
     const text=data.text||'';
-    cur.remove(); outEl.textContent=''; loadEl.style.width='90%';
-    let i=0; const speed=text.length>800?4:8;
+    cur.remove();outEl.textContent='';loadEl.style.width='90%';
+    let i=0;const speed=text.length>800?4:8;
     const iv=setInterval(()=>{outEl.textContent+=text[i]||'';i++;if(i>=text.length)clearInterval(iv);},speed);
     setTimeout(()=>{loadEl.style.width='0%';},800);
     if(tagEl){tagEl.textContent=tagDone||'pronto';tagEl.className='tag tag-green';}
     return text;
-  } catch(e) {
-    cur.remove(); outEl.textContent='⚠ Erro: '+e.message; loadEl.style.width='0%';
+  }catch(e){
+    cur.remove();outEl.textContent='⚠ Erro: '+e.message;loadEl.style.width='0%';
     if(tagEl){tagEl.textContent='erro';tagEl.className='tag tag-red';}
     return null;
   }
 }
 
-// ══ BRAND CONTEXT ══
-function getBrandContext() {
-  const c=getActiveClient(); if(!c||!c.dna) return '';
-  const d=c.dna;
-  return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DNA DE MARCA — USE ESTAS INFORMAÇÕES EM TODO O CONTEÚDO
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ── BRAND CONTEXT ──
+function getBrandContext(){
+  const c=getActiveClient();if(!c||!c.dna)return'';const d=c.dna;
+  return `━━━ DNA DE MARCA ━━━
 Empresa: ${d.nome||''} | Nicho: ${d.nicho||''} | Cidade: ${d.cidade||''}
-Slogan: ${d.slogan||''} | Tom de voz: ${d.tom||''}
-Trata o cliente como: ${d.trato||''} | Emojis: ${d.emoji||''}
-Público: ${d.idade||''} · ${d.genero||''} · Classe ${d.classe||''}
+Slogan: ${d.slogan||''} | Tom: ${d.tom||''} | Trato: ${d.trato||''}
+Emojis: ${d.emoji||''} | Público: ${d.idade||''} · ${d.genero||''} · ${d.classe||''}
 Dores: ${d.dores||''} | Produtos: ${d.produtos||''}
 Diferencial: ${d.diferencial||''} | Ticket: ${d.ticket||''}
-Palavras OBRIGATÓRIAS: ${d.keywords||''} | PROIBIDAS: ${d.evitar||''}
+Keywords OBRIGATÓRIAS: ${d.keywords||''} | Palavras PROIBIDAS: ${d.evitar||''}
 Sazonalidade: ${d.sazonal||''} | Meta: ${d.meta||''}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`;
+━━━━━━━━━━━━━━━━━━━━━━`;
 }
 
-// ══ AGENTE COPY ══
-async function runCopy(n) {
+// ── COPY ──
+async function runCopy(n){
   const ctx=getBrandContext();
-  const sys=`Você é um copywriter sênior especializado em PMEs brasileiras. Crie textos que convertem com personalidade real.
-REGRAS: Use palavras-chave obrigatórias, NUNCA as proibidas. Tom exato do DNA. Soar humano como o dono da empresa. Hashtags: máx 5. NUNCA use clichês como "qualidade incomparável" ou "preço justo".`;
+  const sys=`Você é um copywriter sênior especializado em PMEs brasileiras. Crie textos que convertem, com personalidade real — nunca genéricos.
+REGRAS: use palavras-chave obrigatórias, NUNCA as proibidas, adapte o tom do DNA, CTA natural, hashtags máx 5, sem clichês.`;
   const usr=`${ctx}
 Tipo: ${document.getElementById('copy-tipo').value}
 Rede: ${document.getElementById('copy-rede').value}
-Produto: ${document.getElementById('copy-produto').value||'principal produto'}
+Produto: ${document.getElementById('copy-produto').value||'produto principal'}
 Gancho: ${document.getElementById('copy-gancho').value}
 CTA: ${document.getElementById('copy-cta').value||'entre em contato'}
 Contexto: ${document.getElementById('copy-contexto').value||'nenhum'}
-${n===1?'Crie 1 copy EXCELENTE pronta para publicar.':'Crie 3 variações:\nVARIAÇÃO 1 — Emocional/storytelling\nVARIAÇÃO 2 — Direto ao benefício\nVARIAÇÃO 3 — Prova social/curiosidade\nSepare com "---"'}`;
-  const result=await callClaude(sys,usr,document.getElementById('copy-output'),document.getElementById('copy-loading'),document.getElementById('copy-tag'),n===1?'copy pronta':'3 variações');
-  if(result){sessionStats.copies++;document.getElementById('dash-stat-copies').textContent=sessionStats.copies;addToHistory('copy',document.getElementById('copy-tipo').value,result,getActiveClient()?.nome);}
+${n===1?'Crie 1 copy EXCELENTE pronta para publicar.':`Crie 3 variações:
+VARIAÇÃO 1 — Emocional/storytelling
+VARIAÇÃO 2 — Direto ao benefício
+VARIAÇÃO 3 — Prova social/curiosidade
+Separe com "---".`}`;
+  const result=await callClaude(sys,usr,document.getElementById('copy-output'),document.getElementById('copy-loading'),document.getElementById('copy-tag'),n===1?'1 copy pronta':'3 variações prontas');
+  if(result){sessionStats.copies++;document.getElementById('dash-stat-copies').textContent=sessionStats.copies;addToHistory('copy',document.getElementById('copy-tipo').value+' · '+document.getElementById('copy-rede').value,result,getActiveClient()?.nome);}
 }
 
-// ══ PREVIEW INSTAGRAM ══
-function showPreview() {
-  const text = document.getElementById('copy-output').textContent;
-  if(!text || text.includes('Preencha')) { showToast('⚠ Gere uma copy primeiro.','error'); return; }
-  const c = getActiveClient();
-  const username = c ? '@'+c.nome.toLowerCase().replace(/\s+/g,'').slice(0,15) : '@suamarca';
-  const initials = c ? c.nome.slice(0,2).toUpperCase() : 'MA';
-
-  // Separa texto de hashtags
-  const lines = text.split('\n');
-  const hashLines = lines.filter(l=>l.trim().startsWith('#'));
-  const mainLines = lines.filter(l=>!l.trim().startsWith('#'));
-  const mainText = mainLines.join('\n').trim();
-  const hashtags = hashLines.join(' ').trim();
-
-  document.getElementById('ig-av').textContent = initials;
-  document.getElementById('ig-user').textContent = username;
-  document.getElementById('ig-caption-text').innerHTML =
-    `<strong>${username}</strong> ${mainText.replace(/\n/g,'<br>')}` +
-    (hashtags ? `<div class="ig-hashtags">${hashtags}</div>` : '');
-
-  document.getElementById('ig-preview-card').style.display = 'block';
-  document.getElementById('ig-preview-card').scrollIntoView({behavior:'smooth'});
+// ── PREVIEW ──
+function showPreview(){
+  const text=document.getElementById('copy-output').textContent;
+  if(!text||text.includes('Preencha')){showToast('⚠ Gere uma copy primeiro','error');return;}
+  const c=getActiveClient();
+  const card=document.getElementById('preview-card');
+  document.getElementById('prev-avatar').textContent=c?c.nome.slice(0,2).toUpperCase():'EM';
+  document.getElementById('prev-username').textContent=c?'@'+c.nome.toLowerCase().replace(/\s+/g,'.'):'@empresa';
+  const emojiMap={Alimentação:'🍞',Moda:'👗',Saúde:'💪',Pet:'🐾',Educação:'📚',Auto:'🚗',Varejo:'🛍️',Tecnologia:'💻'};
+  const nicho=c?.nicho||'';
+  const emoji=Object.entries(emojiMap).find(([k])=>nicho.includes(k))?.[1]||'🏪';
+  document.getElementById('prev-emoji').textContent=emoji;
+  document.getElementById('prev-caption').textContent=text.slice(0,400)+(text.length>400?'...':'');
+  card.style.display='block';
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-// ══ AGENTE ORQUESTRADOR ══
-async function runOrchestrator() {
+// ── PDF EXPORT ──
+function exportPDF(){
+  const text=document.getElementById('orc-output').textContent;
+  if(!text||text.includes('Preencha')){showToast('⚠ Gere uma pauta primeiro','error');return;}
+  try{
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const c=getActiveClient();
+    const empresa=c?.nome||'Empresa';
+    // Header
+    doc.setFillColor(122,0,255);
+    doc.rect(0,0,210,28,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(18);doc.setFont('helvetica','bold');
+    doc.text('VÉRTICE',14,12);
+    doc.setFontSize(10);doc.setFont('helvetica','normal');
+    doc.text('Engenharia de crescimento previsível.',14,19);
+    doc.setFontSize(12);doc.setFont('helvetica','bold');
+    doc.text(`Pauta Editorial — ${empresa}`,14,26);
+    // Date
+    doc.setTextColor(180,180,180);
+    doc.setFontSize(8);
+    doc.text(new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}),196,26,{align:'right'});
+    // Content
+    doc.setTextColor(30,30,30);
+    doc.setFontSize(9);doc.setFont('helvetica','normal');
+    const lines=doc.splitTextToSize(text,182);
+    let y=36;
+    lines.forEach(line=>{
+      if(y>280){doc.addPage();y=14;}
+      if(line.startsWith('📅')||line.startsWith('━')){doc.setFont('helvetica','bold');}else{doc.setFont('helvetica','normal');}
+      doc.text(line,14,y);
+      y+=4.5;
+    });
+    // Footer
+    const pageCount=doc.internal.getNumberOfPages();
+    for(let i=1;i<=pageCount;i++){
+      doc.setPage(i);
+      doc.setTextColor(150,150,150);doc.setFontSize(7);
+      doc.text(`Vértice AI · Página ${i}/${pageCount}`,105,292,{align:'center'});
+    }
+    doc.save(`pauta-${empresa.toLowerCase().replace(/\s+/g,'-')}-${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf`);
+    showToast('✓ PDF exportado!','success');
+  }catch(e){showToast('⚠ Erro ao gerar PDF: '+e.message,'error');}
+}
+
+// ── ORCHESTRATOR ──
+async function runOrchestrator(){
   const ctx=getBrandContext();
-  const sys=`Você é um estrategista de conteúdo digital sênior para PMEs brasileiras. Crie pautas editoriais REALISTAS e ESPECÍFICAS — nada genérico. Varie formatos. Use produtos reais do DNA.`;
+  const sys=`Você é estrategista de conteúdo sênior para PMEs brasileiras. Crie pautas específicas, nunca genéricas.`;
   const usr=`${ctx}
 Semana: ${document.getElementById('orc-semana').value||'próxima semana'}
 Redes: ${document.getElementById('orc-redes').value}
@@ -759,21 +837,19 @@ Objetivo: ${document.getElementById('orc-objetivo').value}
 Frequência: ${document.getElementById('orc-freq').value}
 Contexto: ${document.getElementById('orc-contexto').value||'nenhum'}
 
-Crie a pauta no formato:
-━━━ PAUTA EDITORIAL ━━━
 Para cada post:
 📅 DIA E HORÁRIO | 📱 REDE E FORMATO | 🎯 OBJETIVO
-📝 TEMA/TÍTULO | 💡 GANCHO | 📋 ESTRUTURA (3 pontos) | #️⃣ HASHTAGS (máx 5)
+📝 TEMA | 💡 GANCHO | 📋 ESTRUTURA (3 pontos) | #️⃣ HASHTAGS (máx.5)
 ---
-Ao final: 🔑 ESTRATÉGIA DA SEMANA (3 linhas)`;
+Ao final: 🔑 ESTRATÉGIA DA SEMANA (3 linhas).`;
   const result=await callClaude(sys,usr,document.getElementById('orc-output'),document.getElementById('orc-loading'),document.getElementById('orc-tag'),'pauta pronta');
   if(result){sessionStats.pautas++;document.getElementById('dash-stat-pautas').textContent=sessionStats.pautas;addToHistory('orc','Pauta · '+document.getElementById('orc-redes').value,result,getActiveClient()?.nome);}
 }
 
-// ══ AGENTE VISUAL ══
-async function runVisual() {
+// ── VISUAL ──
+async function runVisual(){
   const ctx=getBrandContext();
-  const sys=`Você é Diretor de Arte de uma agência digital. Crie briefings visuais detalhados e prompts para Midjourney/DALL-E. Seja técnico e específico.`;
+  const sys=`Você é Diretor de Arte de agência digital. Crie briefings visuais detalhados e prompts para IA (Midjourney/DALL-E).`;
   const usr=`${ctx}
 Objetivo: ${document.getElementById('vis-objetivo').value}
 Formato: ${document.getElementById('vis-formato').value}
@@ -782,123 +858,80 @@ Elemento: ${document.getElementById('vis-elemento').value||'produto principal'}
 Cores: ${document.getElementById('vis-cores').value||'paleta da marca'}
 Mood: ${document.getElementById('vis-mood').value}
 
-Gere:
-🎨 CONCEITO CRIATIVO
-📐 COMPOSIÇÃO E LAYOUT
-💡 REFERÊNCIAS DE ESTILO (3)
-🤖 PROMPT PARA IA (inglês, técnico, mín 60 palavras)
-🎬 DICAS DE PRODUÇÃO (3 práticas)
-⚠️ EVITE (3 elementos)`;
+🎨 CONCEITO CRIATIVO | 📐 COMPOSIÇÃO | 💡 3 REFERÊNCIAS
+🤖 PROMPT IA (inglês, técnico, 60+ palavras)
+🎬 3 DICAS DE PRODUÇÃO | ⚠️ 3 ELEMENTOS A EVITAR`;
   const result=await callClaude(sys,usr,document.getElementById('vis-output'),document.getElementById('vis-loading'),document.getElementById('vis-tag'),'brief pronto');
   if(result){sessionStats.briefs++;document.getElementById('dash-stat-briefs').textContent=sessionStats.briefs;addToHistory('vis',document.getElementById('vis-objetivo').value,result,getActiveClient()?.nome);}
 }
 
-// ══ AGENTE COMENTÁRIOS ══
-async function runComments() {
-  const ctx = getBrandContext();
-  const comentarios = document.getElementById('com-input').value.trim();
-  if(!comentarios) { showToast('⚠ Cole pelo menos um comentário.','error'); return; }
-  const rede = document.getElementById('com-rede').value;
-  const post = document.getElementById('com-post').value;
-  const tom = document.getElementById('com-tom').value;
+// ── COMMENTS ──
+async function runComments(){
+  const ctx=getBrandContext();
+  const comentarios=document.getElementById('com-input').value.trim();
+  if(!comentarios){showToast('⚠ Cole os comentários primeiro','error');return;}
+  const tom=document.getElementById('com-tom').value;
+  const outArea=document.getElementById('com-output-area');
+  const loadEl=document.getElementById('com-loading');
+  const tagEl=document.getElementById('com-tag');
 
-  const outArea = document.getElementById('com-output-area');
-  outArea.innerHTML = '<div class="output-box" id="com-raw" style="min-height:200px;font-size:12px"></div>';
-  const outEl = document.getElementById('com-raw');
+  outArea.innerHTML='';loadEl.style.width='20%';
+  tagEl.textContent='gerando...';tagEl.className='tag tag-orange';
 
-  const sys = `Você é um gestor de redes sociais especialista em relacionamento com clientes de PMEs brasileiras. Crie respostas que convertem, criam vínculo e são autênticas. NUNCA copie respostas genéricas.`;
-  const usr = `${ctx}
-Rede: ${rede}
-Contexto do post: ${post||'post da marca'}
-Tom preferido: ${tom}
-
-COMENTÁRIOS PARA RESPONDER:
+  const sys=`Você é especialista em gestão de comunidades digitais para PMEs brasileiras. Responda comentários de forma autêntica, mantendo o tom da marca.`;
+  const usr=`${ctx}
+Tom para respostas: ${tom}
+Comentários para responder:
 ${comentarios}
 
-Para CADA comentário, responda no formato:
-👤 [comentário original]
-💬 Resposta sugerida: [sua resposta]
+Para CADA comentário, gere uma resposta no formato exato:
+COMENTÁRIO: [texto original]
+RESPOSTA: [sua resposta]
 ---
 
 Regras:
-- Responda todos os comentários individualmente
-- Use o tom de voz exato do DNA da marca
-- Para perguntas sobre preço/local: seja específico se tiver a info, ou direcione para contato
-- Para elogios: agradeça com personalidade, não apenas "obrigado!"
-- Para críticas: responda com empatia e solução
-- Mantenha respostas curtas (máx 3 linhas) e naturais`;
+- Use o tom de voz da marca
+- Respostas entre 1-3 linhas
+- Inclua emoji se o DNA pedir
+- Para perguntas sobre preço/horário, diga para enviar DM ou WhatsApp
+- Seja caloroso e humano, nunca robotizado`;
 
-  const result = await callClaude(sys, usr, outEl, document.getElementById('com-loading'), document.getElementById('com-tag'), 'respostas prontas');
-  if(result) {
+  loadEl.style.width='50%';
+  try{
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sys,user:usr,model:settings.model,max_tokens:1500})});
+    const data=await res.json();
+    if(!res.ok||data.error)throw new Error(data.error);
+    const text=data.text||'';
+    loadEl.style.width='90%';
+    // Parse e renderiza
+    const blocks=text.split('---').filter(b=>b.trim());
+    let html='<div id="com-raw" style="display:none">'+text+'</div>';
+    blocks.forEach(block=>{
+      const comMatch=block.match(/COMENTÁRIO:\s*(.+?)(?=RESPOSTA:|$)/s);
+      const repMatch=block.match(/RESPOSTA:\s*(.+?)$/s);
+      if(comMatch&&repMatch){
+        html+=`<div class="comment-item">
+          <div class="comment-meta"><span class="tag tag-blue">Comentário</span></div>
+          <div class="comment-text">${comMatch[1].trim()}</div>
+          <div style="font-size:9px;color:var(--green);font-family:var(--font-mono);margin-bottom:4px">↳ RESPOSTA SUGERIDA</div>
+          <div class="comment-reply">${repMatch[1].trim()}</div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(this.closest('.comment-item').querySelector('.comment-reply').textContent);showToast('✓ Copiado!','success')">⎘ Copiar</button>
+          </div>
+        </div>`;
+      }
+    });
+    outArea.innerHTML=html||`<div class="output-box">${text}</div>`;
+    loadEl.style.width='0%';
+    tagEl.textContent='respostas prontas';tagEl.className='tag tag-green';
     document.getElementById('com-actions').style.display='flex';
-    addToHistory('com','Comentários · '+rede, result, getActiveClient()?.nome);
-    // Formatar visualmente
-    renderCommentReplies(comentarios, result, outArea);
+  }catch(e){
+    outArea.innerHTML=`<div class="output-box">⚠ Erro: ${e.message}</div>`;
+    loadEl.style.width='0%';tagEl.textContent='erro';tagEl.className='tag tag-red';
   }
 }
 
-function renderCommentReplies(input, result, container) {
-  const lines = result.split('---').filter(b=>b.trim());
-  let html = '';
-  lines.forEach(block => {
-    const rows = block.trim().split('\n').filter(l=>l.trim());
-    if(!rows.length) return;
-    const orig = rows.find(r=>r.startsWith('👤'))||'';
-    const reply = rows.find(r=>r.startsWith('💬'))||'';
-    html += `<div class="comment-row">
-      <div style="flex:1">
-        <div class="comment-author">${orig.replace('👤','').trim()}</div>
-        <div class="reply-box">${reply.replace('💬 Resposta sugerida:','').trim()}</div>
-      </div>
-      <button class="btn btn-ghost btn-sm" style="flex-shrink:0;margin-top:auto" onclick="navigator.clipboard.writeText(this.previousElementSibling.querySelector('.reply-box').textContent);showToast('✓ Copiado!','success')">⎘</button>
-    </div>`;
-  });
-  if(html) container.innerHTML = html + `<textarea id="com-raw" style="display:none">${result}</textarea>`;
-}
-
-// ══ EXPORT PDF PAUTA ══
-function exportPautaPDF() {
-  const content = document.getElementById('orc-output').textContent;
-  if(!content || content.includes('Preencha')) { showToast('⚠ Gere uma pauta primeiro.','error'); return; }
-  const c = getActiveClient();
-  const empresa = c ? c.nome : 'Empresa';
-  const data = new Date().toLocaleDateString('pt-BR');
-
-  const w = window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pauta — ${empresa}</title>
-  <style>
-    body{font-family:Arial,sans-serif;max-width:800px;margin:40px auto;color:#1a1a1a;line-height:1.7;padding:0 20px;}
-    h1{font-size:22px;margin-bottom:4px;color:#7A00FF;}
-    .sub{font-size:12px;color:#666;margin-bottom:32px;}
-    pre{white-space:pre-wrap;font-family:Arial,sans-serif;font-size:13px;line-height:1.8;}
-    .footer{margin-top:40px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;}
-    @media print{body{margin:20px;}}
-  </style></head><body>
-  <h1>▲ VÉRTICE — Pauta Editorial</h1>
-  <div class="sub">${empresa} · Gerado em ${data}</div>
-  <pre>${content}</pre>
-  <div class="footer">Gerado pela plataforma Vértice AI · vertice.io</div>
-  <script>window.onload=()=>{window.print();}<\/script>
-  </body></html>`);
-  w.document.close();
-}
-
-function exportCopyPDF() {
-  const content = document.getElementById('copy-output').textContent;
-  if(!content || content.includes('Preencha')) { showToast('⚠ Gere uma copy primeiro.','error'); return; }
-  const c = getActiveClient();
-  const empresa = c ? c.nome : 'Empresa';
-  const w = window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Copy — ${empresa}</title>
-  <style>body{font-family:Arial,sans-serif;max-width:600px;margin:40px auto;color:#1a1a1a;line-height:1.8;padding:0 20px;}h1{color:#7A00FF;font-size:20px;}pre{white-space:pre-wrap;font-size:14px;background:#f9f9f9;padding:20px;border-radius:8px;border-left:4px solid #7A00FF;}.footer{margin-top:32px;font-size:11px;color:#999;text-align:center;}</style></head><body>
-  <h1>✦ Copy — ${empresa}</h1><p style="font-size:11px;color:#666">${new Date().toLocaleDateString('pt-BR')}</p>
-  <pre>${content}</pre>
-  <div class="footer">Gerado pela plataforma Vértice AI</div>
-  <script>window.onload=()=>{window.print();}<\/script></body></html>`);
-  w.document.close();
-}
-
-// ══ ONBOARDING ══
+// ── ONBOARDING ──
 let currentStep=1;
 function stepNext(n){goStep(n+1);}
 function stepPrev(n){goStep(n-1);}
@@ -906,38 +939,70 @@ function goStep(n){
   document.getElementById('step-'+currentStep).classList.remove('active');
   currentStep=n;
   document.getElementById('step-'+n).classList.add('active');
-  document.querySelectorAll('#step-ind .step-dot').forEach((d,i)=>{d.classList.remove('active','done');if(i<n-1)d.classList.add('done');else if(i===n-1)d.classList.add('active');});
+  const dots=document.querySelectorAll('#step-ind .step-dot');
+  dots.forEach((d,i)=>{d.classList.remove('active','done');if(i<n-1)d.classList.add('done');else if(i===n-1)d.classList.add('active');});
 }
 
-async function runOnboarding() {
+async function runOnboarding(){
   const nome=document.getElementById('ob-nome').value.trim();
   if(!nome){showToast('⚠ Digite o nome da empresa.','error');return;}
-  const dna={nome,nicho:document.getElementById('ob-nicho').value,cidade:document.getElementById('ob-cidade').value,anos:document.getElementById('ob-anos').value,slogan:document.getElementById('ob-slogan').value,idade:document.getElementById('ob-idade').value,genero:document.getElementById('ob-genero').value,classe:document.getElementById('ob-classe').value,dores:document.getElementById('ob-dores').value,tom:document.getElementById('ob-tom').value,emoji:document.getElementById('ob-emoji').value,trato:document.getElementById('ob-trato').value,evitar:document.getElementById('ob-evitar').value,keywords:document.getElementById('ob-keywords').value,produtos:document.getElementById('ob-produtos').value,diferencial:document.getElementById('ob-diferencial').value,ticket:document.getElementById('ob-ticket').value,sazonal:document.getElementById('ob-sazonal').value,redes:document.getElementById('ob-redes').value,freq:document.getElementById('ob-freq').value,meta:document.getElementById('ob-meta').value,obs:document.getElementById('ob-obs').value};
-  const sys=`Você é estrategista de marca de uma agência digital. Crie DNA de marca completo, estruturado e acionável. Responda em português.`;
-  const usr=`Briefing completo:\n${JSON.stringify(dna,null,2)}\n\nEstruture:\n🏢 PERFIL DA MARCA\n🗣️ VOZ E TOM (regras claras)\n👤 PERSONA DO CLIENTE IDEAL\n📋 DIRETRIZES EDITORIAIS\n🔑 GANCHO EMOCIONAL\n📅 CALENDÁRIO BASE`;
+  const dna={
+    nome,nicho:document.getElementById('ob-nicho').value,cidade:document.getElementById('ob-cidade').value,
+    anos:document.getElementById('ob-anos').value,slogan:document.getElementById('ob-slogan').value,
+    idade:document.getElementById('ob-idade').value,genero:document.getElementById('ob-genero').value,
+    classe:document.getElementById('ob-classe').value,dores:document.getElementById('ob-dores').value,
+    tom:document.getElementById('ob-tom').value,emoji:document.getElementById('ob-emoji').value,
+    trato:document.getElementById('ob-trato').value,evitar:document.getElementById('ob-evitar').value,
+    keywords:document.getElementById('ob-keywords').value,produtos:document.getElementById('ob-produtos').value,
+    diferencial:document.getElementById('ob-diferencial').value,ticket:document.getElementById('ob-ticket').value,
+    sazonal:document.getElementById('ob-sazonal').value,redes:document.getElementById('ob-redes').value,
+    freq:document.getElementById('ob-freq').value,meta:document.getElementById('ob-meta').value,
+    obs:document.getElementById('ob-obs').value,
+  };
+  const sys=`Você é estrategista de marca de agência digital. Crie DNA de marca completo e acionável. Responda em português.`;
+  const usr=`Crie o DNA de marca para: ${JSON.stringify(dna,null,2)}
+
+🏢 PERFIL DA MARCA
+🗣️ VOZ E TOM (regras claras)
+👤 PERSONA DO CLIENTE IDEAL
+📋 DIRETRIZES EDITORIAIS (o que postar / nunca postar)
+🔑 GANCHO EMOCIONAL DA MARCA
+📅 CALENDÁRIO BASE (dias/horários ideais)`;
   const result=await callClaude(sys,usr,document.getElementById('ob-output'),document.getElementById('ob-loading'),document.getElementById('ob-tag'),'DNA salvo');
   if(result){
     dna.dnaText=result;
-    const ei=clients.findIndex(c=>c.nome.toLowerCase()===nome.toLowerCase());
-    if(ei>=0){clients[ei].dna=dna;activeIdx=ei;}else{clients.push({nome,nicho:dna.nicho,dna});activeIdx=clients.length-1;}
+    const idx=clients.findIndex(c=>c.nome.toLowerCase()===nome.toLowerCase());
+    if(idx>=0){clients[idx].dna=dna;activeIdx=idx;}
+    else{clients.push({nome,nicho:dna.nicho,dna});activeIdx=clients.length-1;}
     LS.set('aios_clients',clients);LS.set('aios_active_idx',activeIdx);
     await sbSaveClient({nome,nicho:dna.nicho,dna});
     refreshClientSelect();updateClientSwitcherUI();updateClientIndicators();
-    document.getElementById('ob-memory-grid').innerHTML=[{k:'Empresa',v:dna.nome},{k:'Nicho',v:dna.nicho},{k:'Tom',v:dna.tom},{k:'Público',v:`${dna.idade}·${dna.genero}`},{k:'Keywords',v:dna.keywords||'—'},{k:'Proibido',v:dna.evitar||'—'},{k:'Redes',v:dna.redes},{k:'Meta',v:dna.meta}].map(it=>`<div class="memory-card"><div class="memory-key">${it.k}</div><div class="memory-val">${it.v}</div></div>`).join('');
+    const mg=document.getElementById('ob-memory-grid');
+    mg.innerHTML=[{k:'Empresa',v:dna.nome},{k:'Nicho',v:dna.nicho},{k:'Tom',v:dna.tom},{k:'Público',v:`${dna.idade} · ${dna.genero}`},{k:'Keywords',v:dna.keywords||'—'},{k:'Proibido',v:dna.evitar||'—'},{k:'Redes',v:dna.redes},{k:'Meta',v:dna.meta}].map(it=>`<div class="memory-card"><div class="memory-key">${it.k}</div><div class="memory-val">${it.v}</div></div>`).join('');
     document.getElementById('ob-memory-section').style.display='block';
     showToast(`✓ ${nome} salvo na nuvem!`,'success');
     document.getElementById('dash-stat-clients').textContent=clients.length;
   }
 }
 
-// ══ CLIENTS ══
+// ── CLIENTS ──
 let selectedClientIdx=null;
 function renderClients(){
   const list=document.getElementById('clients-list');
   const sub=document.getElementById('clients-sub');
   sub.textContent=clients.length+' cliente'+(clients.length!==1?'s':'')+' cadastrado'+(clients.length!==1?'s':'');
   if(!clients.length){list.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center">Nenhum cliente ainda.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar agora →</span></div>`;return;}
-  list.innerHTML=clients.map((c,i)=>`<div class="client-row" onclick="selectClient(${i})" style="${activeIdx===i?'border-color:rgba(122,0,255,.4);':''}"><div class="client-row-avatar" style="background:linear-gradient(135deg,var(--accent),var(--pink))">${c.nome.slice(0,2).toUpperCase()}</div><div class="client-row-info"><div class="client-row-name">${c.nome}${activeIdx===i?' <span class="tag tag-green" style="padding:1px 6px;font-size:8px;margin-left:4px">ativo</span>':''}</div><div class="client-row-meta">${c.nicho||'—'} · ${c.dna?'DNA salvo':'sem DNA'}</div></div><div style="font-size:18px;color:var(--text3)">›</div></div>`).join('');
+  list.innerHTML=clients.map((c,i)=>{
+    const isActive=activeIdx===i;
+    return `<div class="client-row" onclick="selectClient(${i})" style="${isActive?'border-color:rgba(122,0,255,.4);':''}">
+      <div class="client-row-avatar" style="background:linear-gradient(135deg,var(--accent),var(--pink))">${c.nome.slice(0,2).toUpperCase()}</div>
+      <div class="client-row-info">
+        <div class="client-row-name">${c.nome}${isActive?' <span class="tag tag-green" style="padding:1px 6px;font-size:8px;margin-left:4px">ativo</span>':''}</div>
+        <div class="client-row-meta">${c.nicho||'—'} · ${c.dna?'DNA salvo':'sem DNA'}</div>
+      </div>
+      <div style="font-size:18px;color:var(--text3)">›</div>
+    </div>`;
+  }).join('');
 }
 function selectClient(i){
   selectedClientIdx=i;const c=clients[i];
@@ -946,14 +1011,14 @@ function selectClient(i){
   document.getElementById('cd-nome').textContent=c.nome;
   document.getElementById('cd-nicho').textContent=c.nicho||'—';
   document.getElementById('cd-delete-btn').onclick=()=>deleteClient(i);
-  const d=c.dna;
-  document.getElementById('cd-memory-grid').innerHTML=d?[{k:'Tom',v:d.tom},{k:'Público',v:`${d.idade||''}·${d.genero||''}`},{k:'Redes',v:d.redes||'—'},{k:'Meta',v:d.meta||'—'},{k:'Keywords',v:d.keywords||'—'},{k:'Proibido',v:d.evitar||'—'},{k:'Ticket',v:d.ticket||'—'},{k:'Diferencial',v:d.diferencial||'—'}].map(it=>`<div class="memory-card"><div class="memory-key">${it.k}</div><div class="memory-val">${it.v||'—'}</div></div>`).join(''):`<div style="color:var(--text3);font-size:12px;padding:12px">DNA não gerado. <span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Fazer onboarding →</span></div>`;
+  const d=c.dna;const mg=document.getElementById('cd-memory-grid');
+  if(d){mg.innerHTML=[{k:'Tom',v:d.tom},{k:'Público',v:`${d.idade||''} · ${d.genero||''}`},{k:'Redes',v:d.redes||'—'},{k:'Meta',v:d.meta||'—'},{k:'Keywords',v:d.keywords||'—'},{k:'Proibido',v:d.evitar||'—'},{k:'Ticket',v:d.ticket||'—'},{k:'Diferencial',v:d.diferencial||'—'}].map(it=>`<div class="memory-card"><div class="memory-key">${it.k}</div><div class="memory-val">${it.v||'—'}</div></div>`).join('');}
+  else{mg.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:12px">DNA não gerado. <span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Fazer onboarding →</span></div>`;}
 }
 function activateClientFromDetail(){if(selectedClientIdx===null)return;switchClient(selectedClientIdx);renderClients();}
 async function deleteClient(i){
   if(!confirm(`Remover "${clients[i].nome}"?`))return;
-  const nome=clients[i].nome;
-  clients.splice(i,1);
+  const nome=clients[i].nome;clients.splice(i,1);
   if(activeIdx===i){activeIdx=null;LS.set('aios_active_idx',null);}else if(activeIdx>i){activeIdx--;LS.set('aios_active_idx',activeIdx);}
   LS.set('aios_clients',clients);await sbDeleteClient(nome);
   refreshClientSelect();updateClientSwitcherUI();selectedClientIdx=null;
@@ -962,19 +1027,19 @@ async function deleteClient(i){
   renderClients();showToast('Cliente removido.','success');
 }
 
-// ══ HISTORY ══
+// ── HISTORY ──
 const typeLabels={copy:'✦ Copy',orc:'⬡ Pauta',vis:'◉ Visual',com:'💬 Comentários'};
 const typeTags={copy:'tag-pink',orc:'tag-purple',vis:'tag-blue',com:'tag-green'};
 function addToHistory(type,label,content,clientName){
   chatHistory.unshift({id:Date.now(),type,label,client:clientName||'—',content,date:new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})});
   if(chatHistory.length>50)chatHistory.pop();
   LS.set('aios_history',chatHistory);
-  const el=document.getElementById('hist-sub');if(el)el.textContent=chatHistory.length+' itens salvos';
+  const s=document.getElementById('hist-sub');if(s)s.textContent=chatHistory.length+' itens salvos';
   sbSaveHistory({type,label,client:clientName||'—',content});
 }
 function saveToHistory(type){
-  const ids={copy:'copy-output',orc:'orc-output',vis:'vis-output',com:'com-raw'};
-  const content=document.getElementById(ids[type])?.textContent;
+  const outId={copy:'copy-output',orc:'orc-output',vis:'vis-output'}[type];
+  const content=document.getElementById(outId)?.textContent;
   if(!content||content.includes('Preencha'))return showToast('⚠ Nenhum conteúdo para salvar.','error');
   addToHistory(type,'Salvo manualmente',content,getActiveClient()?.nome);
   showToast('✓ Salvo no histórico!','success');
@@ -983,37 +1048,55 @@ function renderHistory(){
   const list=document.getElementById('history-list');
   const sub=document.getElementById('hist-sub');
   if(sub)sub.textContent=chatHistory.length+' itens salvos';
-  if(!chatHistory.length){list.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:32px;text-align:center">Nenhum item no histórico ainda.</div>`;return;}
-  list.innerHTML=chatHistory.map(h=>`<div class="history-item"><div class="history-thumb">${{copy:'✦',orc:'⬡',vis:'◉',com:'💬'}[h.type]||'★'}</div><div class="history-meta"><div class="history-title">${typeLabels[h.type]||h.type} — ${h.label}</div><div class="history-excerpt">${h.content}</div><div class="history-footer"><span class="tag ${typeTags[h.type]||'tag-purple'}">${h.client}</span><span style="font-size:10px;font-family:var(--font-mono);color:var(--text3);margin-left:auto">${h.date}</span><button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(chatHistory.find(x=>x.id==${h.id})?.content||'');showToast('✓ Copiado!','success')">⎘</button></div></div></div>`).join('');
+  if(!chatHistory.length){list.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:32px;text-align:center">Nenhum item ainda.</div>`;return;}
+  list.innerHTML=chatHistory.map(h=>`<div class="history-item">
+    <div class="history-thumb">${{copy:'✦',orc:'⬡',vis:'◉',com:'💬'}[h.type]||'★'}</div>
+    <div class="history-meta">
+      <div class="history-title">${typeLabels[h.type]||h.type} — ${h.label}</div>
+      <div class="history-excerpt">${h.content}</div>
+      <div class="history-footer">
+        <span class="tag ${typeTags[h.type]||'tag-purple'}">${h.client}</span>
+        <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3);margin-left:auto">${h.date}</span>
+        <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(chatHistory.find(x=>x.id===${h.id})?.content||'');showToast('✓','success')">⎘</button>
+      </div>
+    </div>
+  </div>`).join('');
 }
-function clearHistory(){if(!confirm('Limpar todo o histórico?'))return;chatHistory=[];LS.set('aios_history',[]);renderHistory();}
+function clearHistory(){if(!confirm('Limpar histórico?'))return;chatHistory=[];LS.set('aios_history',[]);renderHistory();}
 
-// ══ DASHBOARD ══
+// ── DASHBOARD ──
 function renderDashboard(){
   document.getElementById('dash-stat-clients').textContent=clients.length;
   document.getElementById('dash-stat-copies').textContent=sessionStats.copies;
   document.getElementById('dash-stat-pautas').textContent=sessionStats.pautas;
   document.getElementById('dash-stat-briefs').textContent=sessionStats.briefs;
   const dcl=document.getElementById('dash-clients-list');
-  if(!clients.length){dcl.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:16px 0;text-align:center">Nenhum cliente cadastrado.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar →</span></div>`;}
-  else{dcl.innerHTML=clients.slice(0,4).map((c,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="switchClient(${i});nav('copy',null)"><div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${c.nome.slice(0,2).toUpperCase()}</div><div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--text)">${c.nome}</div><div style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">${c.nicho||'—'}</div></div>${activeIdx===i?'<span class="tag tag-green" style="font-size:8px">ativo</span>':'<span style="font-size:10px;color:var(--text3)">›</span>'}</div>`).join('');}
+  if(!clients.length){dcl.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:16px 0;text-align:center">Nenhum cliente.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar →</span></div>`;}
+  else{dcl.innerHTML=clients.slice(0,4).map((c,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="switchClient(${i});nav('copy',null)">
+    <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${c.nome.slice(0,2).toUpperCase()}</div>
+    <div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--text)">${c.nome}</div><div style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">${c.nicho||'—'}</div></div>
+    ${activeIdx===i?'<span class="tag tag-green" style="font-size:8px">ativo</span>':'<span style="font-size:10px;color:var(--text3)">›</span>'}
+  </div>`).join('');}
   const drl=document.getElementById('dash-recent-list');
   const recent=chatHistory.slice(0,3);
   if(!recent.length){drl.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:16px 0;text-align:center">Suas gerações aparecerão aqui.</div>`;}
-  else{drl.innerHTML=recent.map(h=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div style="width:32px;height:32px;border-radius:7px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${{copy:'✦',orc:'⬡',vis:'◉',com:'💬'}[h.type]}</div><div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--text)">${typeLabels[h.type]||h.type} — ${h.label}</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">${h.client} · ${h.date}</div></div></div>`).join('');}
+  else{drl.innerHTML=recent.map(h=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+    <div style="width:32px;height:32px;border-radius:7px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${{copy:'✦',orc:'⬡',vis:'◉',com:'💬'}[h.type]}</div>
+    <div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--text)">${typeLabels[h.type]} — ${h.label}</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">${h.client} · ${h.date}</div></div>
+  </div>`).join('');}
   const b=document.getElementById('no-client-banner');if(b)b.style.display=getActiveClient()?'none':'flex';
 }
 
-// ══ UTILS ══
+// ── UTILS ──
 function copyOutput(id){const t=document.getElementById(id)?.textContent;if(t){navigator.clipboard.writeText(t);showToast('✓ Copiado!','success');}}
 function copyAll(){copyOutput('copy-output');}
 function showToast(msg,type='success'){const t=document.createElement('div');t.className=`toast toast-${type}`;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(10px)';setTimeout(()=>t.remove(),400);},2400);}
 function saveSettings(){settings.model=document.getElementById('cfg-model').value;settings.tokens=parseInt(document.getElementById('cfg-tokens').value);LS.set('aios_settings',settings);showToast('✓ Configurações salvas!','success');}
 function exportData(){const d={clients,history:chatHistory,settings,exportedAt:new Date().toISOString()};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='vertice-backup.json';a.click();}
-function clearAllData(){if(!confirm('⚠ Apagar TODOS os dados locais?'))return;['aios_clients','aios_history','aios_active_idx','aios_settings'].forEach(k=>LS.del(k));clients=[];chatHistory=[];activeIdx=null;sessionStats={copies:0,pautas:0,briefs:0};refreshClientSelect();renderDashboard();renderClients();renderHistory();showToast('Dados apagados.','success');}
+function clearAllData(){if(!confirm('⚠ Apagar TODOS os dados locais?'))return;['aios_clients','aios_history','aios_active_idx','aios_settings'].forEach(k=>LS.del(k));clients=[];chatHistory=[];activeIdx=null;sessionStats={copies:0,pautas:0,briefs:0};refreshClientSelect();renderDashboard();renderClients();renderHistory();showToast('Dados locais apagados.','success');}
 function updateStorageInfo(){try{const u=JSON.stringify(localStorage).length;document.getElementById('storage-info').textContent=`${clients.length} clientes · ${chatHistory.length} histórico · ~${(u/1024).toFixed(1)}KB local · ☁ Supabase ativo`;}catch(e){}}
 
-// ══ INIT ══
+// ── INIT ──
 async function init(){
   refreshClientSelect();updateClientSwitcherUI();updateClientIndicators();renderDashboard();updateStorageInfo();
   if(settings.model)document.getElementById('cfg-model').value=settings.model;

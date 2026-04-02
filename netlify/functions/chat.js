@@ -7,10 +7,10 @@ exports.handler = async function (event) {
     "Content-Type": "application/json",
   };
   try {
-    const { system, user, max_tokens } = JSON.parse(event.body);
-    if (!user) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing user message" }) };
-    }
+    const { system, user, model, max_tokens } = JSON.parse(event.body);
+    if (!user) return { statusCode: 400, headers, body: JSON.stringify({ error: "Missing user message" }) };
+
+    const groqModel = model || "llama-3.3-70b-versatile";
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -18,18 +18,21 @@ exports.handler = async function (event) {
         "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: groqModel,
         max_tokens: max_tokens || 1500,
+        temperature: 0.8,
         messages: [
-          { role: "system", content: system || "Você é um assistente de marketing digital." },
+          { role: "system", content: system || "Você é um assistente de marketing digital especializado em microempresas brasileiras." },
           { role: "user", content: user }
         ],
       }),
     });
+
     if (!response.ok) {
       const err = await response.json();
       return { statusCode: response.status, headers, body: JSON.stringify({ error: err.error?.message || "API error" }) };
     }
+
     const data = await response.json();
     return {
       statusCode: 200,
@@ -37,10 +40,6 @@ exports.handler = async function (event) {
       body: JSON.stringify({ text: data.choices?.[0]?.message?.content || "" }),
     };
   } catch (err) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: err.message }),
-    };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };
   }
 };
