@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vértice</title>
+<!-- Vértice — pacote arquivo único: cole a chave Groq em Configurações. Opcional: no Netlify com functions, pode usar /.netlify/functions/chat sem chave no navegador. -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000000'/%3E%3Cpolygon points='4,6 16,26 28,6 23,6 16,18 9,6' fill='%23F5F5F5'/%3E%3Cpolygon points='14,6 16,10 18,6' fill='%237A00FF'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
@@ -524,9 +525,9 @@ tr:hover td{background:var(--surface2);}
     <div class="card">
       <div class="card-header"><div class="card-title">Configuração dos Agentes</div></div>
       <div class="input-group">
-        <label class="input-label">🔑 Chave de API</label>
-        <input id="cfg-apikey" type="password" value="gerenciada pelo servidor" readonly style="opacity:.4;cursor:not-allowed">
-        <div style="font-size:10px;color:var(--green);font-family:var(--font-mono);margin-top:4px">✓ Chave segura — configurada no Netlify, nunca exposta no browser</div>
+        <label class="input-label">🔑 Chave API Groq (modo arquivo único)</label>
+        <input id="cfg-groq-key" type="password" placeholder="gsk_… (fica só neste navegador)" autocomplete="off">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:4px;line-height:1.5">Salva em localStorage neste aparelho. Se publicar só este HTML e a API bloquear o navegador (CORS), use o pacote com <code style="font-size:9px">netlify/functions</code> + variável GROQ_API_KEY no Netlify.</div>
       </div>
       <div class="input-group"><label class="input-label">🤖 Modelo</label>
         <select id="cfg-model">
@@ -661,9 +662,7 @@ function refreshClientSelect() {
   updateClientSwitcherUI();
 }
 
-// ══ API ══
-
-// System Prompt Central (string segura: sem crases/backticks, sem risco de quebrar o JS)
+// ══ API: Groq — chave no navegador (cfg) OU Netlify Function (sem chave no browser) ══
 const CENTRAL_SYSTEM_PROMPT = [
   "Você é a Inteligência Central da Vértice. Você substitui uma equipe inteira de marketing, vendas e estratégia. Você pensa como: Estrategista, Copywriter Sênior, Designer Criativo, Especialista em Vendas e Analista de Crescimento.",
   "",
@@ -693,16 +692,52 @@ async function callClaude(system, user, outEl, loadEl, tagEl, tagDone) {
   outEl.textContent=''; loadEl.style.width='15%';
   if(tagEl){tagEl.textContent='gerando...';tagEl.className='tag tag-orange';}
   const cur=document.createElement('span'); cur.className='cursor'; outEl.appendChild(cur);
-
-  // Injeção segura do Protocolo Vértice APENAS no "system" enviado à API
   const finalSystem = (CENTRAL_SYSTEM_PROMPT + "\n\n" + (system || "")).trim();
+  const groqKey = (settings.groqApiKey || '').trim();
+
+  async function viaGroqBrowser() {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + groqKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'system', content: finalSystem }, { role: 'user', content: String(user || '') }],
+        max_tokens: tokens,
+        temperature: 0.7
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error?.message || data?.message || `Erro HTTP ${res.status}`);
+    return data?.choices?.[0]?.message?.content || '';
+  }
+
+  async function viaNetlify() {
+    const res = await fetch('/.netlify/functions/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ system: finalSystem, user, model, max_tokens: tokens })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.error) throw new Error(data.error || `Erro HTTP ${res.status}`);
+    return data.text || '';
+  }
 
   try {
     loadEl.style.width='50%';
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system: finalSystem,user,model,max_tokens:tokens})});
-    const data=await res.json();
-    if(!res.ok||data.error) throw new Error(data.error||`Erro HTTP ${res.status}`);
-    const text=data.text||'';
+    let text = '';
+    if (groqKey) {
+      text = await viaGroqBrowser();
+    } else {
+      try {
+        text = await viaNetlify();
+      } catch (nfErr) {
+        cur.remove();
+        outEl.textContent = '⚠ Sem chave Groq: abra Configurações, cole sua chave (gsk_…) e salve — ou publique o site com a Netlify Function e GROQ_API_KEY no painel.\n\nDetalhe: ' + (nfErr?.message || nfErr);
+        loadEl.style.width='0%';
+        if(tagEl){tagEl.textContent='erro';tagEl.className='tag tag-red';}
+        return null;
+      }
+    }
     cur.remove(); outEl.textContent=''; loadEl.style.width='90%';
     let i=0; const speed=text.length>800?4:8;
     const iv=setInterval(()=>{outEl.textContent+=text[i]||'';i++;if(i>=text.length)clearInterval(iv);},speed);
@@ -710,7 +745,7 @@ async function callClaude(system, user, outEl, loadEl, tagEl, tagDone) {
     if(tagEl){tagEl.textContent=tagDone||'pronto';tagEl.className='tag tag-green';}
     return text;
   } catch(e) {
-    cur.remove(); outEl.textContent='⚠ Erro: '+e.message; loadEl.style.width='0%';
+    cur.remove(); outEl.textContent='⚠ Erro: '+e.message + (groqKey ? '\n\nSe for bloqueio CORS do navegador, use o deploy com netlify/functions + GROQ_API_KEY.' : ''); loadEl.style.width='0%';
     if(tagEl){tagEl.textContent='erro';tagEl.className='tag tag-red';}
     return null;
   }
@@ -741,13 +776,15 @@ async function runCopy(n) {
   const sys=`Você é um copywriter sênior especializado em PMEs brasileiras. Crie textos que convertem com personalidade real.
 REGRAS: Use palavras-chave obrigatórias, NUNCA as proibidas. Tom exato do DNA. Soar humano como o dono da empresa. Hashtags: máx 5. NUNCA use clichês como "qualidade incomparável" ou "preço justo".`;
   const usr=`${ctx}
+PRODUTO: ${document.getElementById('copy-produto').value||'principal produto'}
+OBJETIVO: ${document.getElementById('copy-tipo').value} na rede ${document.getElementById('copy-rede').value}, com CTA "${document.getElementById('copy-cta').value||'entre em contato'}"
 Tipo: ${document.getElementById('copy-tipo').value}
 Rede: ${document.getElementById('copy-rede').value}
-Produto: ${document.getElementById('copy-produto').value||'principal produto'}
 Gancho: ${document.getElementById('copy-gancho').value}
 CTA: ${document.getElementById('copy-cta').value||'entre em contato'}
 Contexto: ${document.getElementById('copy-contexto').value||'nenhum'}
-${n===1?'Crie 1 copy EXCELENTE pronta para publicar.':'Crie 3 variações:\nVARIAÇÃO 1 — Emocional/storytelling\nVARIAÇÃO 2 — Direto ao benefício\nVARIAÇÃO 3 — Prova social/curiosidade\nSepare com "---"'}`;
+${n===1?'Crie 1 copy EXCELENTE pronta para publicar (use na seção CONTEÚDO).':'Crie 3 variações na seção CONTEÚDO:\nVARIAÇÃO 1 — Emocional/storytelling\nVARIAÇÃO 2 — Direto ao benefício\nVARIAÇÃO 3 — Prova social/curiosidade\nSepare com "---"'}
+FORMATAÇÃO: Entregue as 7 etapas com títulos em linhas próprias. Na etapa ESTRATÉGIA, o PLANO DE 7 DIAS deve ser obrigatoriamente uma Tabela Markdown (colunas: Dia | Foco | Entregável | KPI).`;
   const result=await callClaude(sys,usr,document.getElementById('copy-output'),document.getElementById('copy-loading'),document.getElementById('copy-tag'),n===1?'copy pronta':'3 variações');
   if(result){sessionStats.copies++;document.getElementById('dash-stat-copies').textContent=sessionStats.copies;addToHistory('copy',document.getElementById('copy-tipo').value,result,getActiveClient()?.nome);}
 }
@@ -782,11 +819,14 @@ async function runOrchestrator() {
   const ctx=getBrandContext();
   const sys=`Você é um estrategista de conteúdo digital sênior para PMEs brasileiras. Crie pautas editoriais REALISTAS e ESPECÍFICAS — nada genérico. Varie formatos. Use produtos reais do DNA.`;
   const usr=`${ctx}
+PRODUTO: ${getActiveClient()?.dna?.produtos||'produtos/serviços conforme DNA ou briefing'}
+OBJETIVO: ${document.getElementById('orc-objetivo').value}
 Semana: ${document.getElementById('orc-semana').value||'próxima semana'}
 Redes: ${document.getElementById('orc-redes').value}
-Objetivo: ${document.getElementById('orc-objetivo').value}
 Frequência: ${document.getElementById('orc-freq').value}
 Contexto: ${document.getElementById('orc-contexto').value||'nenhum'}
+
+FORMATAÇÃO: Entregue as 7 etapas com títulos em linhas próprias. Na etapa ESTRATÉGIA, o PLANO DE 7 DIAS deve ser obrigatoriamente uma Tabela Markdown (colunas: Dia | Foco | Entregável | KPI).
 
 Crie a pauta no formato:
 ━━━ PAUTA EDITORIAL ━━━
@@ -1037,7 +1077,14 @@ function renderDashboard(){
 function copyOutput(id){const t=document.getElementById(id)?.textContent;if(t){navigator.clipboard.writeText(t);showToast('✓ Copiado!','success');}}
 function copyAll(){copyOutput('copy-output');}
 function showToast(msg,type='success'){const t=document.createElement('div');t.className=`toast toast-${type}`;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(10px)';setTimeout(()=>t.remove(),400);},2400);}
-function saveSettings(){settings.model=document.getElementById('cfg-model').value;settings.tokens=parseInt(document.getElementById('cfg-tokens').value);LS.set('aios_settings',settings);showToast('✓ Configurações salvas!','success');}
+function saveSettings(){
+  settings.model=document.getElementById('cfg-model').value;
+  settings.tokens=parseInt(document.getElementById('cfg-tokens').value);
+  const gk=document.getElementById('cfg-groq-key');
+  if(gk) settings.groqApiKey = gk.value.trim();
+  LS.set('aios_settings',settings);
+  showToast('✓ Configurações salvas!','success');
+}
 function exportData(){const d={clients,history:chatHistory,settings,exportedAt:new Date().toISOString()};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='vertice-backup.json';a.click();}
 function clearAllData(){if(!confirm('⚠ Apagar TODOS os dados locais?'))return;['aios_clients','aios_history','aios_active_idx','aios_settings'].forEach(k=>LS.del(k));clients=[];chatHistory=[];activeIdx=null;sessionStats={copies:0,pautas:0,briefs:0};refreshClientSelect();renderDashboard();renderClients();renderHistory();showToast('Dados apagados.','success');}
 function updateStorageInfo(){try{const u=JSON.stringify(localStorage).length;document.getElementById('storage-info').textContent=`${clients.length} clientes · ${chatHistory.length} histórico · ~${(u/1024).toFixed(1)}KB local · ☁ Supabase ativo`;}catch(e){}}
@@ -1047,6 +1094,8 @@ async function init(){
   refreshClientSelect();updateClientSwitcherUI();updateClientIndicators();renderDashboard();updateStorageInfo();
   if(settings.model)document.getElementById('cfg-model').value=settings.model;
   if(settings.tokens)document.getElementById('cfg-tokens').value=settings.tokens;
+  const gkEl=document.getElementById('cfg-groq-key');
+  if(gkEl && settings.groqApiKey) gkEl.value=settings.groqApiKey;
   setSyncStatus('','conectando...');
   await loadSupabase();
   if(sbReady){await sbLoadClients();updateStorageInfo();}
