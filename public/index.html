@@ -3,177 +3,501 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vértice</title>
-<!-- Vértice — pacote arquivo único: cole a chave Groq em Configurações. Opcional: no Netlify com functions, pode usar /.netlify/functions/chat sem chave no navegador. -->
+<title>Vértice — IA de Marketing</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23030304'/%3E%3Cpolygon points='4,6 16,26 28,6 23,6 16,18 9,6' fill='%23F5F5F5'/%3E%3Cpolygon points='14,6 16,10 18,6' fill='%238A2BE2'/%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+/* ── TOKENS ── */
 :root {
-  --bg:#030304; --surface:#0a0a0b; --surface2:#121214; --surface3:#1e1e22;
-  --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.12);
-  --accent:#8A2BE2; --accent2:#a855f7; --accent3:#d8b4fe;
-  --green:#2dd4a0; --orange:#fb923c; --pink:#f472b6; --blue:#60a5fa;
-  --yellow:#fbbf24; --red:#f87171;
-  --text:#F5F5F5; --text2:#8e8ea8; --text3:#4a4a62;
-  --radius:14px; --radius-sm:8px;
-  --font-display:'Inter',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  --bg: #030304;
+  --surface: #0a0a0b;
+  --surface2: #121214;
+  --surface3: #1e1e22;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --accent: #8A2BE2;
+  --accent2: #a855f7;
+  --accent3: #d8b4fe;
+  --green: #2dd4a0;
+  --orange: #fb923c;
+  --pink: #f472b6;
+  --blue: #60a5fa;
+  --yellow: #fbbf24;
+  --red: #f87171;
+  --text: #F5F5F5;
+  --text2: #8e8ea8;
+  --text3: #4a4a62;
+  --r: 12px;
+  --r-sm: 8px;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', sans-serif;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.6;letter-spacing:-0.02em;min-height:100vh;display:flex;overflow-x:hidden;}
-.sidebar{width:232px;min-width:232px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
-.logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
-.logo-mark{font-family:var(--font-display);font-weight:900;font-size:15px;color:var(--text);letter-spacing:.5px;display:flex;align-items:center;gap:9px;}
-.logo-sub{font-size:8.5px;color:var(--text3);font-family:var(--font-mono);margin-top:4px;letter-spacing:.5px;}
-.nav{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:1px;overflow-y:auto;}
-.nav-section{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;padding:12px 10px 5px;}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:12.5px;transition:all .15s;border:1px solid transparent;user-select:none;}
-.nav-item:hover{background:var(--surface2);color:var(--text);}
-.nav-item.active{background:rgba(138,43,226,.14);color:var(--accent3);border-color:rgba(138,43,226,.25);}
-.nav-icon{font-size:13px;width:17px;text-align:center;flex-shrink:0;}
-.nav-badge{margin-left:auto;background:linear-gradient(135deg,var(--accent),#6b21a8);color:#fff;font-size:9px;font-family:var(--font-mono);padding:1px 6px;border-radius:20px;}
-.nav-badge-new{margin-left:auto;background:var(--green);color:#000;font-size:9px;font-family:var(--font-mono);padding:1px 6px;border-radius:20px;font-weight:600;}
-.client-switcher{padding:12px;border-top:1px solid var(--border);}
-.switcher-label{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;padding:0 2px;}
-.switcher-select{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:12px;padding:8px 10px;outline:none;cursor:pointer;}
-.active-client-pill{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(138,43,226,.1);border:1px solid rgba(138,43,226,.22);border-radius:var(--radius-sm);margin-top:6px;}
-.client-avatar-mini{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--pink));}
-.client-active-name{font-size:11.5px;font-weight:500;color:var(--accent3);}
-.client-active-nicho{font-size:9px;font-family:var(--font-mono);color:var(--text3);}
-.sync-status{display:flex;align-items:center;gap:5px;padding:6px 12px;font-size:9px;font-family:var(--font-mono);color:var(--text3);border-top:1px solid var(--border);}
-.sync-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);flex-shrink:0;}
-.sync-dot.synced{background:var(--green);}
-.sync-dot.syncing{background:var(--orange);animation:pulse 1s infinite;}
-.sync-dot.error{background:var(--red);}
-.main{margin-left:232px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
-.header{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;background:rgba(0,0,0,.9);backdrop-filter:blur(14px);position:sticky;top:0;z-index:50;}
-.header-title{font-family:var(--font-display);font-size:18px;font-weight:700;flex:1;}
-.status-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.22);border-radius:20px;font-size:10px;font-family:var(--font-mono);color:var(--green);}
-.status-dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-.content{padding:24px 28px;flex:1;}
-.page{display:none;}
-.page.active{display:block;animation:fadeIn .25s ease;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.card-title{font-family:var(--font-display);font-size:13.5px;font-weight:700;letter-spacing:-.2px;}
-.card-sub{font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:2px;}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;}
-.stat-label{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
-.stat-value{font-family:var(--font-display);font-size:26px;font-weight:800;letter-spacing:-1px;}
-.stat-change{font-size:10px;font-family:var(--font-mono);margin-top:3px;}
-.up{color:var(--green);} .down{color:var(--red);}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s;font-family:var(--font-body);white-space:nowrap;}
-.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
-.btn-primary:hover{filter:brightness(1.12);}
-.btn-ghost{background:transparent;color:var(--text2);border-color:var(--border2);}
-.btn-ghost:hover{background:var(--surface2);color:var(--text);}
-.btn-sm{padding:4px 10px;font-size:10px;}
-.btn-green{background:rgba(45,212,160,.12);color:var(--green);border:1px solid rgba(45,212,160,.25);}
-.btn-green:hover{background:rgba(45,212,160,.22);}
-.tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:9.5px;font-family:var(--font-mono);font-weight:500;}
-.tag-purple{background:rgba(138,43,226,.13);color:var(--accent3);border:1px solid rgba(138,43,226,.2);}
-.tag-green{background:rgba(45,212,160,.1);color:var(--green);border:1px solid rgba(45,212,160,.18);}
-.tag-orange{background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.18);}
-.tag-pink{background:rgba(244,114,182,.1);color:var(--pink);border:1px solid rgba(244,114,182,.18);}
-.tag-blue{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.18);}
-.tag-red{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.18);}
-.input-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
-.input-label{font-size:10px;color:var(--text2);font-family:var(--font-mono);}
-input,textarea,select{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:12.5px;padding:8px 11px;width:100%;outline:none;transition:border-color .15s;}
-input:focus,textarea:focus,select:focus{border-color:var(--accent);}
-textarea{resize:vertical;min-height:72px;}
-select option{background:var(--surface2);}
-.divider{border:none;border-top:1px solid var(--border);margin:16px 0;}
-.loading-bar{height:2px;background:var(--surface3);border-radius:2px;overflow:hidden;margin:10px 0;}
-.loading-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));border-radius:2px;width:0%;transition:width .4s ease;}
-.output-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-size:12px;line-height:1.9;color:var(--text);white-space:pre-wrap;word-break:break-word;}
-.output-box--central{white-space:normal;}
-.ic-wrap{display:flex;flex-direction:column;gap:16px;}
-.ic-section{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);border-left:3px solid var(--accent);padding:16px 18px;}
-.ic-head{display:flex;align-items:center;gap:11px;margin-bottom:12px;}
-.ic-icon{font-size:21px;line-height:1;flex-shrink:0;filter:grayscale(0);}
-.ic-title{font-family:var(--font-display);font-size:14px;font-weight:800;letter-spacing:-0.03em;color:var(--text);margin:0;text-transform:uppercase;}
-.ic-body{font-size:12.5px;line-height:1.78;color:var(--text2);letter-spacing:-0.02em;}
-.ic-body p{margin:0 0 10px;}
-.ic-body p:last-child{margin-bottom:0;}
-.ic-body strong{color:var(--text);font-weight:600;}
-.ic-table-wrap{overflow-x:auto;margin:12px 0;border-radius:10px;border:1px solid var(--border);background:var(--surface);}
-.ic-md-table{width:100%;border-collapse:collapse;font-size:11.5px;}
-.ic-md-table th{background:rgba(138,43,226,.14);color:var(--accent3);border-bottom:1px solid var(--border);padding:10px 12px;text-align:left;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.04em;font-size:9px;}
-.ic-md-table td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text2);}
-.ic-md-table tbody tr:last-child td{border-bottom:none;}
-.ic-md-table tbody tr:hover td{background:rgba(138,43,226,.06);}
-.section{margin-bottom:22px;}
-.section-title{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
-.progress{background:var(--surface2);border-radius:20px;height:5px;overflow:hidden;}
-.progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--accent),var(--pink));}
-table{width:100%;border-collapse:collapse;}
-th{font-size:9px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:7px 12px;text-align:left;border-bottom:1px solid var(--border);}
-td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:var(--surface2);}
-::-webkit-scrollbar{width:3px;height:3px;}
-::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.cursor{display:inline-block;width:2px;height:13px;background:var(--accent);animation:blink 1s infinite;vertical-align:middle;margin-left:2px;}
-.memory-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;}
-.memory-key{font-size:9.5px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
-.memory-val{font-size:12px;color:var(--text);}
-.memory-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.onboard-step{display:none;}
-.onboard-step.active{display:block;animation:fadeIn .25s ease;}
-.step-indicator{display:flex;gap:6px;margin-bottom:20px;}
-.step-dot{width:28px;height:4px;border-radius:2px;background:var(--surface3);transition:background .3s;}
-.step-dot.done{background:var(--green);}
-.step-dot.active{background:var(--accent);}
-.client-row{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;transition:border-color .15s;}
-.client-row:hover{border-color:var(--border2);}
-.client-row-avatar{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
-.client-row-info{flex:1;}
-.client-row-name{font-size:12.5px;font-weight:600;color:var(--text);}
-.client-row-meta{font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:1px;}
-.toast{position:fixed;bottom:24px;right:24px;padding:11px 18px;border-radius:9px;font-size:12px;font-family:var(--font-mono);z-index:9999;transition:all .4s;pointer-events:none;}
-.toast-success{background:rgba(45,212,160,.15);border:1px solid rgba(45,212,160,.35);color:var(--green);}
-.toast-error{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:var(--red);}
-.agent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:border-color .15s;}
-.agent-card:hover{border-color:var(--border2);}
-.agent-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-.agent-status{display:flex;align-items:center;gap:5px;font-size:9.5px;font-family:var(--font-mono);color:var(--green);margin-top:2px;}
-.history-item{display:flex;gap:13px;padding:12px 0;border-bottom:1px solid var(--border);}
-.history-item:last-child{border-bottom:none;}
-.history-thumb{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--surface3);}
-.history-meta{flex:1;}
-.history-title{font-size:12.5px;font-weight:500;color:var(--text);margin-bottom:2px;}
-.history-excerpt{font-size:11px;color:var(--text3);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-.history-footer{display:flex;align-items:center;gap:8px;margin-top:5px;}
-.notif{display:flex;align-items:flex-start;gap:10px;padding:11px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:7px;}
-.notif-icon{font-size:14px;flex-shrink:0;}
-.notif-text{font-size:12px;color:var(--text2);}
 
-/* ── PREVIEW INSTAGRAM ── */
-.ig-preview{background:#1a1a1a;border:1px solid var(--border2);border-radius:12px;overflow:hidden;max-width:360px;margin:0 auto;}
-.ig-header{display:flex;align-items:center;gap:10px;padding:12px 14px;}
-.ig-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
-.ig-username{font-size:12px;font-weight:600;color:#fff;}
-.ig-image{width:100%;height:200px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-size:40px;}
-.ig-actions{display:flex;gap:14px;padding:10px 14px 6px;font-size:18px;}
-.ig-caption{padding:0 14px 14px;font-size:12px;color:#fff;line-height:1.6;white-space:pre-wrap;}
-.ig-hashtags{color:#60a5fa;font-size:11px;margin-top:4px;}
-.ig-caption strong{font-weight:600;}
+/* ── RESET ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: -0.02em;
+  min-height: 100vh;
+  display: flex;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
 
-/* ── COMENTÁRIOS ── */
-.comment-row{display:flex;gap:10px;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;}
-.comment-author{font-size:11px;font-weight:600;color:var(--accent3);margin-bottom:3px;}
-.comment-text{font-size:12px;color:var(--text2);line-height:1.5;}
-.reply-box{background:rgba(45,212,160,.05);border:1px solid rgba(45,212,160,.2);border-radius:var(--radius-sm);padding:10px;margin-top:8px;font-size:12px;color:var(--green);line-height:1.6;white-space:pre-wrap;}
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 228px;
+  min-width: 228px;
+  background: rgba(10,10,11,0.9);
+  backdrop-filter: blur(24px);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 100;
+}
+.logo {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.logo-mark {
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.logo-sub {
+  font-size: 8.5px;
+  color: var(--text3);
+  font-family: var(--mono);
+  margin-top: 4px;
+  letter-spacing: 0.5px;
+}
+.nav {
+  flex: 1;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow-y: auto;
+}
+.nav-sect {
+  font-size: 9px;
+  font-family: var(--mono);
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 12px 10px 5px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 12.5px;
+  transition: all .15s;
+  border: 1px solid transparent;
+  user-select: none;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active {
+  background: rgba(138,43,226,.14);
+  color: var(--accent3);
+  border-color: rgba(138,43,226,.25);
+}
+.nav-icon { font-size: 13px; width: 17px; text-align: center; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto;
+  background: linear-gradient(135deg, var(--accent), #6b21a8);
+  color: #fff;
+  font-size: 9px;
+  font-family: var(--mono);
+  padding: 1px 6px;
+  border-radius: 20px;
+}
+.nav-new {
+  margin-left: auto;
+  background: var(--green);
+  color: #000;
+  font-size: 9px;
+  font-family: var(--mono);
+  padding: 1px 6px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  font-family: var(--mono);
+  color: var(--text3);
+}
+.status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+  flex-shrink: 0;
+}
+.status-dot.idle { background: var(--text3); animation: none; }
+.status-dot.busy { background: var(--orange); }
+
+/* ── MAIN ── */
+.main {
+  margin-left: 228px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.topbar {
+  padding: 14px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(3,3,4,0.88);
+  backdrop-filter: blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.topbar-title { font-size: 17px; font-weight: 700; flex: 1; letter-spacing: -0.03em; }
+.content { padding: 24px 28px; flex: 1; }
+
+/* ── PAGES ── */
+.page { display: none; }
+.page.active { display: block; animation: fadeIn .22s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── CARDS ── */
+.card {
+  background: rgba(10,10,11,0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px;
+  transition: border-color .2s;
+}
+.card:hover { border-color: rgba(255,255,255,.09); }
+.card-title { font-size: 13.5px; font-weight: 700; letter-spacing: -0.02em; }
+.card-sub { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-top: 2px; }
+.card-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+
+/* ── GRID ── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 13px; }
+
+/* ── STAT ── */
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 18px;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.stat:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(138,43,226,.07); border-color: rgba(138,43,226,.18); }
+.stat-label { font-size: 9px; font-family: var(--mono); color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.stat-val { font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+.stat-note { font-size: 10px; font-family: var(--mono); color: var(--text3); margin-top: 2px; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 15px;
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all .15s;
+  font-family: var(--sans);
+  white-space: nowrap;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover:not(:disabled) { filter: brightness(1.12); }
+.btn-ghost { background: transparent; color: var(--text2); border-color: var(--border2); }
+.btn-ghost:hover:not(:disabled) { background: var(--surface2); color: var(--text); }
+.btn-sm { padding: 4px 10px; font-size: 10px; }
+.btn-green { background: rgba(45,212,160,.1); color: var(--green); border: 1px solid rgba(45,212,160,.22); }
+.btn-green:hover:not(:disabled) { background: rgba(45,212,160,.2); }
+.btn-lg { padding: 12px 24px; font-size: 14px; font-weight: 600; border-radius: var(--r); }
+
+/* ── TAGS ── */
+.tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 9.5px; font-family: var(--mono); font-weight: 500; }
+.tag-purple { background: rgba(138,43,226,.13); color: var(--accent3); border: 1px solid rgba(138,43,226,.2); }
+.tag-green { background: rgba(45,212,160,.1); color: var(--green); border: 1px solid rgba(45,212,160,.18); }
+.tag-orange { background: rgba(251,146,60,.1); color: var(--orange); border: 1px solid rgba(251,146,60,.18); }
+
+/* ── FORMS ── */
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field-label { font-size: 10px; color: var(--text2); font-family: var(--mono); }
+input, textarea, select {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  padding: 9px 12px;
+  width: 100%;
+  outline: none;
+  transition: border-color .15s;
+  letter-spacing: -0.01em;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+textarea { resize: vertical; min-height: 80px; }
+select option { background: var(--surface2); }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* ── LOADING BAR ── */
+.progress-track { height: 2px; background: var(--surface3); border-radius: 2px; overflow: hidden; margin: 8px 0; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--pink)); border-radius: 2px; transition: width .4s ease; width: 0%; }
+
+/* ── RESULT SECTIONS ── */
+.results-wrap { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+
+.rs {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  border-left: 3px solid var(--accent);
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.rs[data-color="persona"] { border-left-color: var(--accent2); }
+.rs[data-color="plano"] { border-left-color: var(--blue); }
+.rs[data-color="posts"] { border-left-color: var(--orange); }
+.rs[data-color="visual"] { border-left-color: var(--pink); }
+.rs[data-color="comentarios"] { border-left-color: var(--green); }
+.rs[data-color="vendas"] { border-left-color: var(--yellow); }
+
+.rs-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+.rs-head:hover { background: rgba(255,255,255,.02); }
+.rs-icon { font-size: 18px; line-height: 1; flex-shrink: 0; }
+.rs-title { font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text); flex: 1; }
+.rs-status { font-size: 9.5px; font-family: var(--mono); color: var(--text3); }
+.rs-status.done { color: var(--green); }
+.rs-status.loading { color: var(--orange); }
+.rs-status.error { color: var(--red); }
+.rs-actions { display: flex; gap: 6px; }
+
+.rs-body {
+  padding: 16px;
+  display: block;
+}
+
+/* Loading state inside rs-body */
+.loading-shimmer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  color: var(--text3);
+  font-size: 12px;
+  font-family: var(--mono);
+}
+.spin {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--surface3);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-msg { color: var(--red); font-size: 12px; padding: 8px 0; font-family: var(--mono); }
+
+/* Markdown output */
+.md-out { font-size: 12.5px; line-height: 1.85; color: var(--text2); }
+.md-out strong { color: var(--text); font-weight: 600; }
+.md-out em { color: var(--text2); font-style: italic; }
+.md-out .md-h1 { font-size: 15px; font-weight: 800; color: var(--text); margin: 14px 0 6px; letter-spacing: -0.03em; }
+.md-out .md-h2 { font-size: 13px; font-weight: 700; color: var(--text); margin: 12px 0 5px; }
+.md-out .md-h3 { font-size: 12px; font-weight: 600; color: var(--accent3); margin: 10px 0 4px; }
+.md-out .md-li {
+  display: flex;
+  gap: 8px;
+  padding: 3px 0;
+  align-items: flex-start;
+}
+.md-out .md-li::before {
+  content: '▸';
+  color: var(--accent2);
+  font-size: 10px;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+.md-out .md-oli {
+  display: flex;
+  gap: 8px;
+  padding: 3px 0;
+  align-items: flex-start;
+  counter-increment: oli;
+}
+.md-out .md-ol { counter-reset: oli; }
+.md-out .md-sep { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+.md-out .md-br { display: block; height: 6px; }
+.md-out .md-table-wrap { overflow-x: auto; margin: 12px 0; border-radius: 8px; border: 1px solid var(--border); }
+.md-out table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.md-out th { background: rgba(138,43,226,.12); color: var(--accent3); border-bottom: 1px solid var(--border); padding: 9px 12px; text-align: left; font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: .04em; }
+.md-out td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+.md-out tr:last-child td { border-bottom: none; }
+.md-out tr:hover td { background: rgba(138,43,226,.05); }
+
+/* ── HISTORY ── */
+.hist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .15s;
+}
+.hist-item:last-child { border-bottom: none; }
+.hist-item:hover { background: rgba(255,255,255,.01); border-radius: var(--r-sm); }
+.hist-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  background: rgba(138,43,226,.12);
+  border: 1px solid rgba(138,43,226,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.hist-info { flex: 1; min-width: 0; }
+.hist-prod { font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hist-obj { font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+.hist-date { font-size: 9.5px; font-family: var(--mono); color: var(--text3); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-family: var(--mono);
+  z-index: 9999;
+  transition: all .35s;
+  pointer-events: none;
+}
+.toast-ok { background: rgba(45,212,160,.12); border: 1px solid rgba(45,212,160,.3); color: var(--green); }
+.toast-err { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.28); color: var(--red); }
+
+/* ── BANNER ── */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: var(--r-sm);
+  margin-bottom: 18px;
+  font-size: 12px;
+}
+.banner-warn { background: rgba(251,146,60,.07); border: 1px solid rgba(251,146,60,.2); color: var(--orange); }
+.banner-info { background: rgba(138,43,226,.07); border: 1px solid rgba(138,43,226,.2); color: var(--accent3); }
+
+/* ── QUICK-START GRID ── */
+.quick-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 14px;
+  cursor: pointer;
+  transition: border-color .15s, transform .15s;
+}
+.quick-item:hover { border-color: var(--border2); transform: translateY(-1px); }
+.quick-icon { font-size: 20px; margin-bottom: 8px; }
+.quick-label { font-size: 12px; font-weight: 600; color: var(--text); }
+.quick-desc { font-size: 10.5px; color: var(--text3); margin-top: 2px; line-height: 1.5; }
+
+/* ── NOTIF ── */
+.notif {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px;
+  background: var(--surface2);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+.notif-title { font-size: 12px; color: var(--text); font-weight: 500; }
+.notif-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+/* ── ANIMATIONS ── */
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+@keyframes slideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+.rs.appeared { animation: slideIn .3s ease both; }
+
+/* ── SECTION RUN BUTTON ── */
+#run-btn { width: 100%; margin-top: 6px; justify-content: center; }
+
+/* ── INPUTS GRID FIX ── */
+.inputs-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+@media (max-width: 700px) { .inputs-row { grid-template-columns: 1fr; } }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 860px) {
+  .sidebar { width: 200px; min-width: 200px; }
+  .main { margin-left: 200px; }
+  .content { padding: 18px 18px; }
+  .g4 { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 620px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .g2, .g3 { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 
+<!-- ══ SIDEBAR ══ -->
 <aside class="sidebar">
   <div class="logo">
     <div class="logo-mark">
@@ -185,1058 +509,1091 @@ tr:hover td{background:var(--surface2);}
     </div>
     <div class="logo-sub">Engenharia de crescimento previsível.</div>
   </div>
+
   <nav class="nav">
-    <div class="nav-section">Principal</div>
-    <div class="nav-item active" onclick="nav('dashboard',this)"><span class="nav-icon">◈</span>Dashboard</div>
-    <div class="nav-section">Agentes IA</div>
-    <div class="nav-item" onclick="nav('copy',this)"><span class="nav-icon">✦</span>Agente Copy<span class="nav-badge">IA</span></div>
-    <div class="nav-item" onclick="nav('orchestrator',this)"><span class="nav-icon">⬡</span>Orquestrador<span class="nav-badge">IA</span></div>
-    <div class="nav-item" onclick="nav('visual',this)"><span class="nav-icon">◉</span>Agente Visual<span class="nav-badge">IA</span></div>
-    <div class="nav-item" onclick="nav('comments',this)"><span class="nav-icon">💬</span>Comentários<span class="nav-badge-new">novo</span></div>
-    <div class="nav-section">Gestão</div>
-    <div class="nav-item" onclick="nav('clients',this)"><span class="nav-icon">◈</span>Clientes</div>
-    <div class="nav-item" onclick="nav('onboarding',this)"><span class="nav-icon">★</span>Onboarding<span class="nav-badge-new">novo</span></div>
-    <div class="nav-item" onclick="nav('history',this)"><span class="nav-icon">≡</span>Histórico</div>
-    <div class="nav-item" onclick="nav('settings',this)"><span class="nav-icon">⊙</span>Config</div>
-  </nav>
-  <div class="client-switcher">
-    <div class="switcher-label">Cliente ativo</div>
-    <select class="switcher-select" id="global-client-select" onchange="switchClient(this.value)">
-      <option value="">— Selecione um cliente —</option>
-    </select>
-    <div class="active-client-pill" id="active-client-pill" style="display:none">
-      <div class="client-avatar-mini" id="active-client-avatar">?</div>
-      <div>
-        <div class="client-active-name" id="active-client-name">—</div>
-        <div class="client-active-nicho" id="active-client-nicho">—</div>
-      </div>
+    <div class="nav-sect">Principal</div>
+    <div class="nav-item active" data-page="dashboard" onclick="nav('dashboard',this)">
+      <span class="nav-icon">◈</span> Dashboard
     </div>
-  </div>
-  <div class="sync-status" id="sync-status">
-    <div class="sync-dot" id="sync-dot"></div>
-    <span id="sync-label">conectando...</span>
+
+    <div class="nav-sect">Central IA</div>
+    <div class="nav-item" data-page="central" onclick="nav('central',this)">
+      <span class="nav-icon">✦</span> Estratégia Completa
+      <span class="nav-badge">IA</span>
+    </div>
+
+    <div class="nav-sect">Gestão</div>
+    <div class="nav-item" data-page="history" onclick="nav('history',this)">
+      <span class="nav-icon">≡</span> Histórico
+    </div>
+    <div class="nav-item" data-page="settings" onclick="nav('settings',this)">
+      <span class="nav-icon">⊙</span> Configurações
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="status-row">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-label">4 agentes online</span>
+    </div>
   </div>
 </aside>
 
+<!-- ══ MAIN ══ -->
 <main class="main">
-  <div class="header">
-    <div class="header-title" id="hdr">Dashboard</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div class="status-pill"><span class="status-dot"></span>4 agentes online</div>
-      <button class="btn btn-primary btn-sm" onclick="nav('onboarding',null)">+ Novo cliente</button>
-    </div>
+  <div class="topbar">
+    <div class="topbar-title" id="hdr">Dashboard</div>
+    <button class="btn btn-primary btn-sm" onclick="nav('central', document.querySelector('[data-page=central]'))">✦ Nova estratégia</button>
   </div>
 
   <div class="content">
 
-<!-- ══ DASHBOARD ══ -->
-<div class="page active" id="page-dashboard">
-  <div id="no-client-banner" style="background:rgba(138,43,226,.08);border:1px solid rgba(138,43,226,.22);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
-    <span style="font-size:18px">★</span>
-    <div>
-      <div style="font-size:12.5px;font-weight:500;color:var(--accent3)">Nenhum cliente ativo selecionado</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px">Selecione um cliente na barra lateral ou <span style="color:var(--accent3);cursor:pointer;text-decoration:underline" onclick="nav('onboarding',null)">cadastre um novo</span> para os agentes usarem o contexto de marca.</div>
-    </div>
-  </div>
-  <div class="grid-4 section">
-    <div class="stat-card"><div class="stat-label">Clientes ativos</div><div class="stat-value" id="dash-stat-clients">0</div><div class="stat-change" style="color:var(--text3)">cadastrados</div></div>
-    <div class="stat-card"><div class="stat-label">Copies geradas</div><div class="stat-value" id="dash-stat-copies">0</div><div class="stat-change up">esta sessão</div></div>
-    <div class="stat-card"><div class="stat-label">Pautas criadas</div><div class="stat-value" id="dash-stat-pautas">0</div><div class="stat-change up">esta sessão</div></div>
-    <div class="stat-card"><div class="stat-label">Briefs visuais</div><div class="stat-value" id="dash-stat-briefs">0</div><div class="stat-change up">esta sessão</div></div>
-  </div>
-  <div class="grid-2 section">
-    <div class="card">
-      <div class="card-header"><div class="card-title">Acesso rápido — Agentes</div></div>
-      <div class="grid-2" style="gap:10px">
-        <div class="agent-card" onclick="nav('copy',null)"><div class="agent-icon" style="background:rgba(244,114,182,.12)">✦</div><div><div style="font-weight:600;font-size:12px">Copy</div><div class="agent-status">● pronto</div></div></div>
-        <div class="agent-card" onclick="nav('orchestrator',null)"><div class="agent-icon" style="background:rgba(138,43,226,.14)">⬡</div><div><div style="font-weight:600;font-size:12px">Orquestrador</div><div class="agent-status">● pronto</div></div></div>
-        <div class="agent-card" onclick="nav('visual',null)"><div class="agent-icon" style="background:rgba(96,165,250,.12)">◉</div><div><div style="font-weight:600;font-size:12px">Visual</div><div class="agent-status">● pronto</div></div></div>
-        <div class="agent-card" onclick="nav('comments',null)"><div class="agent-icon" style="background:rgba(45,212,160,.12)">💬</div><div><div style="font-weight:600;font-size:12px">Comentários</div><div class="agent-status">● pronto</div></div></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">Seus clientes</div><button class="btn btn-ghost btn-sm" onclick="nav('clients',null)">Ver todos →</button></div>
-      <div id="dash-clients-list"><div style="color:var(--text3);font-size:12px;padding:20px 0;text-align:center">Nenhum cliente cadastrado ainda.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar primeiro cliente →</span></div></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-header"><div class="card-title">Últimas gerações</div><button class="btn btn-ghost btn-sm" onclick="nav('history',null)">Histórico completo →</button></div>
-    <div id="dash-recent-list"><div style="color:var(--text3);font-size:12px;padding:16px 0;text-align:center">Suas gerações de conteúdo aparecerão aqui.</div></div>
-  </div>
-</div>
+    <!-- ══════════════════════ DASHBOARD ══════════════════════ -->
+    <div class="page active" id="page-dashboard">
 
-<!-- ══ COPY ══ -->
-<div class="page" id="page-copy">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title">✦ Agente Copy</div><div class="card-sub" id="copy-client-indicator">contexto: nenhum cliente ativo</div></div></div>
-      <div class="input-group"><label class="input-label">Tipo de post</label>
-        <select id="copy-tipo"><option>Produto em destaque</option><option>Oferta / Promoção</option><option>Educativo / Dica</option><option>Bastidores</option><option>Depoimento de cliente</option><option>Lançamento</option><option>Engajamento (pergunta)</option><option>Storytelling de marca</option></select>
-      </div>
-      <div class="input-group"><label class="input-label">Rede social</label>
-        <select id="copy-rede"><option>Instagram (feed)</option><option>Instagram (stories)</option><option>Instagram (reels)</option><option>TikTok</option><option>Facebook</option><option>LinkedIn</option></select>
-      </div>
-      <div class="input-group"><label class="input-label">Produto / serviço em foco</label><input id="copy-produto" placeholder="ex: Pão de queijo artesanal"></div>
-      <div class="input-group"><label class="input-label">Gancho emocional / ângulo</label>
-        <select id="copy-gancho"><option>Curiosidade ("Você sabia que...")</option><option>Urgência / Escassez</option><option>Prova social / Depoimento</option><option>Transformação antes/depois</option><option>Nos bastidores</option><option>Pergunta provocativa</option><option>Nostalgia / Emoção</option><option>Benefício direto</option></select>
-      </div>
-      <div class="input-group"><label class="input-label">CTA (chamada para ação)</label><input id="copy-cta" placeholder="ex: Peça pelo WhatsApp, Venha nos visitar"></div>
-      <div class="input-group"><label class="input-label">Contexto extra (opcional)</label><textarea id="copy-contexto" placeholder="ex: Semana do aniversário da loja..." style="min-height:52px"></textarea></div>
-      <div style="display:flex;gap:8px;margin-top:4px">
-        <button class="btn btn-primary" style="flex:1" onclick="runCopy(1)">✦ Gerar 1 versão</button>
-        <button class="btn btn-ghost" style="flex:1" onclick="runCopy(3)">✦✦✦ 3 variações</button>
-      </div>
-    </div>
-    <div>
-      <div class="card" style="margin-bottom:16px">
-        <div class="card-header"><div class="card-title">Copy gerada</div><span class="tag tag-purple" id="copy-tag">aguardando</span></div>
-        <div class="loading-bar"><div class="loading-fill" id="copy-loading"></div></div>
-        <div class="output-box" id="copy-output" style="min-height:220px;font-size:12px">Preencha o brief ao lado e clique em gerar...</div>
-        <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap" id="copy-actions">
-          <button class="btn btn-ghost btn-sm" onclick="copyAll()">⎘ Copiar</button>
-          <button class="btn btn-ghost btn-sm" onclick="saveToHistory('copy')">≡ Salvar</button>
-          <button class="btn btn-ghost btn-sm" onclick="showPreview()">👁 Preview Instagram</button>
-          <button class="btn btn-ghost btn-sm" onclick="exportCopyPDF()">⬇ PDF</button>
+      <!-- Key warning banner -->
+      <div class="banner banner-warn" id="dash-key-banner" style="display:none">
+        <span style="font-size:18px;flex-shrink:0">⚠</span>
+        <div>
+          <div style="font-weight:600">API Key não configurada</div>
+          <div style="font-size:11px;margin-top:2px;opacity:.85">Configure sua chave Groq em <span style="text-decoration:underline;cursor:pointer" onclick="nav('settings',null)">Configurações</span> para usar a IA.</div>
         </div>
       </div>
 
-      <!-- PREVIEW INSTAGRAM -->
-      <div class="card" id="ig-preview-card" style="display:none">
-        <div class="card-header"><div class="card-title">Preview — Instagram</div><button class="btn btn-ghost btn-sm" onclick="document.getElementById('ig-preview-card').style.display='none'">✕</button></div>
-        <div class="ig-preview" id="ig-preview-box">
-          <div class="ig-header">
-            <div class="ig-avatar" id="ig-av">?</div>
-            <div><div class="ig-username" id="ig-user">@usuario</div></div>
-            <div style="margin-left:auto;font-size:18px;color:#fff">···</div>
+      <!-- Stats -->
+      <div class="g4 section" style="margin-bottom:20px">
+        <div class="stat">
+          <div class="stat-label">Estratégias geradas</div>
+          <div class="stat-val" id="dash-total">0</div>
+          <div class="stat-note">total no histórico</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Esta sessão</div>
+          <div class="stat-val" id="dash-session">0</div>
+          <div class="stat-note">gerações hoje</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Agentes IA</div>
+          <div class="stat-val" style="color:var(--green)">6</div>
+          <div class="stat-note">rodando em paralelo</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Módulos</div>
+          <div class="stat-val" style="color:var(--accent3)">6</div>
+          <div class="stat-note">persona · pauta · posts · visual · comentários · vendas</div>
+        </div>
+      </div>
+
+      <!-- Quick start + recent -->
+      <div class="g2" style="margin-bottom:20px">
+        <!-- Quick agents -->
+        <div class="card">
+          <div class="card-hdr">
+            <div>
+              <div class="card-title">O que a IA gera para você</div>
+              <div class="card-sub">uma chamada, seis entregáveis</div>
+            </div>
           </div>
-          <div class="ig-image">🖼️</div>
-          <div class="ig-actions">❤️ 💬 📤 <span style="margin-left:auto">🔖</span></div>
-          <div class="ig-caption" id="ig-caption-text">O texto do post aparecerá aqui...</div>
+          <div class="g2" style="gap:10px">
+            <div class="quick-item">
+              <div class="quick-icon">👤</div>
+              <div class="quick-label">Persona</div>
+              <div class="quick-desc">Cliente ideal detalhado com dores e desejos</div>
+            </div>
+            <div class="quick-item">
+              <div class="quick-icon">📅</div>
+              <div class="quick-label">Plano 7 dias</div>
+              <div class="quick-desc">Calendário editorial completo por tipo de post</div>
+            </div>
+            <div class="quick-item">
+              <div class="quick-icon">💡</div>
+              <div class="quick-label">Ideias de posts</div>
+              <div class="quick-desc">Ganchos e copies prontos para publicar</div>
+            </div>
+            <div class="quick-item">
+              <div class="quick-icon">🎨</div>
+              <div class="quick-label">Visuais</div>
+              <div class="quick-desc">Conceitos, paletas e direção criativa</div>
+            </div>
+            <div class="quick-item">
+              <div class="quick-icon">💬</div>
+              <div class="quick-label">Comentários</div>
+              <div class="quick-desc">Respostas prontas para os comentários mais comuns</div>
+            </div>
+            <div class="quick-item">
+              <div class="quick-icon">🎯</div>
+              <div class="quick-label">Script de vendas</div>
+              <div class="quick-desc">Roteiro completo de abordagem e fechamento</div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg" style="width:100%;margin-top:16px;justify-content:center" onclick="nav('central',document.querySelector('[data-page=central]'))">
+            ✦ Executar IA agora
+          </button>
+        </div>
+
+        <!-- Recent history -->
+        <div class="card">
+          <div class="card-hdr">
+            <div>
+              <div class="card-title">Histórico recente</div>
+              <div class="card-sub" id="dash-hist-count">0 estratégias salvas</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="nav('history',null)">Ver todas →</button>
+          </div>
+          <div id="dash-recent-list">
+            <div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center;line-height:1.8">
+              Nenhuma geração ainda.<br>
+              <span style="color:var(--accent3);cursor:pointer" onclick="nav('central',document.querySelector('[data-page=central]'))">Começar agora →</span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
-<!-- ══ ORCHESTRATOR ══ -->
-<div class="page" id="page-orchestrator">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title">⬡ Orquestrador</div><div class="card-sub" id="orc-client-indicator">contexto: nenhum cliente ativo</div></div></div>
-      <div class="input-group"><label class="input-label">Semana de referência</label><input id="orc-semana" placeholder="ex: 31 mar – 6 abr, ou deixe em branco"></div>
-      <div class="input-group"><label class="input-label">Redes para a pauta</label>
-        <select id="orc-redes"><option>Instagram + Facebook</option><option>Instagram + TikTok</option><option>Só Instagram</option><option>Todas as redes</option></select>
-      </div>
-      <div class="input-group"><label class="input-label">Objetivo da semana</label>
-        <select id="orc-objetivo"><option>Aumentar vendas</option><option>Crescer seguidores</option><option>Engajar comunidade</option><option>Lançar produto/serviço</option><option>Construir autoridade</option></select>
-      </div>
-      <div class="input-group"><label class="input-label">Posts por semana</label>
-        <select id="orc-freq"><option>3 posts</option><option>5 posts</option><option>7 posts (diário)</option><option>10+ posts</option></select>
-      </div>
-      <div class="input-group"><label class="input-label">Contexto especial</label><textarea id="orc-contexto" placeholder="ex: Dia das Mães, lançamento, promoção..."></textarea></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-primary" style="flex:1" onclick="runOrchestrator()">⬡ Gerar pauta</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportPautaPDF()" title="Exportar PDF">⬇ PDF</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">Pauta da semana</div><span class="tag tag-purple" id="orc-tag">aguardando</span></div>
-      <div class="loading-bar"><div class="loading-fill" id="orc-loading"></div></div>
-      <div class="output-box" id="orc-output" style="min-height:400px;font-size:12px">Preencha o brief e clique em gerar...</div>
-      <div style="display:flex;gap:6px;margin-top:12px">
-        <button class="btn btn-ghost btn-sm" onclick="copyOutput('orc-output')">⎘ Copiar</button>
-        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('orc')">≡ Salvar</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportPautaPDF()">⬇ Exportar PDF</button>
-      </div>
-    </div>
-  </div>
-</div>
+    </div><!-- /dashboard -->
 
-<!-- ══ VISUAL ══ -->
-<div class="page" id="page-visual">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title">◉ Agente Visual</div><div class="card-sub" id="vis-client-indicator">contexto: nenhum cliente ativo</div></div></div>
-      <div class="input-group"><label class="input-label">Objetivo do visual</label>
-        <select id="vis-objetivo"><option>Apresentar produto</option><option>Promoção / Oferta</option><option>Conteúdo educativo</option><option>Bastidores</option><option>Depoimento / Prova social</option><option>Identidade de marca</option></select>
-      </div>
-      <div class="input-group"><label class="input-label">Formato</label>
-        <select id="vis-formato"><option>Feed quadrado 1:1</option><option>Story / Reels 9:16</option><option>Carrossel (até 10 slides)</option><option>Banner 16:9</option></select>
-      </div>
-      <div class="input-group"><label class="input-label">Estilo visual</label>
-        <select id="vis-estilo"><option>Fotografia real, luz natural</option><option>Flat design minimalista</option><option>Ilustração colorida</option><option>Dark & premium</option><option>Vintage / Retrô</option><option>Clean & corporativo</option></select>
-      </div>
-      <div class="input-group"><label class="input-label">Elemento principal</label><input id="vis-elemento" placeholder="ex: pão de queijo saindo do forno"></div>
-      <div class="input-group"><label class="input-label">Paleta de cores da marca</label><input id="vis-cores" placeholder="ex: marrom, bege, dourado"></div>
-      <div class="input-group"><label class="input-label">Mood / sensação</label>
-        <select id="vis-mood"><option>Aconchegante e familiar</option><option>Fresco e energético</option><option>Luxuoso e sofisticado</option><option>Divertido e jovem</option><option>Nostálgico e emocional</option><option>Limpo e confiável</option></select>
-      </div>
-      <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="runVisual()">◉ Gerar direção criativa</button>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">Direção criativa + Prompt IA</div><span class="tag tag-blue" id="vis-tag">aguardando</span></div>
-      <div class="loading-bar"><div class="loading-fill" id="vis-loading"></div></div>
-      <div class="output-box" id="vis-output" style="min-height:400px;font-size:12px">Preencha o brief e clique em gerar...</div>
-      <div style="display:flex;gap:6px;margin-top:12px">
-        <button class="btn btn-ghost btn-sm" onclick="copyOutput('vis-output')">⎘ Copiar</button>
-        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('vis')">≡ Salvar</button>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- ══ COMENTÁRIOS ══ -->
-<div class="page" id="page-comments">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title">💬 Agente de Comentários</div><div class="card-sub" id="com-client-indicator">contexto: nenhum cliente ativo</div></div></div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.6">Cole comentários do Instagram, Facebook ou TikTok. A IA vai sugerir respostas no tom exato da marca do cliente.</div>
+    <!-- ══════════════════════ CENTRAL IA ══════════════════════ -->
+    <div class="page" id="page-central">
 
-      <div class="input-group">
-        <label class="input-label">Rede social</label>
-        <select id="com-rede"><option>Instagram</option><option>Facebook</option><option>TikTok</option><option>LinkedIn</option></select>
+      <!-- No key warning -->
+      <div class="banner banner-warn" id="central-key-banner" style="display:none">
+        <span style="font-size:18px;flex-shrink:0">⚠</span>
+        <div>
+          <div style="font-weight:600">API Key necessária</div>
+          <div style="font-size:11px;margin-top:2px;opacity:.85">Configure sua chave Groq gratuita em <span style="text-decoration:underline;cursor:pointer" onclick="nav('settings',null)">Configurações</span>.</div>
+        </div>
       </div>
 
-      <div class="input-group">
-        <label class="input-label">Contexto do post (opcional)</label>
-        <input id="com-post" placeholder="ex: Post de promoção do croissant">
+      <!-- Input card -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-hdr">
+          <div>
+            <div class="card-title">◎ Central de Estratégia</div>
+            <div class="card-sub">descreva seu produto e objetivo · a IA gera tudo automaticamente</div>
+          </div>
+          <span class="tag tag-purple">6 Agentes</span>
+        </div>
+
+        <div class="inputs-row">
+          <div class="field">
+            <label class="field-label">Produto ou Serviço</label>
+            <input id="prod-input" placeholder="ex: Academia de Natação Infantil, Consultoria de RH…" maxlength="180">
+          </div>
+          <div class="field">
+            <label class="field-label">Objetivo</label>
+            <input id="obj-input" placeholder="ex: Aumentar matrículas em 30% no próximo mês…" maxlength="180">
+          </div>
+        </div>
+
+        <!-- Progress bar (hidden until running) -->
+        <div id="prog-wrap" style="display:none;margin-bottom:10px">
+          <div class="progress-track">
+            <div class="progress-fill" id="prog-bar"></div>
+          </div>
+          <div style="font-size:9.5px;font-family:var(--mono);color:var(--text3);margin-top:4px" id="prog-label">Iniciando agentes…</div>
+        </div>
+
+        <button class="btn btn-primary btn-lg" id="run-btn" onclick="runCentral()">
+          ✦ Executar IA
+        </button>
       </div>
 
-      <div class="input-group">
-        <label class="input-label">Tom da resposta</label>
-        <select id="com-tom">
-          <option>Usar tom do DNA da marca</option>
-          <option>Mais formal e profissional</option>
-          <option>Mais descontraído e próximo</option>
-          <option>Empático e acolhedor</option>
-        </select>
-      </div>
+      <!-- Results (hidden until first run) -->
+      <div id="results-area" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:11px;font-family:var(--mono);color:var(--text3)">Estratégia gerada para: <span id="res-label" style="color:var(--accent3)">—</span></div>
+          <button class="btn btn-ghost btn-sm" onclick="copyAll()">⎘ Copiar tudo</button>
+        </div>
 
-      <div class="input-group">
-        <label class="input-label">Cole os comentários abaixo (um por linha)</label>
-        <textarea id="com-input" style="min-height:160px" placeholder="@usuario1: Amei o produto! Quanto custa?
-@usuario2: Onde vocês ficam?
-@usuario3: Já comprei e recomendo!
-@usuario4: Tem entrega?"></textarea>
-      </div>
+        <div class="results-wrap">
 
-      <button class="btn btn-primary" style="width:100%" onclick="runComments()">💬 Gerar respostas</button>
-    </div>
+          <!-- PERSONA -->
+          <div class="rs appeared" id="rs-persona" data-color="persona">
+            <div class="rs-head" onclick="toggleSection('persona')">
+              <span class="rs-icon">👤</span>
+              <span class="rs-title">Persona</span>
+              <span class="rs-status" id="rs-persona-status">aguardando</span>
+              <div class="rs-actions">
+                <button class="btn btn-ghost btn-sm" onclick="copySection(event,'persona')">⎘ Copiar</button>
+              </div>
+            </div>
+            <div class="rs-body" id="rs-persona-body">
+              <div class="loading-shimmer"><div class="spin"></div>Aguardando execução…</div>
+            </div>
+          </div>
 
-    <div class="card">
-      <div class="card-header"><div class="card-title">Respostas sugeridas</div><span class="tag tag-green" id="com-tag">aguardando</span></div>
-      <div class="loading-bar"><div class="loading-fill" id="com-loading"></div></div>
-      <div id="com-output-area">
-        <div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center">Cole comentários ao lado e clique em gerar.<br><span style="font-size:11px">As respostas usarão o tom de voz do cliente ativo.</span></div>
-      </div>
-      <div style="display:flex;gap:6px;margin-top:12px" id="com-actions" style="display:none">
-        <button class="btn btn-ghost btn-sm" onclick="copyOutput('com-raw')">⎘ Copiar tudo</button>
-        <button class="btn btn-ghost btn-sm" onclick="saveToHistory('com')">≡ Salvar</button>
-      </div>
-    </div>
-  </div>
-</div>
+          <!-- PLANO 7 DIAS -->
+          <div class="rs appeared" id="rs-plano" data-color="plano" style="animation-delay:.04s">
+            <div class="rs-head" onclick="toggleSection('plano')">
+              <span class="rs-icon">📅</span>
+              <span class="rs-title">Plano de Conteúdo — 7 dias</span>
+              <span class="rs-status" id="rs-plano-status">aguardando</span>
+              <div class="rs-actions">
+                <button class="btn btn-ghost btn-sm" onclick="copySection(event,'plano')">⎘ Copiar</button>
+              </div>
+            </div>
+            <div class="rs-body" id="rs-plano-body">
+              <div class="loading-shimmer"><div class="spin"></div>Aguardando execução…</div>
+            </div>
+          </div>
 
-<!-- ══ CLIENTS ══ -->
-<div class="page" id="page-clients">
-  <div class="grid-2">
-    <div>
+          <!-- IDEIAS DE POSTS -->
+          <div class="rs appeared" id="rs-posts" data-color="posts" style="animation-delay:.08s">
+            <div class="rs-head" onclick="toggleSection('posts')">
+              <span class="rs-icon">💡</span>
+              <span class="rs-title">Ideias de Posts</span>
+              <span class="rs-status" id="rs-posts-status">aguardando</span>
+              <div class="rs-actions">
+                <button class="btn btn-ghost btn-sm" onclick="copySection(event,'posts')">⎘ Copiar</button>
+              </div>
+            </div>
+            <div class="rs-body" id="rs-posts-body">
+              <div class="loading-shimmer"><div class="spin"></div>Aguardando execução…</div>
+            </div>
+          </div>
+
+          <!-- IDEIAS VISUAIS -->
+          <div class="rs appeared" id="rs-visual" data-color="visual" style="animation-delay:.12s">
+            <div class="rs-head" onclick="toggleSection('visual')">
+              <span class="rs-icon">🎨</span>
+              <span class="rs-title">Ideias Visuais</span>
+              <span class="rs-status" id="rs-visual-status">aguardando</span>
+              <div class="rs-actions">
+                <button class="btn btn-ghost btn-sm" onclick="copySection(event,'visual')">⎘ Copiar</button>
+              </div>
+            </div>
+            <div class="rs-body" id="rs-visual-body">
+              <div class="loading-shimmer"><div class="spin"></div>Aguardando execução…</div>
+            </div>
+          </div>
+
+          <!-- COMENTÁRIOS -->
+          <div class="rs appeared" id="rs-comentarios" data-color="comentarios" style="animation-delay:.16s">
+            <div class="rs-head" onclick="toggleSection('comentarios')">
+              <span class="rs-icon">💬</span>
+              <span class="rs-title">Respostas para Comentários</span>
+              <span class="rs-status" id="rs-comentarios-status">aguardando</span>
+              <div class="rs-actions">
+                <button class="btn btn-ghost btn-sm" onclick="copySection(event,'comentarios')">⎘ Copiar</button>
+              </div>
+            </div>
+            <div class="rs-body" id="rs-comentarios-body">
+              <div class="loading-shimmer"><div class="spin"></div>Aguardando execução…</div>
+            </div>
+          </div>
+
+          <!-- SCRIPT DE VENDAS -->
+          <div class="rs appeared" id="rs-vendas" data-color="vendas" style="animation-delay:.2s">
+            <div class="rs-head" onclick="toggleSection('vendas')">
+              <span class="rs-icon">🎯</span>
+              <span class="rs-title">Script de Vendas</span>
+              <span class="rs-status" id="rs-vendas-status">aguardando</span>
+              <div class="rs-actions">
+                <button class="btn btn-ghost btn-sm" onclick="copySection(event,'vendas')">⎘ Copiar</button>
+              </div>
+            </div>
+            <div class="rs-body" id="rs-vendas-body">
+              <div class="loading-shimmer"><div class="spin"></div>Aguardando execução…</div>
+            </div>
+          </div>
+
+        </div><!-- /results-wrap -->
+      </div><!-- /results-area -->
+
+    </div><!-- /central -->
+
+
+    <!-- ══════════════════════ HISTÓRICO ══════════════════════ -->
+    <div class="page" id="page-history">
       <div class="card">
-        <div class="card-header"><div><div class="card-title">Seus clientes</div><div class="card-sub" id="clients-sub">0 cadastrados</div></div><button class="btn btn-primary btn-sm" onclick="nav('onboarding',null)">+ Novo cliente</button></div>
-        <div id="clients-list"><div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center">Nenhum cliente ainda.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar agora →</span></div></div>
-      </div>
-    </div>
-    <div class="card" id="client-detail-card" style="display:none">
-      <div class="card-header">
-        <div><div class="card-title" id="cd-nome">—</div><div class="card-sub" id="cd-nicho">—</div></div>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-primary btn-sm" onclick="activateClientFromDetail()">Ativar</button>
-          <button class="btn btn-ghost btn-sm" style="color:var(--red)" id="cd-delete-btn">Remover</button>
+        <div class="card-hdr">
+          <div>
+            <div class="card-title">Histórico de Estratégias</div>
+            <div class="card-sub" id="hist-count-label">0 estratégias</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearHistory()">✕ Limpar</button>
+        </div>
+        <div id="history-list">
+          <div style="color:var(--text3);font-size:12px;padding:28px;text-align:center">Nenhuma estratégia gerada ainda.</div>
         </div>
       </div>
-      <div class="memory-grid" id="cd-memory-grid"></div>
-    </div>
-    <div class="card" id="client-empty-card"><div style="color:var(--text3);font-size:12px;padding:32px;text-align:center;line-height:2">← Selecione um cliente para ver o DNA de marca salvo</div></div>
-  </div>
-</div>
+    </div><!-- /history -->
 
-<!-- ══ ONBOARDING ══ -->
-<div class="page" id="page-onboarding">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title">★ Onboarding de Cliente</div><div class="card-sub">Cria o DNA de marca — usado por todos os agentes</div></div></div>
-      <div class="step-indicator" id="step-ind">
-        <div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div>
-      </div>
-      <div class="onboard-step active" id="step-1">
-        <div class="section-title">1 / 5 — Identidade</div>
-        <div class="input-group"><label class="input-label">Nome da empresa *</label><input id="ob-nome" placeholder="ex: Padaria Boa"></div>
-        <div class="input-group"><label class="input-label">Nicho</label>
-          <select id="ob-nicho"><option>Alimentação e Gastronomia</option><option>Moda e Beleza</option><option>Saúde e Bem-estar</option><option>Serviços Locais</option><option>Educação</option><option>Pet Shop</option><option>Varejo</option><option>Auto e Mecânica</option><option>Tecnologia</option><option>Outro</option></select>
+
+    <!-- ══════════════════════ CONFIGURAÇÕES ══════════════════════ -->
+    <div class="page" id="page-settings">
+      <div class="g2">
+
+        <!-- API + Model -->
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Configurações da IA</div></div>
+
+          <div class="field" style="margin-bottom:14px">
+            <label class="field-label">🔑 Chave API Groq</label>
+            <input id="cfg-key" type="password" placeholder="gsk_…" autocomplete="off">
+            <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:5px;line-height:1.6">
+              Gratuito em <strong style="color:var(--text2)">console.groq.com</strong>. A chave fica salva só neste navegador (localStorage).
+              Para evitar expor a chave no HTML ao publicar, use Netlify Functions com variável <code style="font-size:9px">GROQ_API_KEY</code>.
+            </div>
+          </div>
+
+          <div class="field" style="margin-bottom:14px">
+            <label class="field-label">🤖 Modelo</label>
+            <select id="cfg-model">
+              <option value="llama-3.3-70b-versatile">Llama 3.3 70B — Groq · gratuito · recomendado</option>
+              <option value="llama-3.1-8b-instant">Llama 3.1 8B — Groq · mais rápido</option>
+              <option value="gemma2-9b-it">Gemma 2 9B — Groq · alternativo</option>
+            </select>
+          </div>
+
+          <div class="field" style="margin-bottom:16px">
+            <label class="field-label">📏 Tamanho das respostas</label>
+            <select id="cfg-tokens">
+              <option value="800">Curto (800 tokens)</option>
+              <option value="1500" selected>Médio (1500 tokens) — recomendado</option>
+              <option value="2500">Longo (2500 tokens)</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%" onclick="saveSettings()">Salvar configurações</button>
         </div>
-        <div class="input-group"><label class="input-label">Cidade / Região</label><input id="ob-cidade" placeholder="ex: São Paulo, SP"></div>
-        <div class="input-group"><label class="input-label">Tempo no mercado</label><select id="ob-anos"><option>Menos de 1 ano</option><option>1–3 anos</option><option>3–10 anos</option><option>Mais de 10 anos</option></select></div>
-        <div class="input-group"><label class="input-label">Slogan ou frase da marca</label><input id="ob-slogan" placeholder="ex: Feito com amor desde 1998"></div>
-        <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="stepNext(1)">Próximo →</button>
-      </div>
-      <div class="onboard-step" id="step-2">
-        <div class="section-title">2 / 5 — Público-Alvo</div>
-        <div class="input-group"><label class="input-label">Faixa etária</label><select id="ob-idade"><option>18–25 anos</option><option>25–35 anos</option><option>35–50 anos</option><option>50+ anos</option><option>Todas as idades</option></select></div>
-        <div class="input-group"><label class="input-label">Gênero predominante</label><select id="ob-genero"><option>Feminino</option><option>Masculino</option><option>Equilibrado</option></select></div>
-        <div class="input-group"><label class="input-label">Classe social</label><select id="ob-classe"><option>C / Popular</option><option>C/B — Médio</option><option>B/A — Médio-alto</option><option>A — Premium</option></select></div>
-        <div class="input-group"><label class="input-label">Principais dores do cliente ideal</label><textarea id="ob-dores" placeholder="ex: Quer produtos frescos perto de casa..."></textarea></div>
-        <div style="display:flex;gap:8px"><button class="btn btn-ghost" style="flex:1" onclick="stepPrev(2)">← Voltar</button><button class="btn btn-primary" style="flex:2" onclick="stepNext(2)">Próximo →</button></div>
-      </div>
-      <div class="onboard-step" id="step-3">
-        <div class="section-title">3 / 5 — Tom de Voz</div>
-        <div class="input-group"><label class="input-label">Tom principal</label><select id="ob-tom"><option>Amigável e acolhedor</option><option>Profissional e confiável</option><option>Jovem e descolado</option><option>Premium e sofisticado</option><option>Divertido e irreverente</option><option>Educativo e especialista</option></select></div>
-        <div class="input-group"><label class="input-label">Uso de emojis</label><select id="ob-emoji"><option>Sim, com moderação</option><option>Sim, bastante</option><option>Raramente</option><option>Nunca</option></select></div>
-        <div class="input-group"><label class="input-label">Trata o cliente como</label><select id="ob-trato"><option>Você (informal)</option><option>Você (formal)</option><option>Amigo / Parceiro</option></select></div>
-        <div class="input-group"><label class="input-label">Palavras PROIBIDAS</label><input id="ob-evitar" placeholder="ex: barato, genérico..."></div>
-        <div class="input-group"><label class="input-label">Palavras-chave obrigatórias</label><input id="ob-keywords" placeholder="ex: artesanal, amor, tradição..."></div>
-        <div style="display:flex;gap:8px"><button class="btn btn-ghost" style="flex:1" onclick="stepPrev(3)">← Voltar</button><button class="btn btn-primary" style="flex:2" onclick="stepNext(3)">Próximo →</button></div>
-      </div>
-      <div class="onboard-step" id="step-4">
-        <div class="section-title">4 / 5 — Produto & Diferencial</div>
-        <div class="input-group"><label class="input-label">Principais produtos / serviços</label><textarea id="ob-produtos" placeholder="Liste separados por vírgula..."></textarea></div>
-        <div class="input-group"><label class="input-label">Maior diferencial competitivo</label><textarea id="ob-diferencial" placeholder="O que faz esta empresa única?"></textarea></div>
-        <div class="input-group"><label class="input-label">Ticket médio</label><select id="ob-ticket"><option>Até R$ 30</option><option>R$ 30–100</option><option>R$ 100–500</option><option>Acima de R$ 500</option></select></div>
-        <div class="input-group"><label class="input-label">Sazonalidade importante</label><input id="ob-sazonal" placeholder="ex: Natal, Páscoa, Dia das Mães..."></div>
-        <div style="display:flex;gap:8px"><button class="btn btn-ghost" style="flex:1" onclick="stepPrev(4)">← Voltar</button><button class="btn btn-primary" style="flex:2" onclick="stepNext(4)">Próximo →</button></div>
-      </div>
-      <div class="onboard-step" id="step-5">
-        <div class="section-title">5 / 5 — Redes & Objetivo</div>
-        <div class="input-group"><label class="input-label">Redes ativas</label><select id="ob-redes"><option>Instagram + Facebook</option><option>Instagram + TikTok</option><option>Todas</option><option>Só Instagram</option></select></div>
-        <div class="input-group"><label class="input-label">Frequência desejada</label><select id="ob-freq"><option>3–4 posts/semana</option><option>5–7 posts/semana</option><option>1–2 posts/semana</option><option>Diário</option></select></div>
-        <div class="input-group"><label class="input-label">Meta principal</label><select id="ob-meta"><option>Aumentar vendas</option><option>Crescer seguidores</option><option>Construir autoridade</option><option>Engajar comunidade</option></select></div>
-        <div class="input-group"><label class="input-label">Observações extras</label><textarea id="ob-obs" placeholder="Qualquer detalhe adicional..."></textarea></div>
-        <div style="display:flex;gap:8px"><button class="btn btn-ghost" style="flex:1" onclick="stepPrev(5)">← Voltar</button><button class="btn btn-primary" style="flex:2" onclick="runOnboarding()">★ Gerar DNA de Marca</button></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">DNA de Marca</div><span class="tag tag-green" id="ob-tag">aguardando</span></div>
-      <div class="loading-bar"><div class="loading-fill" id="ob-loading"></div></div>
-      <div class="output-box" id="ob-output" style="min-height:400px;font-size:11.5px">Complete o onboarding e a IA vai gerar o DNA completo da marca...</div>
-      <div id="ob-memory-section" style="display:none;margin-top:16px">
-        <hr class="divider">
-        <div style="font-size:12px;font-weight:600;margin-bottom:10px;color:var(--text2)">Salvo na memória dos agentes</div>
-        <div class="memory-grid" id="ob-memory-grid"></div>
-        <button class="btn btn-green" style="width:100%;margin-top:12px" onclick="nav('copy',null)">Ir para Agente Copy com este contexto →</button>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- ══ HISTORY ══ -->
-<div class="page" id="page-history">
-  <div class="card">
-    <div class="card-header"><div><div class="card-title">Histórico de Gerações</div><div class="card-sub" id="hist-sub">0 itens salvos</div></div><button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearHistory()">Limpar tudo</button></div>
-    <div id="history-list"><div style="color:var(--text3);font-size:12px;padding:32px;text-align:center">Suas gerações salvas aparecerão aqui.</div></div>
-  </div>
-</div>
+        <!-- Storage info -->
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">Dados & Armazenamento</div></div>
 
-<!-- ══ SETTINGS ══ -->
-<div class="page" id="page-settings">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-header"><div class="card-title">Configuração dos Agentes</div></div>
-      <div class="input-group">
-        <label class="input-label">🔑 Chave API Groq (modo arquivo único)</label>
-        <input id="cfg-groq-key" type="password" placeholder="gsk_… (fica só neste navegador)" autocomplete="off">
-        <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:4px;line-height:1.5">Salva em localStorage neste aparelho. Se publicar só este HTML e a API bloquear o navegador (CORS), use o pacote com <code style="font-size:9px">netlify/functions</code> + variável GROQ_API_KEY no Netlify.</div>
-      </div>
-      <div class="input-group"><label class="input-label">🤖 Modelo</label>
-        <select id="cfg-model">
-          <option value="llama-3.3-70b-versatile">Llama 3.3 70B (Groq · gratuito · recomendado)</option>
-          <option value="llama-3.1-8b-instant">Llama 3.1 8B (Groq · mais rápido)</option>
-          <option value="gemma2-9b-it">Gemma 2 9B (Groq · gratuito)</option>
-        </select>
-      </div>
-      <div class="input-group"><label class="input-label">Idioma padrão</label><select id="cfg-lang"><option>Português Brasileiro</option><option>Inglês</option><option>Espanhol</option></select></div>
-      <div class="input-group"><label class="input-label">Tamanho máximo da resposta</label>
-        <select id="cfg-tokens"><option value="800">Curto (800 tokens)</option><option value="1500" selected>Médio (1500 tokens)</option><option value="2500">Longo (2500 tokens)</option></select>
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="saveSettings()">Salvar configurações</button>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title">Dados salvos</div></div>
-      <div class="notif"><span class="notif-icon">☁</span><div><div class="notif-text" style="color:var(--text)">Armazenamento em nuvem (Supabase)</div><div class="notif-text" style="font-size:11px;margin-top:2px">Clientes e DNA de marca salvos no servidor.</div></div></div>
-      <div class="notif" style="margin-top:6px"><span class="notif-icon">💾</span><div><div class="notif-text" style="color:var(--text)">Backup local (localStorage)</div><div class="notif-text" style="font-size:11px;margin-top:2px">Cópia local de segurança. Funciona offline.</div></div></div>
-      <div style="margin-top:12px;display:flex;gap:8px">
-        <button class="btn btn-ghost btn-sm" onclick="exportData()">⬇ Exportar dados</button>
-        <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearAllData()">✕ Apagar tudo</button>
-      </div>
-      <div class="divider"></div>
-      <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono)" id="storage-info">Calculando...</div>
-    </div>
-  </div>
-</div>
+          <div class="notif">
+            <span style="font-size:16px">💾</span>
+            <div>
+              <div class="notif-title">Armazenamento local (localStorage)</div>
+              <div class="notif-sub">Histórico, configurações e API key salvos neste navegador.</div>
+            </div>
+          </div>
 
-  </div>
+          <div class="notif">
+            <span style="font-size:16px">🔒</span>
+            <div>
+              <div class="notif-title">Privacidade</div>
+              <div class="notif-sub">Seus dados nunca saem do seu navegador. A IA recebe apenas o prompt.</div>
+            </div>
+          </div>
+
+          <div style="margin:14px 0 10px;font-size:11px;font-family:var(--mono);color:var(--text3)" id="storage-info">Calculando…</div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="exportData()">⬇ Exportar JSON</button>
+            <button class="btn btn-ghost btn-sm" onclick="importData()">⬆ Importar JSON</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="clearAll()">✕ Apagar tudo</button>
+          </div>
+          <input type="file" id="import-file" accept=".json" style="display:none" onchange="doImport(this)">
+        </div>
+
+      </div>
+    </div><!-- /settings -->
+
+
+  </div><!-- /content -->
 </main>
 
+<!-- ══ SCRIPT ══ -->
 <script>
-// ══ SUPABASE ══
-const SUPABASE_URL = 'https://opigoplvnbcbtbgwgadb.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_nlaH3jiD9uwNiRNdG4OR_g_AhZSkBII';
-let sbReady = false;
 
-async function loadSupabase() {
-  return new Promise((resolve) => {
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-    s.onload = () => { window._sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); sbReady = true; setSyncStatus('synced','nuvem ativa'); resolve(true); };
-    s.onerror = () => { setSyncStatus('error','offline — usando local'); resolve(false); };
-    document.head.appendChild(s);
-  });
-}
-
-function setSyncStatus(state, label) {
-  document.getElementById('sync-dot').className = 'sync-dot ' + state;
-  document.getElementById('sync-label').textContent = label;
-}
-
-// ══ STORAGE ══
+// ══ STORAGE HELPER ══
 const LS = {
-  get:(k,d=null)=>{ try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;} },
-  set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} },
-  del:(k)=>{ try{localStorage.removeItem(k);}catch(e){} }
+  get: (k, d=null) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch(e) { return d; } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} },
+  del: (k) => { try { localStorage.removeItem(k); } catch(e) {} }
 };
 
-async function sbSaveClient(c) {
-  if(!sbReady) return;
-  try { setSyncStatus('syncing','sincronizando...'); await window._sb.from('clients').upsert({nome:c.nome,nicho:c.nicho,dna:c.dna},{onConflict:'nome'}); setSyncStatus('synced','salvo na nuvem'); } catch(e) { setSyncStatus('error','erro ao salvar'); }
-}
-async function sbLoadClients() {
-  if(!sbReady) return;
-  try {
-    setSyncStatus('syncing','carregando...');
-    const {data,error} = await window._sb.from('clients').select('*').order('created_at',{ascending:true});
-    if(error) throw error;
-    if(data && data.length>0) {
-      data.forEach(r=>{ const li=clients.findIndex(c=>c.nome.toLowerCase()===r.nome.toLowerCase()); if(li>=0){clients[li]={nome:r.nome,nicho:r.nicho,dna:r.dna};}else{clients.push({nome:r.nome,nicho:r.nicho,dna:r.dna});} });
-      LS.set('aios_clients',clients); refreshClientSelect(); renderDashboard();
-    }
-    setSyncStatus('synced','nuvem ativa');
-  } catch(e) { setSyncStatus('error','offline — usando local'); }
-}
-async function sbSaveHistory(item) { if(!sbReady) return; try { await window._sb.from('history').insert({type:item.type,label:item.label,client_name:item.client,content:item.content}); } catch(e){} }
-async function sbDeleteClient(nome) { if(!sbReady) return; try { await window._sb.from('clients').delete().eq('nome',nome); } catch(e){} }
-
 // ══ STATE ══
-let clients = LS.get('aios_clients',[]);
-let chatHistory = LS.get('aios_history',[]);
-let activeIdx = LS.get('aios_active_idx',null);
-let sessionStats = {copies:0,pautas:0,briefs:0};
-let settings = LS.get('aios_settings',{});
-if(!settings.model) settings.model = 'llama-3.3-70b-versatile';
-if(!settings.tokens) settings.tokens = 1500;
-LS.set('aios_settings',settings);
+let settings = LS.get('vt_settings', { model:'llama-3.3-70b-versatile', tokens:1500, groqApiKey:'' });
+let history  = LS.get('vt_history', []);
+let sessionCount = 0;
+let isRunning = false;
+let currentResults = {};
 
-// ══ NAV ══
-const pageTitles = {dashboard:'Dashboard',copy:'Agente Copy',orchestrator:'Orquestrador',visual:'Agente Visual',comments:'Agente de Comentários',clients:'Clientes',onboarding:'Onboarding de Cliente',history:'Histórico',settings:'Configurações'};
+// Normalize settings
+if (!settings.model)  settings.model  = 'llama-3.3-70b-versatile';
+if (!settings.tokens) settings.tokens = 1500;
+if (!settings.groqApiKey) settings.groqApiKey = '';
+
+// ══ NAVIGATION ══
+const pageTitles = {
+  dashboard : 'Dashboard',
+  central   : 'Central de Estratégia',
+  history   : 'Histórico',
+  settings  : 'Configurações'
+};
+
 function nav(page, el) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  document.getElementById('hdr').textContent = pageTitles[page]||page;
-  if(el) el.classList.add('active');
-  else document.querySelectorAll('.nav-item').forEach(n=>{ if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'")) n.classList.add('active'); });
-  if(page==='clients') renderClients();
-  if(page==='history') renderHistory();
-  if(page==='dashboard') renderDashboard();
-  updateClientIndicators();
-}
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
-// ══ CLIENT ══
-function getActiveClient() { if(activeIdx===null||!clients[activeIdx]) return null; return clients[activeIdx]; }
-function switchClient(idx) {
-  activeIdx = idx===''?null:parseInt(idx);
-  LS.set('aios_active_idx',activeIdx);
-  updateClientSwitcherUI(); updateClientIndicators(); renderDashboard();
-  showToast('✓ Cliente: '+(getActiveClient()?getActiveClient().nome:'nenhum'),'success');
-}
-function updateClientSwitcherUI() {
-  const sel=document.getElementById('global-client-select');
-  const pill=document.getElementById('active-client-pill');
-  const c=getActiveClient();
-  sel.value=activeIdx===null?'':activeIdx;
-  if(c){ pill.style.display='flex'; document.getElementById('active-client-avatar').textContent=c.nome.slice(0,2).toUpperCase(); document.getElementById('active-client-name').textContent=c.nome; document.getElementById('active-client-nicho').textContent=c.nicho||''; const b=document.getElementById('no-client-banner'); if(b) b.style.display='none'; }
-  else { pill.style.display='none'; const b=document.getElementById('no-client-banner'); if(b) b.style.display='flex'; }
-}
-function updateClientIndicators() {
-  const c=getActiveClient();
-  const label=c?`contexto: ${c.nome}`:'contexto: nenhum cliente ativo';
-  ['copy','orc','vis','com'].forEach(p=>{ const el=document.getElementById(p+'-client-indicator'); if(el){el.textContent=label;el.style.color=c?'var(--green)':'var(--text3)';} });
-}
-function refreshClientSelect() {
-  const sel=document.getElementById('global-client-select');
-  sel.innerHTML='<option value="">— Selecione um cliente —</option>';
-  clients.forEach((c,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=c.nome+' · '+(c.nicho||''); sel.appendChild(o); });
-  if(activeIdx!==null&&clients[activeIdx]) sel.value=activeIdx;
-  else { activeIdx=null; LS.set('aios_active_idx',null); }
-  updateClientSwitcherUI();
-}
+  const pageEl = document.getElementById('page-' + page);
+  if (pageEl) pageEl.classList.add('active');
 
-// ══ INTELIGÊNCIA CENTRAL — layout das 7 etapas ══
-const IC_SECTION_ORDER = ['PERSONA','ESTRATÉGIA','CONTEÚDO','VISUAL','ENGAJAMENTO','VENDAS','OTIMIZAÇÃO'];
-const IC_ICONS = { PERSONA:'👤', ESTRATÉGIA:'⬡', CONTEÚDO:'✦', VISUAL:'◉', ENGAJAMENTO:'💬', VENDAS:'📲', OTIMIZAÇÃO:'◎' };
+  const hdrEl = document.getElementById('hdr');
+  if (hdrEl) hdrEl.textContent = pageTitles[page] || page;
 
-function escapeHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function normalizeSectionKey(s) {
-  const x = String(s).toUpperCase();
-  if (x.startsWith('CONTE')) return 'CONTEÚDO';
-  if (x.startsWith('ESTRAT')) return 'ESTRATÉGIA';
-  if (x.startsWith('OTIMIZ')) return 'OTIMIZAÇÃO';
-  return x;
-}
-
-function shouldFormatAsCentral(text) {
-  if (!text || typeof text !== 'string') return false;
-  const t = text.replace(/\r\n/g,'\n');
-  const re = /(?:^|\n)\s*(?:#{1,3}\s*)?(?:\*\*)?(?:\d+[\.\)]\s*)?(PERSONA|ESTRAT[EÉ]GIA|CONTE[UÚ]DO|VISUAL|ENGAJAMENTO|VENDAS|OTIMIZA(?:ÇÃO|CAO))\b/gi;
-  const n = (t.match(re) || []).length;
-  return n >= 3;
-}
-
-function splitCentralSections(text) {
-  const t = text.replace(/\r\n/g,'\n');
-  const re = /(?:^|\n)\s*(?:#{1,3}\s*)?(?:\*\*)?(?:\d+[\.\)]\s*)?(PERSONA|ESTRAT[EÉ]GIA|CONTE[UÚ]DO|VISUAL|ENGAJAMENTO|VENDAS|OTIMIZA(?:ÇÃO|CAO))\b[^\n]*/gi;
-  const parts = [];
-  let prevEnd = 0;
-  let m;
-  while ((m = re.exec(t)) !== null) {
-    if (parts.length) parts[parts.length - 1].body = t.slice(prevEnd, m.index).trim();
-    parts.push({ key: normalizeSectionKey(m[1]), title: m[0].replace(/^\n/, '').trim(), body: '' });
-    prevEnd = m.index + m[0].length;
+  if (el) {
+    el.classList.add('active');
+  } else {
+    const found = document.querySelector(`.nav-item[data-page="${page}"]`);
+    if (found) found.classList.add('active');
   }
-  if (parts.length) parts[parts.length - 1].body = t.slice(prevEnd).trim();
-  return parts;
+
+  if (page === 'history')   renderHistory();
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'settings')  loadSettingsUI();
+  if (page === 'central')   checkKeyBanner();
 }
 
-function renderMdTable(block) {
-  const lines = block.trim().split('\n').filter(l => l.includes('|'));
-  if (lines.length < 2) return null;
-  const parseRow = (line) => line.split('|').map(c => c.trim()).filter((c, i, arr) => !(c === '' && (i === 0 || i === arr.length - 1)));
-  const rows = [];
-  for (const line of lines) {
-    if (/^\|[\s\-:|]+\|$/m.test(line.trim())) continue;
-    const cells = parseRow(line);
-    if (cells.length) rows.push(cells);
+// ══ AI CALL ══
+async function callAI(prompt) {
+  const key = settings.groqApiKey;
+  if (!key) throw new Error('API Key não configurada. Vá em Configurações.');
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`
+    },
+    body: JSON.stringify({
+      model   : settings.model  || 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens  : settings.tokens || 1500,
+      temperature : 0.85
+    })
+  });
+
+  if (!res.ok) {
+    let errMsg = `Erro HTTP ${res.status}`;
+    try { const j = await res.json(); errMsg = j.error?.message || errMsg; } catch(e) {}
+    throw new Error(errMsg);
   }
-  if (rows.length < 2) return null;
-  let html = '<div class="ic-table-wrap"><table class="ic-md-table"><thead><tr>';
-  rows[0].forEach(c => { html += `<th>${escapeHtml(c)}</th>`; });
-  html += '</tr></thead><tbody>';
-  for (let r = 1; r < rows.length; r++) {
-    html += '<tr>' + rows[r].map(c => `<td>${escapeHtml(c)}</td>`).join('') + '</tr>';
+
+  const data = await res.json();
+  return data?.choices?.[0]?.message?.content || '';
+}
+
+// ══ PROMPTS ══
+function buildPrompts(produto, objetivo) {
+  const ctx = `Produto/Serviço: ${produto}\nObjetivo de marketing: ${objetivo}`;
+
+  return {
+    persona: `Você é um especialista em marketing e comportamento do consumidor. Com base nos dados abaixo, crie a persona detalhada do cliente ideal.
+
+${ctx}
+
+Estruture sua resposta com estas seções:
+## Nome e Perfil
+Dê um nome fictício e descreva demograficamente (idade, gênero, localização, renda mensal estimada, escolaridade).
+
+## Estilo de Vida e Psicografia
+Valores, hobbies, rotina diária, como consome conteúdo online, redes sociais favoritas.
+
+## Dores e Frustrações
+As 4 principais dores que este produto/serviço resolve. Seja específico e empático.
+
+## Objetivos e Desejos
+O que ela quer conquistar? O que a motiva profundamente?
+
+## Como este produto a ajuda
+Conexão direta entre as dores dela e os benefícios do produto.
+
+## Onde encontrá-la
+Hashtags que segue, perfis que admira, horários de maior atividade online.
+
+Responda em português brasileiro. Seja específico, humano e detalhado.`,
+
+    plano: `Você é um estrategista de conteúdo para redes sociais. Crie um plano de conteúdo completo para 7 dias.
+
+${ctx}
+
+Para CADA dia da semana (Segunda a Domingo), forneça:
+- **Tipo de formato**: Reels, Carrossel, Post estático, Stories ou Live
+- **Tema do dia**: Assunto principal
+- **Gancho**: Primeira frase ou legenda de abertura (máx. 2 linhas — deve parar o scroll)
+- **Objetivo do post**: Engajamento, Vendas, Autoridade, Relacionamento ou Tráfego
+- **CTA**: Chamada para ação específica
+
+Use a estrutura:
+### Dia 1 — [Nome do dia]
+**Formato:** ...
+**Tema:** ...
+**Gancho:** "..."
+**Objetivo:** ...
+**CTA:** ...
+
+Responda em português brasileiro. Varie os formatos e objetivos ao longo da semana.`,
+
+    posts: `Você é um copywriter especialista em redes sociais virais. Crie 5 posts completos prontos para publicar.
+
+${ctx}
+
+Para cada post, forneça:
+**POST [número] — [Tipo: Reels/Carrossel/Feed]**
+
+**🎣 Gancho** (primeiras 2 linhas que prendem atenção):
+...
+
+**📝 Corpo do texto** (desenvolvimento com valor real):
+...
+
+**📣 CTA** (chamada clara para ação):
+...
+
+**#️⃣ Hashtags** (10–15 tags estratégicas):
+...
+
+Os 5 posts devem ter abordagens diferentes: storytelling, dor/solução, prova social, curiosidade e urgência.
+Responda em português brasileiro com tom adequado ao produto.`,
+
+    visual: `Você é um diretor criativo especialista em identidade visual para redes sociais. Crie 5 conceitos visuais detalhados.
+
+${ctx}
+
+Para cada conceito visual:
+**CONCEITO VISUAL [número] — [Nome criativo do conceito]**
+
+**🖼 Descrição da imagem/cena:**
+(descreva o que aparece visualmente — pessoas, objetos, ambiente, ação)
+
+**🎨 Paleta de cores:**
+(3–4 cores com referência — ex: laranja vibrante #FF6B2C, creme #FFF8F0...)
+
+**✍ Texto sobreposto / Headline:**
+(frase principal que aparece na arte)
+
+**📐 Formato ideal:**
+(Stories 9:16 / Reels / Feed 4:5 / Carrossel)
+
+**🔧 Elementos gráficos:**
+(ícones, shapes, texturas, filtros sugeridos)
+
+Responda em português brasileiro. Varie entre estilos: minimalista, editorial, vibrante, humano/relacional e aspiracional.`,
+
+    comentarios: `Você é um especialista em gestão de comunidades e atendimento ao cliente em redes sociais. Crie respostas prontas para os comentários mais comuns.
+
+${ctx}
+
+Crie respostas autênticas, na voz da marca, para estes 8 cenários:
+
+**1. "Quanto custa?" / "Qual o preço?"**
+Resposta que gera curiosidade sem entregar preço direto, convida para DM.
+
+**2. Elogio simples ("Adorei!", "Incrível!")**
+Resposta calorosa que aprofunda o relacionamento.
+
+**3. Dúvida sobre o produto ("Como funciona?")**
+Resposta que esclarece e convida para próximo passo.
+
+**4. Crítica ou reclamação ("Não gostei de...")**
+Resposta empática que vira situação e demonstra profissionalismo.
+
+**5. "Onde compro?" / "Como adquirir?"**
+Resposta direta com CTA claro.
+
+**6. "Tem desconto?" / "Parcela?"**
+Resposta que mantém valor percebido sem ceder facilmente.
+
+**7. Comparação com concorrente**
+Resposta confiante que destaca diferenciais sem atacar a concorrência.
+
+**8. Depoimento positivo de cliente**
+Resposta que amplifica a prova social e incentiva mais depoimentos.
+
+Responda em português brasileiro. Cada resposta deve ter de 2 a 4 linhas.`,
+
+    vendas: `Você é um especialista em copywriting de vendas e consultoria comercial. Crie um script de vendas completo.
+
+${ctx}
+
+Estruture o script nas seguintes fases:
+
+## 1. Abertura (primeiros 30 segundos)
+Como iniciar o contato. Quebra-gelo + pergunta de qualificação inicial.
+
+## 2. Diagnóstico (identificar dor)
+3–4 perguntas abertas para entender o problema do lead. O objetivo é fazer o lead verbalizar a própria dor.
+
+## 3. Apresentação da solução
+Como apresentar o produto conectando cada benefício a uma dor identificada. Use a estrutura: "Você mencionou que [dor] — com [produto] você consegue [resultado]."
+
+## 4. Prova social
+2 formas de inserir depoimentos, resultados ou casos de sucesso naturalmente na conversa.
+
+## 5. Objeções mais comuns + respostas
+- "Está caro" → ...
+- "Vou pensar" → ...
+- "Não tenho tempo agora" → ...
+
+## 6. Fechamento
+3 técnicas de fechamento adaptadas ao produto (urgência, alternativa e resumo de valor).
+
+## 7. Acompanhamento (follow-up)
+Mensagem de follow-up para 24h, 3 dias e 7 dias sem resposta.
+
+Responda em português brasileiro. Tom consultivo, sem pressão, focado em valor.`
+  };
+}
+
+// ══ SECTION HELPERS ══
+const SECTIONS = ['persona','plano','posts','visual','comentarios','vendas'];
+
+function setSectionLoading(s) {
+  const body = document.getElementById(`rs-${s}-body`);
+  const status = document.getElementById(`rs-${s}-status`);
+  if (body) body.innerHTML = `<div class="loading-shimmer"><div class="spin"></div>Gerando com IA…</div>`;
+  if (status) { status.textContent = 'gerando…'; status.className = 'rs-status loading'; }
+}
+
+function setSectionDone(s, content) {
+  const body = document.getElementById(`rs-${s}-body`);
+  const status = document.getElementById(`rs-${s}-status`);
+  if (body) {
+    body.innerHTML = `<div class="md-out">${renderMD(content)}</div>`;
+    // Store raw text for copy
+    body.dataset.raw = content;
   }
-  html += '</tbody></table></div>';
-  return html;
+  if (status) { status.textContent = '✓ pronto'; status.className = 'rs-status done'; }
 }
 
-function formatSectionBody(body) {
-  if (!body) return '<p>—</p>';
-  const chunks = body.split(/\n{2,}/);
-  return chunks.map(part => {
-    const t = part.trim();
-    if (!t) return '';
-    if (t.includes('|') && /^\s*\|/.test(t.split('\n')[0])) {
-      const tbl = renderMdTable(t);
-      if (tbl) return tbl;
-    }
-    return '<p>' + escapeHtml(t).replace(/\n/g,'<br>') + '</p>';
-  }).join('');
+function setSectionError(s, msg) {
+  const body = document.getElementById(`rs-${s}-body`);
+  const status = document.getElementById(`rs-${s}-status`);
+  if (body) body.innerHTML = `<div class="error-msg">⚠ ${escapeHTML(msg)}</div>`;
+  if (status) { status.textContent = 'erro'; status.className = 'rs-status error'; }
 }
 
-function renderInteligenciaCentral(raw, outEl) {
-  const parts = splitCentralSections(raw);
-  if (parts.length < 2) {
-    outEl.classList.remove('output-box--central');
-    outEl.textContent = raw;
+function setSectionWaiting(s) {
+  const body = document.getElementById(`rs-${s}-body`);
+  const status = document.getElementById(`rs-${s}-status`);
+  if (body) body.innerHTML = `<div class="loading-shimmer"><div class="spin" style="border-top-color:var(--text3)"></div>Na fila…</div>`;
+  if (status) { status.textContent = 'aguardando'; status.className = 'rs-status'; }
+}
+
+// ══ MARKDOWN RENDERER ══
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function renderMD(text) {
+  if (!text) return '';
+
+  let t = escapeHTML(text);
+
+  // Tables (simple | col | col | detection)
+  t = t.replace(/(\|.+\|\n)+/g, match => {
+    const rows = match.trim().split('\n');
+    let html = '<div class="md-table-wrap"><table>';
+    rows.forEach((row, idx) => {
+      if (/^\|[-\s|]+\|$/.test(row)) return; // separator row
+      const cells = row.split('|').filter((c,i,a) => i>0 && i<a.length-1);
+      if (idx === 0) {
+        html += '<thead><tr>' + cells.map(c => `<th>${c.trim()}</th>`).join('') + '</tr></thead><tbody>';
+      } else {
+        html += '<tr>' + cells.map(c => `<td>${c.trim()}</td>`).join('') + '</tr>';
+      }
+    });
+    html += '</tbody></table></div>';
+    return html;
+  });
+
+  // Headers
+  t = t.replace(/^### (.+)$/gm, '<div class="md-h3">$1</div>');
+  t = t.replace(/^## (.+)$/gm,  '<div class="md-h2">$1</div>');
+  t = t.replace(/^# (.+)$/gm,   '<div class="md-h1">$1</div>');
+
+  // Bold and italic
+  t = t.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  t = t.replace(/\*\*(.+?)\*\*/g,     '<strong>$1</strong>');
+  t = t.replace(/__(.+?)__/g,          '<strong>$1</strong>');
+  t = t.replace(/\*(.+?)\*/g,          '<em>$1</em>');
+
+  // Horizontal rule
+  t = t.replace(/^---+$/gm, '<div class="md-sep"></div>');
+
+  // Unordered lists
+  t = t.replace(/^[-*•] (.+)$/gm, '<div class="md-li">$1</div>');
+
+  // Ordered lists (simple)
+  t = t.replace(/^\d+\. (.+)$/gm, '<div class="md-li">$1</div>');
+
+  // Emoji lines starting with emoji (keep as-is, just wrap)
+  // Line breaks
+  t = t.replace(/\n\n+/g, '<div class="md-br"></div>');
+  t = t.replace(/\n/g, '<br>');
+
+  return t;
+}
+
+// ══ PROGRESS BAR ══
+let progressStep = 0;
+function setProgress(step, label) {
+  progressStep = step;
+  const fill = document.getElementById('prog-bar');
+  const lbl  = document.getElementById('prog-label');
+  if (fill) fill.style.width = (step / 6 * 100) + '%';
+  if (lbl)  lbl.textContent = label || '';
+}
+
+// ══ RUN CENTRAL ══
+async function runCentral() {
+  if (isRunning) return;
+
+  const produto  = (document.getElementById('prod-input')?.value || '').trim();
+  const objetivo = (document.getElementById('obj-input')?.value  || '').trim();
+
+  if (!produto || !objetivo) {
+    showToast('Preencha produto/serviço e objetivo.', 'err');
     return;
   }
-  let html = '<div class="ic-wrap">';
-  for (const p of parts) {
-    const icon = IC_ICONS[p.key] || '◇';
-    const cleanTitle = p.title.replace(/^#{1,3}\s*/, '').replace(/\*\*/g, '').replace(/^\d+[\.\)]\s*/, '').trim();
-    html += `<section class="ic-section"><header class="ic-head"><span class="ic-icon" aria-hidden="true">${icon}</span><h3 class="ic-title">${escapeHtml(cleanTitle)}</h3></header><div class="ic-body">${formatSectionBody(p.body)}</div></section>`;
-  }
-  html += '</div>';
-  outEl.innerHTML = html;
-  outEl.classList.add('output-box--central');
-}
 
-function getPlainOutput(id) {
-  const el = document.getElementById(id);
-  if (!el) return '';
-  if (el.dataset && el.dataset.plainExport) return el.dataset.plainExport;
-  if (el.tagName === 'TEXTAREA') return el.value || '';
-  return el.innerText || el.textContent || '';
-}
-
-function extractConteudoForPreview(full) {
-  if (!full) return '';
-  const t = full.replace(/\r\n/g,'\n');
-  const r = /\n\s*(?:#{1,3}\s*)?(?:\d+[\.\)]\s*)?CONTE[UÚ]DO\b[^\n]*\r?\n([\s\S]*?)(?=\n\s*(?:#{1,3}\s*)?(?:\d+[\.\)]\s*)?VISUAL\b)/i;
-  const m = t.match(r);
-  if (m) return m[1].trim();
-  return full.trim();
-}
-
-// ══ API: Groq — chave no navegador (cfg) OU Netlify Function (sem chave no browser) ══
-const CENTRAL_SYSTEM_PROMPT = [
-  "Você é a Inteligência Central da Vértice. Você substitui uma equipe inteira de marketing, vendas e estratégia. Você pensa como: Estrategista, Copywriter Sênior, Designer Criativo, Especialista em Vendas e Analista de Crescimento.",
-  "",
-  "PROCESSO OBRIGATÓRIO DE RESPOSTA:",
-  "Sempre que receber um Produto e um Objetivo, execute exatamente estas 7 etapas, NESTA ORDEM:",
-  "",
-  "PERSONA — Perfil profundo, dores e desejos.",
-  "ESTRATÉGIA — Plano de 7 dias com objetivos claros. Obrigatório: incluir tabela Markdown com pipes (ex.: | Dia | Foco | Entregável | KPI |) com 7 linhas de dias.",
-  "CONTEÚDO — 5 textos completos com gancho e CTA.",
-  "VISUAL — Direção criativa detalhada para cada um dos 5 conteúdos.",
-  "ENGAJAMENTO — Sugestões de respostas para comentários.",
-  "VENDAS — Script completo de fechamento para WhatsApp.",
-  "OTIMIZAÇÃO — O que melhorar e o que evitar.",
-  "",
-  "FORMATAÇÃO OBRIGATÓRIA PARA O PAINEL: inicie cada etapa com o título exatamente como acima (uma palavra em MAIÚSCULAS: PERSONA, ESTRATÉGIA, CONTEÚDO, VISUAL, ENGAJAMENTO, VENDAS, OTIMIZAÇÃO) sozinho no início da linha (pode prefixar com ## ou número opcional). Não mescle seções.",
-  "",
-  "REGRAS DE OURO: Nada de clichês ou hype. Respostas técnicas, precisas e focadas em ROI."
-].join("\n");
-
-async function callClaude(system, user, outEl, loadEl, tagEl, tagDone) {
-  const model = settings.model || 'llama-3.3-70b-versatile';
-  const tokens = settings.tokens || 1500;
-  delete outEl.dataset.plainExport;
-  outEl.classList.remove('output-box--central');
-  outEl.textContent=''; loadEl.style.width='15%';
-  if(tagEl){tagEl.textContent='gerando...';tagEl.className='tag tag-orange';}
-  const cur=document.createElement('span'); cur.className='cursor'; outEl.appendChild(cur);
-  const finalSystem = (CENTRAL_SYSTEM_PROMPT + "\n\n" + (system || "")).trim();
-  const groqKey = (settings.groqApiKey || '').trim();
-
-  async function viaGroqBrowser() {
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + groqKey, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: 'system', content: finalSystem }, { role: 'user', content: String(user || '') }],
-        max_tokens: tokens,
-        temperature: 0.7
-      })
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data?.error?.message || data?.message || `Erro HTTP ${res.status}`);
-    return data?.choices?.[0]?.message?.content || '';
+  if (!settings.groqApiKey) {
+    showToast('Configure sua API Key primeiro.', 'err');
+    nav('settings', null);
+    return;
   }
 
-  async function viaNetlify() {
-    const res = await fetch('/.netlify/functions/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ system: finalSystem, user, model, max_tokens: tokens })
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || data.error) throw new Error(data.error || `Erro HTTP ${res.status}`);
-    return data.text || '';
+  isRunning = true;
+  currentResults = {};
+
+  // UI: set running state
+  const btn = document.getElementById('run-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⟳ Processando…'; }
+
+  const progWrap = document.getElementById('prog-wrap');
+  if (progWrap) progWrap.style.display = 'block';
+  setProgress(0, 'Iniciando agentes…');
+
+  // Show results area
+  const resultsArea = document.getElementById('results-area');
+  if (resultsArea) resultsArea.style.display = 'block';
+
+  const resLabel = document.getElementById('res-label');
+  if (resLabel) resLabel.textContent = produto;
+
+  // Scroll to results
+  resultsArea?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Set all sections to "waiting"
+  SECTIONS.forEach(s => setSectionWaiting(s));
+
+  // Build prompts
+  const prompts = buildPrompts(produto, objetivo);
+
+  const sectionNames = {
+    persona     : 'Persona',
+    plano       : 'Plano 7 dias',
+    posts       : 'Ideias de posts',
+    visual      : 'Ideias visuais',
+    comentarios : 'Comentários',
+    vendas      : 'Script de vendas'
+  };
+
+  // Run sections sequentially (avoids rate-limit issues)
+  let step = 0;
+  for (const s of SECTIONS) {
+    step++;
+    setProgress(step - 0.5, `Gerando: ${sectionNames[s]}…`);
+    setSectionLoading(s);
+    try {
+      const result = await callAI(prompts[s]);
+      currentResults[s] = result;
+      setSectionDone(s, result);
+    } catch(e) {
+      currentResults[s] = '';
+      setSectionError(s, e.message);
+    }
+    setProgress(step, `✓ ${sectionNames[s]} concluído`);
   }
 
-  try {
-    loadEl.style.width='50%';
-    let text = '';
-    if (groqKey) {
-      text = await viaGroqBrowser();
-    } else {
-      try {
-        text = await viaNetlify();
-      } catch (nfErr) {
-        cur.remove();
-        outEl.textContent = '⚠ Sem chave Groq: abra Configurações, cole sua chave (gsk_…) e salve — ou publique o site com a Netlify Function e GROQ_API_KEY no painel.\n\nDetalhe: ' + (nfErr?.message || nfErr);
-        loadEl.style.width='0%';
-        if(tagEl){tagEl.textContent='erro';tagEl.className='tag tag-red';}
-        return null;
+  // Save to history
+  const item = {
+    id        : Date.now(),
+    produto,
+    objetivo,
+    results   : { ...currentResults },
+    timestamp : new Date().toISOString()
+  };
+  history.unshift(item);
+  if (history.length > 100) history.length = 100;
+  LS.set('vt_history', history);
+  sessionCount++;
+
+  // Reset UI
+  isRunning = false;
+  if (btn) { btn.disabled = false; btn.textContent = '✦ Executar IA'; }
+  if (progWrap) progWrap.style.display = 'none';
+
+  renderDashboard();
+  showToast('✓ Estratégia completa gerada!', 'ok');
+}
+
+// ══ SECTION COLLAPSE ══
+function toggleSection(s) {
+  const body = document.getElementById(`rs-${s}-body`);
+  if (!body) return;
+  body.style.display = body.style.display === 'none' ? 'block' : 'none';
+}
+
+// ══ COPY ══
+function copySection(evt, s) {
+  if (evt) { evt.stopPropagation(); }
+  const body = document.getElementById(`rs-${s}-body`);
+  if (!body) return;
+  const text = body.dataset.raw || body.innerText || '';
+  if (!text.trim()) { showToast('Nada para copiar ainda.', 'err'); return; }
+  navigator.clipboard.writeText(text.trim()).then(() => showToast('✓ Copiado!', 'ok'));
+}
+
+function copyAll() {
+  const parts = [];
+  SECTIONS.forEach(s => {
+    const body = document.getElementById(`rs-${s}-body`);
+    if (body) {
+      const text = body.dataset.raw || '';
+      if (text.trim()) {
+        const names = { persona:'PERSONA', plano:'PLANO 7 DIAS', posts:'IDEIAS DE POSTS', visual:'IDEIAS VISUAIS', comentarios:'RESPOSTAS PARA COMENTÁRIOS', vendas:'SCRIPT DE VENDAS' };
+        parts.push(`══ ${names[s]} ══\n\n${text.trim()}`);
       }
     }
-    cur.remove(); outEl.textContent=''; loadEl.style.width='90%';
-    outEl.dataset.plainExport = text;
-    const skipCentral = outEl.id === 'com-raw';
-    if (!skipCentral && shouldFormatAsCentral(text)) {
-      renderInteligenciaCentral(text, outEl);
-      setTimeout(()=>{loadEl.style.width='0%';},400);
-      if(tagEl){tagEl.textContent=tagDone||'pronto';tagEl.className='tag tag-green';}
-    } else {
-      let i=0; const speed=text.length>800?4:8;
-      const iv=setInterval(()=>{
-        outEl.textContent+=text[i]||'';
-        i++;
-        if(i>=text.length){
-          clearInterval(iv);
-          setTimeout(()=>{loadEl.style.width='0%';},300);
-          if(tagEl){tagEl.textContent=tagDone||'pronto';tagEl.className='tag tag-green';}
-        }
-      },speed);
-    }
-    return text;
-  } catch(e) {
-    cur.remove(); outEl.textContent='⚠ Erro: '+e.message + (groqKey ? '\n\nSe for bloqueio CORS do navegador, use o deploy com netlify/functions + GROQ_API_KEY.' : ''); loadEl.style.width='0%';
-    if(tagEl){tagEl.textContent='erro';tagEl.className='tag tag-red';}
-    return null;
-  }
-}
-
-// ══ BRAND CONTEXT ══
-function getBrandContext() {
-  const c=getActiveClient(); if(!c||!c.dna) return '';
-  const d=c.dna;
-  return `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DNA DE MARCA — USE ESTAS INFORMAÇÕES EM TODO O CONTEÚDO
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Empresa: ${d.nome||''} | Nicho: ${d.nicho||''} | Cidade: ${d.cidade||''}
-Slogan: ${d.slogan||''} | Tom de voz: ${d.tom||''}
-Trata o cliente como: ${d.trato||''} | Emojis: ${d.emoji||''}
-Público: ${d.idade||''} · ${d.genero||''} · Classe ${d.classe||''}
-Dores: ${d.dores||''} | Produtos: ${d.produtos||''}
-Diferencial: ${d.diferencial||''} | Ticket: ${d.ticket||''}
-Palavras OBRIGATÓRIAS: ${d.keywords||''} | PROIBIDAS: ${d.evitar||''}
-Sazonalidade: ${d.sazonal||''} | Meta: ${d.meta||''}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`;
-}
-
-// ══ AGENTE COPY ══
-async function runCopy(n) {
-  const ctx=getBrandContext();
-  const sys=`Você é um copywriter sênior especializado em PMEs brasileiras. Crie textos que convertem com personalidade real.
-REGRAS: Use palavras-chave obrigatórias, NUNCA as proibidas. Tom exato do DNA. Soar humano como o dono da empresa. Hashtags: máx 5. NUNCA use clichês como "qualidade incomparável" ou "preço justo".`;
-  const usr=`${ctx}
-PRODUTO: ${document.getElementById('copy-produto').value||'principal produto'}
-OBJETIVO: ${document.getElementById('copy-tipo').value} na rede ${document.getElementById('copy-rede').value}, com CTA "${document.getElementById('copy-cta').value||'entre em contato'}"
-Tipo: ${document.getElementById('copy-tipo').value}
-Rede: ${document.getElementById('copy-rede').value}
-Gancho: ${document.getElementById('copy-gancho').value}
-CTA: ${document.getElementById('copy-cta').value||'entre em contato'}
-Contexto: ${document.getElementById('copy-contexto').value||'nenhum'}
-${n===1?'Crie 1 copy EXCELENTE pronta para publicar (use na seção CONTEÚDO).':'Crie 3 variações na seção CONTEÚDO:\nVARIAÇÃO 1 — Emocional/storytelling\nVARIAÇÃO 2 — Direto ao benefício\nVARIAÇÃO 3 — Prova social/curiosidade\nSepare com "---"'}
-FORMATAÇÃO: Entregue as 7 etapas com títulos em linhas próprias. Na etapa ESTRATÉGIA, o PLANO DE 7 DIAS deve ser obrigatoriamente uma Tabela Markdown (colunas: Dia | Foco | Entregável | KPI).`;
-  const result=await callClaude(sys,usr,document.getElementById('copy-output'),document.getElementById('copy-loading'),document.getElementById('copy-tag'),n===1?'copy pronta':'3 variações');
-  if(result){sessionStats.copies++;document.getElementById('dash-stat-copies').textContent=sessionStats.copies;addToHistory('copy',document.getElementById('copy-tipo').value,result,getActiveClient()?.nome);}
-}
-
-// ══ PREVIEW INSTAGRAM ══
-function showPreview() {
-  const text = extractConteudoForPreview(getPlainOutput('copy-output')) || getPlainOutput('copy-output');
-  if(!text || text.includes('Preencha')) { showToast('⚠ Gere uma copy primeiro.','error'); return; }
-  const c = getActiveClient();
-  const username = c ? '@'+c.nome.toLowerCase().replace(/\s+/g,'').slice(0,15) : '@suamarca';
-  const initials = c ? c.nome.slice(0,2).toUpperCase() : 'MA';
-
-  // Separa texto de hashtags
-  const lines = text.split('\n');
-  const hashLines = lines.filter(l=>l.trim().startsWith('#'));
-  const mainLines = lines.filter(l=>!l.trim().startsWith('#'));
-  const mainText = mainLines.join('\n').trim();
-  const hashtags = hashLines.join(' ').trim();
-
-  document.getElementById('ig-av').textContent = initials;
-  document.getElementById('ig-user').textContent = username;
-  document.getElementById('ig-caption-text').innerHTML =
-    `<strong>${username}</strong> ${mainText.replace(/\n/g,'<br>')}` +
-    (hashtags ? `<div class="ig-hashtags">${hashtags}</div>` : '');
-
-  document.getElementById('ig-preview-card').style.display = 'block';
-  document.getElementById('ig-preview-card').scrollIntoView({behavior:'smooth'});
-}
-
-// ══ AGENTE ORQUESTRADOR ══
-async function runOrchestrator() {
-  const ctx=getBrandContext();
-  const sys=`Você é um estrategista de conteúdo digital sênior para PMEs brasileiras. Crie pautas editoriais REALISTAS e ESPECÍFICAS — nada genérico. Varie formatos. Use produtos reais do DNA.`;
-  const usr=`${ctx}
-PRODUTO: ${getActiveClient()?.dna?.produtos||'produtos/serviços conforme DNA ou briefing'}
-OBJETIVO: ${document.getElementById('orc-objetivo').value}
-Semana: ${document.getElementById('orc-semana').value||'próxima semana'}
-Redes: ${document.getElementById('orc-redes').value}
-Frequência: ${document.getElementById('orc-freq').value}
-Contexto: ${document.getElementById('orc-contexto').value||'nenhum'}
-
-FORMATAÇÃO: Entregue as 7 etapas com títulos em linhas próprias. Na etapa ESTRATÉGIA, o PLANO DE 7 DIAS deve ser obrigatoriamente uma Tabela Markdown (colunas: Dia | Foco | Entregável | KPI).
-
-Crie a pauta no formato:
-━━━ PAUTA EDITORIAL ━━━
-Para cada post:
-📅 DIA E HORÁRIO | 📱 REDE E FORMATO | 🎯 OBJETIVO
-📝 TEMA/TÍTULO | 💡 GANCHO | 📋 ESTRUTURA (3 pontos) | #️⃣ HASHTAGS (máx 5)
----
-Ao final: 🔑 ESTRATÉGIA DA SEMANA (3 linhas)`;
-  const result=await callClaude(sys,usr,document.getElementById('orc-output'),document.getElementById('orc-loading'),document.getElementById('orc-tag'),'pauta pronta');
-  if(result){sessionStats.pautas++;document.getElementById('dash-stat-pautas').textContent=sessionStats.pautas;addToHistory('orc','Pauta · '+document.getElementById('orc-redes').value,result,getActiveClient()?.nome);}
-}
-
-// ══ AGENTE VISUAL ══
-async function runVisual() {
-  const ctx=getBrandContext();
-  const sys=`Você é Diretor de Arte de uma agência digital. Crie briefings visuais detalhados e prompts para Midjourney/DALL-E. Seja técnico e específico.`;
-  const usr=`${ctx}
-Objetivo: ${document.getElementById('vis-objetivo').value}
-Formato: ${document.getElementById('vis-formato').value}
-Estilo: ${document.getElementById('vis-estilo').value}
-Elemento: ${document.getElementById('vis-elemento').value||'produto principal'}
-Cores: ${document.getElementById('vis-cores').value||'paleta da marca'}
-Mood: ${document.getElementById('vis-mood').value}
-
-Gere:
-🎨 CONCEITO CRIATIVO
-📐 COMPOSIÇÃO E LAYOUT
-💡 REFERÊNCIAS DE ESTILO (3)
-🤖 PROMPT PARA IA (inglês, técnico, mín 60 palavras)
-🎬 DICAS DE PRODUÇÃO (3 práticas)
-⚠️ EVITE (3 elementos)`;
-  const result=await callClaude(sys,usr,document.getElementById('vis-output'),document.getElementById('vis-loading'),document.getElementById('vis-tag'),'brief pronto');
-  if(result){sessionStats.briefs++;document.getElementById('dash-stat-briefs').textContent=sessionStats.briefs;addToHistory('vis',document.getElementById('vis-objetivo').value,result,getActiveClient()?.nome);}
-}
-
-// ══ AGENTE COMENTÁRIOS ══
-async function runComments() {
-  const ctx = getBrandContext();
-  const comentarios = document.getElementById('com-input').value.trim();
-  if(!comentarios) { showToast('⚠ Cole pelo menos um comentário.','error'); return; }
-  const rede = document.getElementById('com-rede').value;
-  const post = document.getElementById('com-post').value;
-  const tom = document.getElementById('com-tom').value;
-
-  const outArea = document.getElementById('com-output-area');
-  outArea.innerHTML = '<div class="output-box" id="com-raw" style="min-height:200px;font-size:12px"></div>';
-  const outEl = document.getElementById('com-raw');
-
-  const sys = `Você é um gestor de redes sociais especialista em relacionamento com clientes de PMEs brasileiras. Crie respostas que convertem, criam vínculo e são autênticas. NUNCA copie respostas genéricas.`;
-  const usr = `${ctx}
-Rede: ${rede}
-Contexto do post: ${post||'post da marca'}
-Tom preferido: ${tom}
-
-COMENTÁRIOS PARA RESPONDER:
-${comentarios}
-
-Para CADA comentário, responda no formato:
-👤 [comentário original]
-💬 Resposta sugerida: [sua resposta]
----
-
-Regras:
-- Responda todos os comentários individualmente
-- Use o tom de voz exato do DNA da marca
-- Para perguntas sobre preço/local: seja específico se tiver a info, ou direcione para contato
-- Para elogios: agradeça com personalidade, não apenas "obrigado!"
-- Para críticas: responda com empatia e solução
-- Mantenha respostas curtas (máx 3 linhas) e naturais`;
-
-  const result = await callClaude(sys, usr, outEl, document.getElementById('com-loading'), document.getElementById('com-tag'), 'respostas prontas');
-  if(result) {
-    document.getElementById('com-actions').style.display='flex';
-    addToHistory('com','Comentários · '+rede, result, getActiveClient()?.nome);
-    // Formatar visualmente
-    renderCommentReplies(comentarios, result, outArea);
-  }
-}
-
-function renderCommentReplies(input, result, container) {
-  const lines = result.split('---').filter(b=>b.trim());
-  let html = '';
-  lines.forEach(block => {
-    const rows = block.trim().split('\n').filter(l=>l.trim());
-    if(!rows.length) return;
-    const orig = rows.find(r=>r.startsWith('👤'))||'';
-    const reply = rows.find(r=>r.startsWith('💬'))||'';
-    html += `<div class="comment-row">
-      <div style="flex:1">
-        <div class="comment-author">${orig.replace('👤','').trim()}</div>
-        <div class="reply-box">${reply.replace('💬 Resposta sugerida:','').trim()}</div>
-      </div>
-      <button class="btn btn-ghost btn-sm" style="flex-shrink:0;margin-top:auto" onclick="navigator.clipboard.writeText(this.previousElementSibling.querySelector('.reply-box').textContent);showToast('✓ Copiado!','success')">⎘</button>
-    </div>`;
   });
-  if(html) container.innerHTML = html + `<textarea id="com-raw" style="display:none">${result}</textarea>`;
-}
-
-// ══ EXPORT PDF PAUTA ══
-function exportPautaPDF() {
-  const content = getPlainOutput('orc-output');
-  if(!content || content.includes('Preencha')) { showToast('⚠ Gere uma pauta primeiro.','error'); return; }
-  const c = getActiveClient();
-  const empresa = c ? c.nome : 'Empresa';
-  const data = new Date().toLocaleDateString('pt-BR');
-
-  const w = window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pauta — ${empresa}</title>
-  <style>
-    body{font-family:Arial,sans-serif;max-width:800px;margin:40px auto;color:#1a1a1a;line-height:1.7;padding:0 20px;}
-    h1{font-size:22px;margin-bottom:4px;color:#8A2BE2;}
-    .sub{font-size:12px;color:#666;margin-bottom:32px;}
-    pre{white-space:pre-wrap;font-family:Arial,sans-serif;font-size:13px;line-height:1.8;}
-    .footer{margin-top:40px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#999;text-align:center;}
-    @media print{body{margin:20px;}}
-  </style></head><body>
-  <h1>▲ VÉRTICE — Pauta Editorial</h1>
-  <div class="sub">${empresa} · Gerado em ${data}</div>
-  <pre>${content}</pre>
-  <div class="footer">Gerado pela plataforma Vértice AI · vertice.io</div>
-  <script>window.onload=()=>{window.print();}<\/script>
-  </body></html>`);
-  w.document.close();
-}
-
-function exportCopyPDF() {
-  const content = getPlainOutput('copy-output');
-  if(!content || content.includes('Preencha')) { showToast('⚠ Gere uma copy primeiro.','error'); return; }
-  const c = getActiveClient();
-  const empresa = c ? c.nome : 'Empresa';
-  const w = window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Copy — ${empresa}</title>
-  <style>body{font-family:Arial,sans-serif;max-width:600px;margin:40px auto;color:#1a1a1a;line-height:1.8;padding:0 20px;}h1{color:#8A2BE2;font-size:20px;}pre{white-space:pre-wrap;font-size:14px;background:#f9f9f9;padding:20px;border-radius:8px;border-left:4px solid #8A2BE2;}.footer{margin-top:32px;font-size:11px;color:#999;text-align:center;}</style></head><body>
-  <h1>✦ Copy — ${empresa}</h1><p style="font-size:11px;color:#666">${new Date().toLocaleDateString('pt-BR')}</p>
-  <pre>${content}</pre>
-  <div class="footer">Gerado pela plataforma Vértice AI</div>
-  <script>window.onload=()=>{window.print();}<\/script></body></html>`);
-  w.document.close();
-}
-
-// ══ ONBOARDING ══
-let currentStep=1;
-function stepNext(n){goStep(n+1);}
-function stepPrev(n){goStep(n-1);}
-function goStep(n){
-  document.getElementById('step-'+currentStep).classList.remove('active');
-  currentStep=n;
-  document.getElementById('step-'+n).classList.add('active');
-  document.querySelectorAll('#step-ind .step-dot').forEach((d,i)=>{d.classList.remove('active','done');if(i<n-1)d.classList.add('done');else if(i===n-1)d.classList.add('active');});
-}
-
-async function runOnboarding() {
-  const nome=document.getElementById('ob-nome').value.trim();
-  if(!nome){showToast('⚠ Digite o nome da empresa.','error');return;}
-  const dna={nome,nicho:document.getElementById('ob-nicho').value,cidade:document.getElementById('ob-cidade').value,anos:document.getElementById('ob-anos').value,slogan:document.getElementById('ob-slogan').value,idade:document.getElementById('ob-idade').value,genero:document.getElementById('ob-genero').value,classe:document.getElementById('ob-classe').value,dores:document.getElementById('ob-dores').value,tom:document.getElementById('ob-tom').value,emoji:document.getElementById('ob-emoji').value,trato:document.getElementById('ob-trato').value,evitar:document.getElementById('ob-evitar').value,keywords:document.getElementById('ob-keywords').value,produtos:document.getElementById('ob-produtos').value,diferencial:document.getElementById('ob-diferencial').value,ticket:document.getElementById('ob-ticket').value,sazonal:document.getElementById('ob-sazonal').value,redes:document.getElementById('ob-redes').value,freq:document.getElementById('ob-freq').value,meta:document.getElementById('ob-meta').value,obs:document.getElementById('ob-obs').value};
-  const sys=`Você é estrategista de marca de uma agência digital. Crie DNA de marca completo, estruturado e acionável. Responda em português.`;
-  const usr=`Briefing completo:\n${JSON.stringify(dna,null,2)}\n\nEstruture:\n🏢 PERFIL DA MARCA\n🗣️ VOZ E TOM (regras claras)\n👤 PERSONA DO CLIENTE IDEAL\n📋 DIRETRIZES EDITORIAIS\n🔑 GANCHO EMOCIONAL\n📅 CALENDÁRIO BASE`;
-  const result=await callClaude(sys,usr,document.getElementById('ob-output'),document.getElementById('ob-loading'),document.getElementById('ob-tag'),'DNA salvo');
-  if(result){
-    dna.dnaText=result;
-    const ei=clients.findIndex(c=>c.nome.toLowerCase()===nome.toLowerCase());
-    if(ei>=0){clients[ei].dna=dna;activeIdx=ei;}else{clients.push({nome,nicho:dna.nicho,dna});activeIdx=clients.length-1;}
-    LS.set('aios_clients',clients);LS.set('aios_active_idx',activeIdx);
-    await sbSaveClient({nome,nicho:dna.nicho,dna});
-    refreshClientSelect();updateClientSwitcherUI();updateClientIndicators();
-    document.getElementById('ob-memory-grid').innerHTML=[{k:'Empresa',v:dna.nome},{k:'Nicho',v:dna.nicho},{k:'Tom',v:dna.tom},{k:'Público',v:`${dna.idade}·${dna.genero}`},{k:'Keywords',v:dna.keywords||'—'},{k:'Proibido',v:dna.evitar||'—'},{k:'Redes',v:dna.redes},{k:'Meta',v:dna.meta}].map(it=>`<div class="memory-card"><div class="memory-key">${it.k}</div><div class="memory-val">${it.v}</div></div>`).join('');
-    document.getElementById('ob-memory-section').style.display='block';
-    showToast(`✓ ${nome} salvo na nuvem!`,'success');
-    document.getElementById('dash-stat-clients').textContent=clients.length;
-  }
-}
-
-// ══ CLIENTS ══
-let selectedClientIdx=null;
-function renderClients(){
-  const list=document.getElementById('clients-list');
-  const sub=document.getElementById('clients-sub');
-  sub.textContent=clients.length+' cliente'+(clients.length!==1?'s':'')+' cadastrado'+(clients.length!==1?'s':'');
-  if(!clients.length){list.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center">Nenhum cliente ainda.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar agora →</span></div>`;return;}
-  list.innerHTML=clients.map((c,i)=>`<div class="client-row" onclick="selectClient(${i})" style="${activeIdx===i?'border-color:rgba(138,43,226,.45);':''}"><div class="client-row-avatar" style="background:linear-gradient(135deg,var(--accent),var(--pink))">${c.nome.slice(0,2).toUpperCase()}</div><div class="client-row-info"><div class="client-row-name">${c.nome}${activeIdx===i?' <span class="tag tag-green" style="padding:1px 6px;font-size:8px;margin-left:4px">ativo</span>':''}</div><div class="client-row-meta">${c.nicho||'—'} · ${c.dna?'DNA salvo':'sem DNA'}</div></div><div style="font-size:18px;color:var(--text3)">›</div></div>`).join('');
-}
-function selectClient(i){
-  selectedClientIdx=i;const c=clients[i];
-  document.getElementById('client-empty-card').style.display='none';
-  document.getElementById('client-detail-card').style.display='block';
-  document.getElementById('cd-nome').textContent=c.nome;
-  document.getElementById('cd-nicho').textContent=c.nicho||'—';
-  document.getElementById('cd-delete-btn').onclick=()=>deleteClient(i);
-  const d=c.dna;
-  document.getElementById('cd-memory-grid').innerHTML=d?[{k:'Tom',v:d.tom},{k:'Público',v:`${d.idade||''}·${d.genero||''}`},{k:'Redes',v:d.redes||'—'},{k:'Meta',v:d.meta||'—'},{k:'Keywords',v:d.keywords||'—'},{k:'Proibido',v:d.evitar||'—'},{k:'Ticket',v:d.ticket||'—'},{k:'Diferencial',v:d.diferencial||'—'}].map(it=>`<div class="memory-card"><div class="memory-key">${it.k}</div><div class="memory-val">${it.v||'—'}</div></div>`).join(''):`<div style="color:var(--text3);font-size:12px;padding:12px">DNA não gerado. <span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Fazer onboarding →</span></div>`;
-}
-function activateClientFromDetail(){if(selectedClientIdx===null)return;switchClient(selectedClientIdx);renderClients();}
-async function deleteClient(i){
-  if(!confirm(`Remover "${clients[i].nome}"?`))return;
-  const nome=clients[i].nome;
-  clients.splice(i,1);
-  if(activeIdx===i){activeIdx=null;LS.set('aios_active_idx',null);}else if(activeIdx>i){activeIdx--;LS.set('aios_active_idx',activeIdx);}
-  LS.set('aios_clients',clients);await sbDeleteClient(nome);
-  refreshClientSelect();updateClientSwitcherUI();selectedClientIdx=null;
-  document.getElementById('client-detail-card').style.display='none';
-  document.getElementById('client-empty-card').style.display='block';
-  renderClients();showToast('Cliente removido.','success');
+  if (!parts.length) { showToast('Nada para copiar.', 'err'); return; }
+  navigator.clipboard.writeText(parts.join('\n\n' + '─'.repeat(60) + '\n\n'))
+    .then(() => showToast('✓ Estratégia completa copiada!', 'ok'));
 }
 
 // ══ HISTORY ══
-const typeLabels={copy:'✦ Copy',orc:'⬡ Pauta',vis:'◉ Visual',com:'💬 Comentários'};
-const typeTags={copy:'tag-pink',orc:'tag-purple',vis:'tag-blue',com:'tag-green'};
-function addToHistory(type,label,content,clientName){
-  chatHistory.unshift({id:Date.now(),type,label,client:clientName||'—',content,date:new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})});
-  if(chatHistory.length>50)chatHistory.pop();
-  LS.set('aios_history',chatHistory);
-  const el=document.getElementById('hist-sub');if(el)el.textContent=chatHistory.length+' itens salvos';
-  sbSaveHistory({type,label,client:clientName||'—',content});
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  const countLbl = document.getElementById('hist-count-label');
+  if (countLbl) countLbl.textContent = `${history.length} estratégia${history.length !== 1 ? 's' : ''}`;
+
+  if (!list) return;
+  if (history.length === 0) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:28px;text-align:center">Nenhuma estratégia gerada ainda.</div>';
+    return;
+  }
+
+  list.innerHTML = history.map((item, idx) => `
+    <div class="hist-item" onclick="loadFromHistory(${idx})">
+      <div class="hist-thumb">✦</div>
+      <div class="hist-info">
+        <div class="hist-prod">${escapeHTML(item.produto)}</div>
+        <div class="hist-obj">${escapeHTML(item.objetivo)}</div>
+        <div class="hist-date">${formatDate(item.timestamp)}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="flex-shrink:0" onclick="event.stopPropagation();loadFromHistory(${idx})">Carregar →</button>
+    </div>
+  `).join('');
 }
-function saveToHistory(type){
-  const ids={copy:'copy-output',orc:'orc-output',vis:'vis-output',com:'com-raw'};
-  const content=getPlainOutput(ids[type]);
-  if(!content||content.includes('Preencha'))return showToast('⚠ Nenhum conteúdo para salvar.','error');
-  addToHistory(type,'Salvo manualmente',content,getActiveClient()?.nome);
-  showToast('✓ Salvo no histórico!','success');
+
+function loadFromHistory(idx) {
+  const item = history[idx];
+  if (!item) return;
+
+  // Fill inputs
+  const prodEl = document.getElementById('prod-input');
+  const objEl  = document.getElementById('obj-input');
+  if (prodEl) prodEl.value = item.produto;
+  if (objEl)  objEl.value  = item.objetivo;
+
+  // Show and fill results
+  const resultsArea = document.getElementById('results-area');
+  if (resultsArea) resultsArea.style.display = 'block';
+
+  const resLabel = document.getElementById('res-label');
+  if (resLabel) resLabel.textContent = item.produto;
+
+  SECTIONS.forEach(s => {
+    const content = item.results?.[s];
+    if (content) setSectionDone(s, content);
+    else setSectionWaiting(s);
+  });
+
+  nav('central', document.querySelector('[data-page="central"]'));
+  showToast('Histórico carregado.', 'ok');
 }
-function renderHistory(){
-  const list=document.getElementById('history-list');
-  const sub=document.getElementById('hist-sub');
-  if(sub)sub.textContent=chatHistory.length+' itens salvos';
-  if(!chatHistory.length){list.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:32px;text-align:center">Nenhum item no histórico ainda.</div>`;return;}
-  list.innerHTML=chatHistory.map(h=>`<div class="history-item"><div class="history-thumb">${{copy:'✦',orc:'⬡',vis:'◉',com:'💬'}[h.type]||'★'}</div><div class="history-meta"><div class="history-title">${typeLabels[h.type]||h.type} — ${h.label}</div><div class="history-excerpt">${h.content}</div><div class="history-footer"><span class="tag ${typeTags[h.type]||'tag-purple'}">${h.client}</span><span style="font-size:10px;font-family:var(--font-mono);color:var(--text3);margin-left:auto">${h.date}</span><button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(chatHistory.find(x=>x.id==${h.id})?.content||'');showToast('✓ Copiado!','success')">⎘</button></div></div></div>`).join('');
+
+function clearHistory() {
+  if (!confirm('Apagar todo o histórico?')) return;
+  history = [];
+  LS.del('vt_history');
+  renderHistory();
+  renderDashboard();
+  showToast('Histórico apagado.', 'ok');
 }
-function clearHistory(){if(!confirm('Limpar todo o histórico?'))return;chatHistory=[];LS.set('aios_history',[]);renderHistory();}
 
 // ══ DASHBOARD ══
-function renderDashboard(){
-  document.getElementById('dash-stat-clients').textContent=clients.length;
-  document.getElementById('dash-stat-copies').textContent=sessionStats.copies;
-  document.getElementById('dash-stat-pautas').textContent=sessionStats.pautas;
-  document.getElementById('dash-stat-briefs').textContent=sessionStats.briefs;
-  const dcl=document.getElementById('dash-clients-list');
-  if(!clients.length){dcl.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:16px 0;text-align:center">Nenhum cliente cadastrado.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('onboarding',null)">Cadastrar →</span></div>`;}
-  else{dcl.innerHTML=clients.slice(0,4).map((c,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="switchClient(${i});nav('copy',null)"><div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">${c.nome.slice(0,2).toUpperCase()}</div><div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--text)">${c.nome}</div><div style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">${c.nicho||'—'}</div></div>${activeIdx===i?'<span class="tag tag-green" style="font-size:8px">ativo</span>':'<span style="font-size:10px;color:var(--text3)">›</span>'}</div>`).join('');}
-  const drl=document.getElementById('dash-recent-list');
-  const recent=chatHistory.slice(0,3);
-  if(!recent.length){drl.innerHTML=`<div style="color:var(--text3);font-size:12px;padding:16px 0;text-align:center">Suas gerações aparecerão aqui.</div>`;}
-  else{drl.innerHTML=recent.map(h=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div style="width:32px;height:32px;border-radius:7px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${{copy:'✦',orc:'⬡',vis:'◉',com:'💬'}[h.type]}</div><div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--text)">${typeLabels[h.type]||h.type} — ${h.label}</div><div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">${h.client} · ${h.date}</div></div></div>`).join('');}
-  const b=document.getElementById('no-client-banner');if(b)b.style.display=getActiveClient()?'none':'flex';
+function renderDashboard() {
+  const totalEl   = document.getElementById('dash-total');
+  const sessionEl = document.getElementById('dash-session');
+  const countLbl  = document.getElementById('dash-hist-count');
+
+  if (totalEl)   totalEl.textContent   = history.length;
+  if (sessionEl) sessionEl.textContent = sessionCount;
+  if (countLbl)  countLbl.textContent  = `${history.length} estratégia${history.length !== 1 ? 's' : ''} salvas`;
+
+  const listEl = document.getElementById('dash-recent-list');
+  if (!listEl) return;
+
+  if (history.length === 0) {
+    listEl.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:24px 0;text-align:center;line-height:1.8">Nenhuma geração ainda.<br><span style="color:var(--accent3);cursor:pointer" onclick="nav('central',document.querySelector('[data-page=central]'))">Começar agora →</span></div>`;
+    return;
+  }
+
+  listEl.innerHTML = history.slice(0, 5).map((item, idx) => `
+    <div class="hist-item" onclick="loadFromHistory(${idx})">
+      <div class="hist-thumb" style="width:36px;height:36px;font-size:13px">✦</div>
+      <div class="hist-info">
+        <div class="hist-prod">${escapeHTML(item.produto)}</div>
+        <div class="hist-date">${formatDate(item.timestamp)}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Key banners
+  checkKeyBanner();
 }
 
-// ══ UTILS ══
-function copyOutput(id){const t=getPlainOutput(id);if(t){navigator.clipboard.writeText(t);showToast('✓ Copiado!','success');}}
-function copyAll(){copyOutput('copy-output');}
-function showToast(msg,type='success'){const t=document.createElement('div');t.className=`toast toast-${type}`;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(10px)';setTimeout(()=>t.remove(),400);},2400);}
-function saveSettings(){
-  settings.model=document.getElementById('cfg-model').value;
-  settings.tokens=parseInt(document.getElementById('cfg-tokens').value);
-  const gk=document.getElementById('cfg-groq-key');
-  if(gk) settings.groqApiKey = gk.value.trim();
-  LS.set('aios_settings',settings);
-  showToast('✓ Configurações salvas!','success');
+function checkKeyBanner() {
+  const hasKey = Boolean(settings.groqApiKey);
+  const dashBanner    = document.getElementById('dash-key-banner');
+  const centralBanner = document.getElementById('central-key-banner');
+  if (dashBanner)    dashBanner.style.display    = hasKey ? 'none' : 'flex';
+  if (centralBanner) centralBanner.style.display = hasKey ? 'none' : 'flex';
 }
-function exportData(){const d={clients,history:chatHistory,settings,exportedAt:new Date().toISOString()};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='vertice-backup.json';a.click();}
-function clearAllData(){if(!confirm('⚠ Apagar TODOS os dados locais?'))return;['aios_clients','aios_history','aios_active_idx','aios_settings'].forEach(k=>LS.del(k));clients=[];chatHistory=[];activeIdx=null;sessionStats={copies:0,pautas:0,briefs:0};refreshClientSelect();renderDashboard();renderClients();renderHistory();showToast('Dados apagados.','success');}
-function updateStorageInfo(){try{const u=JSON.stringify(localStorage).length;document.getElementById('storage-info').textContent=`${clients.length} clientes · ${chatHistory.length} histórico · ~${(u/1024).toFixed(1)}KB local · ☁ Supabase ativo`;}catch(e){}}
+
+// ══ SETTINGS ══
+function loadSettingsUI() {
+  const keyEl    = document.getElementById('cfg-key');
+  const modelEl  = document.getElementById('cfg-model');
+  const tokensEl = document.getElementById('cfg-tokens');
+
+  if (keyEl    && settings.groqApiKey) keyEl.value    = settings.groqApiKey;
+  if (modelEl  && settings.model)      modelEl.value  = settings.model;
+  if (tokensEl && settings.tokens)     tokensEl.value = settings.tokens;
+
+  updateStorageInfo();
+}
+
+function saveSettings() {
+  const keyEl    = document.getElementById('cfg-key');
+  const modelEl  = document.getElementById('cfg-model');
+  const tokensEl = document.getElementById('cfg-tokens');
+
+  if (keyEl)    settings.groqApiKey = keyEl.value.trim();
+  if (modelEl)  settings.model      = modelEl.value;
+  if (tokensEl) settings.tokens     = parseInt(tokensEl.value) || 1500;
+
+  LS.set('vt_settings', settings);
+  checkKeyBanner();
+  showToast('✓ Configurações salvas!', 'ok');
+}
+
+function updateStorageInfo() {
+  const el = document.getElementById('storage-info');
+  if (!el) return;
+  try {
+    const size = JSON.stringify(localStorage).length;
+    el.textContent = `${history.length} histórico · ~${(size/1024).toFixed(1)}KB no navegador`;
+  } catch(e) {}
+}
+
+// ══ EXPORT / IMPORT ══
+function exportData() {
+  const d = { history, settings: { model: settings.model, tokens: settings.tokens }, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `vertice-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importData() {
+  document.getElementById('import-file')?.click();
+}
+
+function doImport(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (d.history && Array.isArray(d.history)) {
+        history = d.history;
+        LS.set('vt_history', history);
+      }
+      if (d.settings) {
+        settings.model  = d.settings.model  || settings.model;
+        settings.tokens = d.settings.tokens || settings.tokens;
+        LS.set('vt_settings', settings);
+      }
+      renderDashboard();
+      showToast(`✓ Importado: ${history.length} itens.`, 'ok');
+    } catch(err) {
+      showToast('⚠ Arquivo inválido.', 'err');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function clearAll() {
+  if (!confirm('⚠ Apagar TODOS os dados locais (histórico + configurações)?')) return;
+  ['vt_settings','vt_history'].forEach(k => LS.del(k));
+  history  = [];
+  settings = { model:'llama-3.3-70b-versatile', tokens:1500, groqApiKey:'' };
+  sessionCount = 0;
+  renderDashboard();
+  renderHistory();
+  loadSettingsUI();
+  showToast('Dados apagados.', 'ok');
+}
+
+// ══ TOAST ══
+function showToast(msg, type='ok') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateY(8px)';
+    setTimeout(() => t.remove(), 350);
+  }, 2600);
+}
+
+// ══ DATE UTIL ══
+function formatDate(iso) {
+  if (!iso) return '—';
+  try {
+    return new Intl.DateTimeFormat('pt-BR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }).format(new Date(iso));
+  } catch(e) { return iso.slice(0,16).replace('T',' '); }
+}
 
 // ══ INIT ══
-async function init(){
-  refreshClientSelect();updateClientSwitcherUI();updateClientIndicators();renderDashboard();updateStorageInfo();
-  if(settings.model)document.getElementById('cfg-model').value=settings.model;
-  if(settings.tokens)document.getElementById('cfg-tokens').value=settings.tokens;
-  const gkEl=document.getElementById('cfg-groq-key');
-  if(gkEl && settings.groqApiKey) gkEl.value=settings.groqApiKey;
-  setSyncStatus('','conectando...');
-  await loadSupabase();
-  if(sbReady){await sbLoadClients();updateStorageInfo();}
+function init() {
+  renderDashboard();
+  loadSettingsUI();
+
+  // Allow Enter key to run
+  ['prod-input','obj-input'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) runCentral(); });
+  });
+
+  // Active nav item on load
+  const dashNav = document.querySelector('[data-page="dashboard"]');
+  if (dashNav) dashNav.classList.add('active');
 }
+
 init();
 </script>
 </body>
